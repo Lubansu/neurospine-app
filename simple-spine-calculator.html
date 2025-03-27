@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur des Paramètres de la Colonne Vertébrale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        #calculate {
+            background-color: #4285f4;
+            color: white;
+        }
+        #reset {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        .warning {
+            color: #e53935;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .info-box {
+            background-color: #f1f8e9;
+            border-left: 4px solid #8bc34a;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculateur des Paramètres de la Colonne Vertébrale</h1>
+    
+    <div class="input-group">
+        <label for="pi">Incidence Pelvienne (PI) en degrés</label>
+        <input type="number" id="pi" step="0.1" placeholder="Entrez la valeur de PI">
+    </div>
+    
+    <div class="input-group">
+        <label for="pt">Version Pelvienne (PT) en degrés</label>
+        <input type="number" id="pt" step="0.1" placeholder="Entrez la valeur de PT (optionnel si SS est rempli)">
+    </div>
+    
+    <div class="input-group">
+        <label for="ss">Pente Sacrée (SS) en degrés</label>
+        <input type="number" id="ss" step="0.1" placeholder="Entrez la valeur de SS (optionnel si PT est rempli)">
+    </div>
+    
+    <div class="input-group">
+        <label for="current-ll">Lordose Lombaire actuelle (LL) en degrés</label>
+        <input type="number" id="current-ll" step="0.1" placeholder="Entrez la valeur de LL mesurée (optionnel)">
+    </div>
+    
+    <div class="button-group">
+        <button id="calculate">Calculer</button>
+        <button id="reset">Réinitialiser</button>
+    </div>
+    
+    <div id="results" class="results">
+        <div id="warning" class="warning"></div>
+        
+        <div class="section-title">Paramètres d'entrée</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Paramètre</th>
+                    <th>Valeur</th>
+                </tr>
+            </thead>
+            <tbody id="input-params">
+                <!-- Données dynamiques -->
+            </tbody>
+        </table>
+        
+        <div class="section-title">Paramètres principaux calculés</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Paramètre</th>
+                    <th>Valeur</th>
+                    <th>Formule</th>
+                </tr>
+            </thead>
+            <tbody id="main-params">
+                <!-- Données dynamiques -->
+            </tbody>
+        </table>
+        
+        <div class="section-title">Distribution idéale de la lordose lombaire</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Segment</th>
+                    <th>Pourcentage</th>
+                    <th>Valeur idéale</th>
+                </tr>
+            </thead>
+            <tbody id="segments">
+                <!-- Données dynamiques -->
+            </tbody>
+        </table>
+        
+        <div class="section-title">Classification de Roussouly</div>
+        <div id="roussouly-type" class="info-box">
+            <!-- Données dynamiques -->
+        </div>
+        
+        <div class="section-title">Vérification de la relation de Roussouly</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Paramètre</th>
+                    <th>Valeur</th>
+                </tr>
+            </thead>
+            <tbody id="roussouly-check">
+                <!-- Données dynamiques -->
+            </tbody>
+        </table>
+        
+        <div id="surgical-recommendations" style="display: none;">
+            <div class="section-title">Analyse de la lordose actuelle</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Paramètre</th>
+                        <th>Valeur</th>
+                    </tr>
+                </thead>
+                <tbody id="lordosis-analysis">
+                    <!-- Données dynamiques -->
+                </tbody>
+            </table>
+            
+            <div class="section-title">Recommandations chirurgicales</div>
+            <div id="surgical-advice" class="info-box">
+                <!-- Données dynamiques -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const piInput = document.getElementById('pi');
+            const ptInput = document.getElementById('pt');
+            const ssInput = document.getElementById('ss');
+            const currentLLInput = document.getElementById('current-ll');
+            const calculateBtn = document.getElementById('calculate');
+            const resetBtn = document.getElementById('reset');
+            const resultsDiv = document.getElementById('results');
+            const warningDiv = document.getElementById('warning');
+            const surgicalRecommendationsDiv = document.getElementById('surgical-recommendations');
+            
+            // Auto-calculate missing value
+            function calculateMissing() {
+                if (piInput.value && ptInput.value && !ssInput.value) {
+                    ssInput.value = (parseFloat(piInput.value) - parseFloat(ptInput.value)).toFixed(1);
+                } else if (piInput.value && ssInput.value && !ptInput.value) {
+                    ptInput.value = (parseFloat(piInput.value) - parseFloat(ssInput.value)).toFixed(1);
+                }
+            }
+            
+            piInput.addEventListener('input', calculateMissing);
+            ptInput.addEventListener('input', calculateMissing);
+            ssInput.addEventListener('input', calculateMissing);
+            
+            // Calculate button click
+            calculateBtn.addEventListener('click', function() {
+                // Validate inputs
+                if (!piInput.value) {
+                    warningDiv.textContent = "L'Incidence Pelvienne (PI) est requise!";
+                    resultsDiv.style.display = 'block';
+                    return;
+                }
+                
+                // Get values
+                const pi = parseFloat(piInput.value);
+                let pt = ptInput.value ? parseFloat(ptInput.value) : null;
+                let ss = ssInput.value ? parseFloat(ssInput.value) : null;
+                
+                // Calculate missing value if possible
+                if (pi && pt && !ss) {
+                    ss = pi - pt;
+                    ssInput.value = ss.toFixed(1);
+                } else if (pi && ss && !pt) {
+                    pt = pi - ss;
+                    ptInput.value = pt.toFixed(1);
+                }
+                
+                // Final validation
+                if (!(pi && pt !== null && ss !== null)) {
+                    warningDiv.textContent = "Veuillez fournir au moins PI et soit PT, soit SS.";
+                    resultsDiv.style.display = 'block';
+                    return;
+                }
+                
+                // Check if values add up
+                warningDiv.textContent = '';
+                if (Math.abs((pt + ss) - pi) > 0.1) {
+                    warningDiv.textContent = `Attention: PI (${pi}) n'est pas égal à PT (${pt}) + SS (${ss}). Calculs effectués quand même.`;
+                }
+                
+                // Calculate main parameters
+                const ll = 0.54 * pi + 27.6;
+                const l4s1 = (2/3) * ll;
+                const ct = 0.75 * ll;
+                
+                // Get current LL if available
+                const currentLL = currentLLInput.value ? parseFloat(currentLLInput.value) : null;
+                
+                // Calculate segment distribution
+                const l1l2 = 0.03 * ll;
+                const l2l3 = 0.12 * ll;
+                const l3l4 = 0.18 * ll;
+                const l4l5 = 0.27 * ll;
+                const l5s1 = 0.40 * ll;
+                
+                // Determine Roussouly type
+                let roussoulyType = '';
+                if (ss < 35) {
+                    roussoulyType = 'Type 1 - Faible lordose (SS < 35°)';
+                } else if (ss >= 35 && ss < 45) {
+                    roussoulyType = 'Type 2 - Lordose plate (SS 35-45°)';
+                } else if (ss >= 45 && ss < 55) {
+                    roussoulyType = 'Type 3 - Lordose équilibrée (SS 45-55°)';
+                } else {
+                    roussoulyType = 'Type 4 - Lordose accentuée (SS > 55°)';
+                }
+                
+                // Fill in the tables
+                document.getElementById('input-params').innerHTML = `
+                    <tr><td>Incidence Pelvienne (PI)</td><td>${pi.toFixed(1)}°</td></tr>
+                    <tr><td>Version Pelvienne (PT)</td><td>${pt.toFixed(1)}°</td></tr>
+                    <tr><td>Pente Sacrée (SS)</td><td>${ss.toFixed(1)}°</td></tr>
+                `;
+                
+                document.getElementById('main-params').innerHTML = `
+                    <tr><td>Lordose Lombaire (LL) idéale</td><td>${ll.toFixed(1)}°</td><td>LL = 0.54*PI + 27.6</td></tr>
+                    <tr><td>Lordose L4-S1 idéale</td><td>${l4s1.toFixed(1)}°</td><td>L4-S1 = 2/3 LL</td></tr>
+                    <tr><td>Cyphose Thoracique (T4-T12) idéale</td><td>${ct.toFixed(1)}°</td><td>CT = 0.75*LL</td></tr>
+                `;
+                
+                document.getElementById('segments').innerHTML = `
+                    <tr><td>L1-L2</td><td>3%</td><td>${l1l2.toFixed(1)}°</td></tr>
+                    <tr><td>L2-L3</td><td>12%</td><td>${l2l3.toFixed(1)}°</td></tr>
+                    <tr><td>L3-L4</td><td>18%</td><td>${l3l4.toFixed(1)}°</td></tr>
+                    <tr><td>L4-L5</td><td>27%</td><td>${l4l5.toFixed(1)}°</td></tr>
+                    <tr><td>L5-S1</td><td>40%</td><td>${l5s1.toFixed(1)}°</td></tr>
+                `;
+                
+                document.getElementById('roussouly-type').innerHTML = roussoulyType;
+                
+                document.getElementById('roussouly-check').innerHTML = `
+                    <tr><td>L4-S1</td><td>${l4s1.toFixed(1)}°</td></tr>
+                    <tr><td>2/3 LL</td><td>${(2/3 * ll).toFixed(1)}°</td></tr>
+                    <tr><td>SS</td><td>${ss.toFixed(1)}°</td></tr>
+                    <tr><td>Harmonie</td><td>${Math.abs(l4s1 - ss) < 5 ? "Bonne" : "À améliorer"}</td></tr>
+                `;
+                
+                // Handle surgical recommendations if current LL is provided
+                if (currentLL !== null) {
+                    const llDifference = ll - currentLL;
+                    const recommendations = getSurgicalRecommendations(ll, currentLL, pi, ss);
+                    
+                    document.getElementById('lordosis-analysis').innerHTML = `
+                        <tr><td>Lordose Lombaire idéale</td><td>${ll.toFixed(1)}°</td></tr>
+                        <tr><td>Lordose Lombaire actuelle</td><td>${currentLL.toFixed(1)}°</td></tr>
+                        <tr><td>Différence</td><td>${llDifference.toFixed(1)}° ${llDifference > 0 ? "(hypolordose)" : llDifference < 0 ? "(hyperlordose)" : "(normale)"}</td></tr>
+                    `;
+                    
+                    document.getElementById('surgical-advice').innerHTML = `
+                        <p><strong>Voie d'abord recommandée:</strong> ${recommendations.approach}</p>
+                        <p><strong>Technique recommandée:</strong> ${recommendations.technique}</p>
+                        <p><strong>Détails:</strong> ${recommendations.details}</p>
+                    `;
+                    
+                    surgicalRecommendationsDiv.style.display = 'block';
+                } else {
+                    surgicalRecommendationsDiv.style.display = 'none';
+                }
+                
+                // Show results
+                resultsDiv.style.display = 'block';
+            });
+            
+            // Fonction pour déterminer les recommandations chirurgicales
+            function getSurgicalRecommendations(idealLL, currentLL, pi, ss) {
+                const llDifference = idealLL - currentLL;
+                const absoluteDifference = Math.abs(llDifference);
+                let approach = "";
+                let technique = "";
+                let details = "";
+                
+                // Déterminer l'approche et la technique
+                if (absoluteDifference < 10) {
+                    // Différence faible
+                    if (llDifference > 0) {
+                        // Hypolordose légère
+                        approach = "Postérieure";
+                        technique = "PLIF ou TLIF";
+                        details = "Une approche postérieure avec PLIF ou TLIF est recommandée pour les corrections légères. " +
+                                 "Les cages intersomatiques permettront d'augmenter légèrement la lordose.";
+                    } else {
+                        // Hyperlordose légère
+                        approach = "Postérieure";
+                        technique = "Arthrodèse postéro-latérale simple";
+                        details = "Une simple arthrodèse postéro-latérale peut être suffisante pour stabiliser sans modifier significativement la lordose.";
+                    }
+                } else if (absoluteDifference >= 10 && absoluteDifference < 20) {
+                    // Différence modérée
+                    if (llDifference > 0) {
+                        // Hypolordose modérée
+                        approach = "Postérieure";
+                        technique = "TLIF avec cages lordosantes";
+                        details = "Utilisation de cages intersomatiques lordosantes via TLIF. " +
+                                 "Une ostéotomie de Smith-Petersen peut être envisagée sur 1-2 niveaux.";
+                    } else {
+                        // Hyperlordose modérée
+                        approach = "Postérieure";
+                        technique = "Arthrodèse avec compression";
+                        details = "Arthrodèse postérieure avec manœuvre de compression pour réduire la lordose.";
+                    }
+                } else {
+                    // Différence importante
+                    if (llDifference > 0) {
+                        // Hypolordose sévère
+                        approach = "Combinée (antérieure et postérieure)";
+                        technique = "ALIF + approche postérieure";
+                        details = "L'ALIF (Anterior Lumbar Interbody Fusion) permet une meilleure restauration de la lordose. " +
+                                 "Pour les cas sévères, des ostéotomies de soustraction pédiculaire (PSO) peuvent être nécessaires.";
+                    } else {
+                        // Hyperlordose sévère
+                        approach = "Postérieure";
+                        technique = "Ostéotomie de soustraction";
+                        details = "Une ostéotomie de soustraction postérieure peut être nécessaire pour corriger une hyperlordose importante.";
+                    }
+                }
+                
+                // Considérations basées sur PI et SS
+                if (pi > 60 && ss < 30) {
+                    details += " Attention: PI élevée avec SS faible indique un déséquilibre sagittal significatif. " +
+                             "Privilégier une correction qui restaure la relation SS ≈ 0.5*PI.";
+                }
+                
+                if (ss > 50 && llDifference > 15) {
+                    details += " La pente sacrée élevée nécessite une restauration adéquate de la lordose lombaire. " +
+                             "Envisager une approche antérieure pour maximiser la correction lordotique.";
+                }
+                
+                return {
+                    approach: approach,
+                    technique: technique,
+                    details: details
+                };
+            }
+            
+            // Reset button click
+            resetBtn.addEventListener('click', function() {
+                piInput.value = '';
+                ptInput.value = '';
+                ssInput.value = '';
+                currentLLInput.value = '';
+                resultsDiv.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
