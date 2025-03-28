@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Capture - NeurosurgerySpine.healthcenter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-style: italic;
+            opacity: 0.8;
+        }
+        
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 25px;
+            cursor: pointer;
+            background-color: #f5f7fa;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .info-message {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #444;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #fff;
+        }
+        
+        input:focus,
+        select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+        
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: center;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        .action-button svg {
+            margin-right: 10px;
+        }
+        
+        .camera-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .camera-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .capture-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .capture-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .save-btn {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .save-btn:hover {
+            background-color: #e67e22;
+        }
+        
+        .home-btn {
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .home-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .camera-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        #camera-view {
+            width: 100%;
+            max-width: 500px;
+            height: 375px;
+            border: 2px dashed #3498db;
+            margin: 0 auto 20px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        #camera-feed {
+            width: 100%;
+            height: 100%;
+            display: none;
+            object-fit: cover;
+        }
+        
+        .preview-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        #preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            display: none;
+            margin: 0 auto 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .document-section {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        .document-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .doc-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .doc-item img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            margin-right: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .doc-info {
+            flex: 1;
+        }
+        
+        .doc-name {
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #2c3e50;
+        }
+        
+        .doc-patient {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .doc-date {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+        
+        .doc-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .doc-actions button {
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            background-color: #e74c3c;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .doc-status {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .counter {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .storage-status {
+            background-color: #f1f9ff;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-top: 15px;
+            color: #2c3e50;
+        }
+        
+        .view-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .view-container {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .view-container img {
+            max-width: 100%;
+            max-height: 90vh;
+            border: 3px solid white;
+            border-radius: 4px;
+        }
+        
+        .close-view {
+            position: absolute;
+            top: -30px;
+            right: 0;
+            color: white;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .gallery-container {
+            margin-top: 20px;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .gallery-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .gallery-img-container {
+            position: relative;
+            padding-top: 75%;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .gallery-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .gallery-info {
+            padding: 10px;
+        }
+        
+        .gallery-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .gallery-patient {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .gallery-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .gallery-actions button {
+            flex: 1;
+            padding: 8px 6px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 0 2px;
+        }
+        
+        .download-btn {
+            background-color: #3498db;
+        }
+        
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+        
+        .empty-gallery {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .empty-gallery h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .disclaimer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            border-left: 4px solid #dc3545;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .tab {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .doc-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .doc-item img {
+                margin-bottom: 10px;
+                width: 100%;
+                height: 150px;
+            }
+            
+            .doc-actions {
+                margin-top: 10px;
+                width: 100%;
+            }
+            
+            .doc-actions button {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">NeurosurgerySpine.healthcenter</div>
+        <div class="tagline">Solutions avancées pour la chirurgie vertébrale</div>
+    </header>
+    
+    <main>
+        <div class="container">
+            <h1>Capture de Documents Administratifs</h1>
+            
+            <div class="tab-container">
+                <div class="tab active" data-tab="capture">Capture</div>
+                <div class="tab" data-tab="gallery">Galerie de documents</div>
+            </div>
+            
+            <div class="tab-content active" id="capture-tab">
+                <div class="info-message">
+                    <p>Utilisez cette application pour prendre des photos des documents administratifs des patients. Les documents seront automatiquement sauvegardés dans le stockage local de votre appareil.</p>
+                </div>
+                
+                <div class="form-section">
+                    <h2>Informations du Patient</h2>
+                    <div class="form-group">
+                        <label for="patient-name">Nom du patient</label>
+                        <input type="text" id="patient-name" placeholder="Entrez le nom du patient">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="patient-id">Numéro d'identification</label>
+                        <input type="text" id="patient-id" placeholder="Entrez le numéro d'identification">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="surgery-date">Date de l'opération</label>
+                        <input type="date" id="surgery-date">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="document-type">Type de document</label>
+                        <select id="document-type">
+                            <option value="">-- Sélectionnez un type --</option>
+                            <option value="assurance">Carte d'assurance</option>
+                            <option value="identite">Pièce d'identité</option>
+                            <option value="consentement">Formulaire de consentement</option>
+                            <option value="questionnaire">Questionnaire médical</option>
+                            <option value="prescription">Prescription médicale</option>
+                            <option value="autre">Autre document</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="camera-view">
+                    <span id="camera-placeholder">Cliquez sur "Activer la caméra" pour commencer</span>
+                    <video id="camera-feed" autoplay playsinline></video>
+                </div>
+                
+                <button id="camera-btn" class="action-button camera-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="13" r="4"/>
+                    </svg>
+                    Activer la caméra
+                </button>
+                
+                <button id="capture-btn" class="action-button capture-btn" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Prendre la photo
+                </button>
+                
+                <div class="preview-container">
+                    <img id="preview-image" alt="Aperçu de l'image">
+                    <button id="save-btn" class="action-button save-btn" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                            <polyline points="17 21 17 13 7 13 7 21"/>
+                            <polyline points="7 3 7 8 15 8"/>
+                        </svg>
+                        Enregistrer
+                    </button>
+                </div>
+                
+                <div class="document-section">
+                    <h2>Documents récemment capturés</h2>
+                    <div id="document-list">
+                        <p class="empty-docs">Aucun document capturé.</p>
+                    </div>
+                    
+                    <div class="counter">
+                        Documents capturés: <span id="document-count">0</span>
+                    </div>
+                    
+                    <div class="storage-status">
+                        Utilisation du stockage: <span id="storage-usage">0 Mo</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="gallery-tab">
+                <div class="form-group">
+                    <label for="filter-patient">Filtrer par patient</label>
+                    <select id="filter-patient">
+                        <option value="">Tous les patients</option>
+                    </select>
+                </div>
+                
+                <div id="gallery" class="gallery-container">
+                    <!-- La galerie sera remplie dynamiquement -->
+                </div>
+            </div>
+            
+            <a href="index.html" class="action-button home-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                Retour à l'accueil
+            </a>
+        </div>
+        
+        <div class="disclaimer">
+            <h3 style="color: #dc3545; margin-bottom: 10px;">Avis de confidentialité</h3>
+            <p>Cette application est conçue pour capturer des documents administratifs sensibles. Assurez-vous d'obtenir le consentement approprié du patient avant de prendre des photos de ses documents personnels.</p>
+            <p>Les données capturées sont stockées localement sur votre appareil et ne sont pas transmises via Internet. Veuillez vous conformer aux réglementations locales en matière de protection des données (RGPD, etc.).</p>
+        </div>
+    </main>
+    
+    <div class="view-overlay" id="document-viewer">
+        <div class="view-container">
+            <button class="close-view" id="close-viewer">×</button>
+            <img id="viewer-image" alt="Document">
+        </div>
+    </div>
+    
+    <footer>
+        &copy; 2025 NeurosurgerySpine.healthcenter. Développé par Dr Lubansu. Tous droits réservés.
+    </footer>
+    
+    <script>
+        // Variables globales
+        const STORAGE_KEY = 'neurospine_documents';
+        let stream = null;
+        let capturedImage = null;
+        let documents = [];
+        
+        // Éléments DOM
+        const cameraBtn = document.getElementById('camera-btn');
+        const captureBtn = document.getElementById('capture-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const cameraFeed = document.getElementById('camera-feed');
+        const cameraPlaceholder = document.getElementById('camera-placeholder');
+        const previewImage = document.getElementById('preview-image');
+        const documentList = document.getElementById('document-list');
+        const documentCount = document.getElementById('document-count');
+        const storageUsage = document.getElementById('storage-usage');
+        const gallery = document.getElementById('gallery');
+        const filterPatient = document.getElementById('filter-patient');
+        const documentViewer = document.getElementById('document-viewer');
+        const viewerImage = document.getElementById('viewer-image');
+        const closeViewer = document.getElementById('close-viewer');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Chargement initial
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDocuments();
+            setupTabs();
+            
+            // Gestionnaires d'événements
+            cameraBtn.addEventListener('click', startCamera);
+            captureBtn.addEventListener('click', capturePhoto);
+            saveBtn.addEventListener('click', saveDocument);
+            closeViewer.addEventListener('click', () => documentViewer.style.display = 'none');
+            filterPatient.addEventListener('change', updateGallery);
+        });
+        
+        // Configuration des onglets
+        function setupTabs() {
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Désactiver tous les onglets
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Activer l'onglet cliqué
+                    tab.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                    
+                    // Si on active la galerie, la mettre à jour
+                    if (tabId === 'gallery') {
+                        updateGallery();
+                    }
+                });
+            });
+        }
+        
+        // Charger les documents du stockage local
+        function loadDocuments() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    documents = JSON.parse(stored);
+                    updateDocumentList();
+                    updatePatientFilter();
+                    documentCount.textContent = documents.length;
+                    updateStorageUsage();
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des documents:', error);
+            }
+        }
+        
+        // Enregistrer les documents dans le stockage local
+        function saveToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
+                updateStorageUsage();
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde:', error);
+                alert('Erreur lors de la sauvegarde des documents. Espace de stockage insuffisant?');
+            }
+        }
+        
+        // Mettre à jour l'utilisation du stockage
+        function updateStorageUsage() {
+            try {
+                const storageUsed = new Blob([localStorage.getItem(STORAGE_KEY) || '']).size;
+                const usageMB = (storageUsed / (1024 * 1024)).toFixed(2);
+                storageUsage.textContent = `${usageMB} Mo`;
+            } catch (error) {
+                console.error('Erreur lors du calcul de l\'utilisation du stockage:', error);
+                storageUsage.textContent = 'Erreur de calcul';
+            }
+        }
+        
+        // Activer la caméra
+        function startCamera() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                })
+                .then(function(mediaStream) {
+                    stream = mediaStream;
+                    cameraFeed.srcObject = mediaStream;
+                    cameraFeed.style.display = 'block';
+                    cameraPlaceholder.style.display = 'none';
+                    captureBtn.disabled = false;
+                    cameraBtn.textContent = 'Caméra activée';
+                    cameraBtn.disabled = true;
+                })
+                .catch(function(err) {
+                    console.error('Erreur caméra:', err);
+                    alert('Impossible d\'accéder à la caméra. Erreur: ' + err.message);
+                });
+            } else {
+                alert('Votre navigateur ne prend pas en charge l\'accès à la caméra.');
+            }
+        }
+        
+        // Capturer une photo
+        function capturePhoto() {
+            if (!stream) {
+                alert('Veuillez d\'abord activer la caméra.');
+                return;
+            }
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = cameraFeed.videoWidth;
+            canvas.height = cameraFeed.videoHeight;
+            
+            const context = canvas.getContext('2d');
+            context.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+            
+            capturedImage = canvas.toDataURL('image/jpeg', 0.8);
+            
+            previewImage.src = capturedImage;
+            previewImage.style.display = 'block';
+            saveBtn.disabled = false;
+        }
+        
+        // Enregistrer le document
+        function saveDocument() {
+            if (!capturedImage) {
+                alert('Veuillez d\'abord prendre une photo.');
+                return;
+            }
+            
+            const patientName = document.getElementById('patient-name').value;
+            const patientId = document.getElementById('patient-id').value;
+            const surgeryDate = document.getElementById('surgery-date').value;
+            const documentType = document.getElementById('document-type').value;
+            const documentTypeName = document.getElementById('document-type').options[document.getElementById('document-type').selectedIndex].text;
+            
+            if (!patientName || !patientId || !surgeryDate || !documentType) {
+                alert('Veuillez remplir tous les champs.');
+                return;
+            }
+            
+            const newDoc = {
+                id: Date.now(),
+                patientName,
+                patientId,
+                surgeryDate,
+                documentType,
+                documentTypeName,
+                imageData: capturedImage,
+                captureDate: new Date().toISOString()
+            };
+            
+            documents.push(newDoc);
+            saveToStorage();
+            updateDocumentList();
+            updatePatientFilter();
+            documentCount.textContent = documents.length;
+            
+            // Réinitialiser le formulaire
+            previewImage.style.display = 'none';
+            saveBtn.disabled = true;
+            
+            alert('Document enregistré avec succès!');
+        }
+        
+        // Mettre à jour la liste des documents récents
+        function updateDocumentList() {
+            if (documents.length === 0) {
+                documentList.innerHTML = '<p class="empty-docs">Aucun document capturé.</p>';
+                return;
+            }
+            
+            documentList.innerHTML = '';
+            
+            // Afficher les 5 documents les plus récents
+            const recentDocs = [...documents].reverse().slice(0, 5);
+            
+            recentDocs.forEach(doc => {
+                const item = document.createElement('div');
+                item.className = 'doc-item';
+                
+                item.innerHTML = `
+                    <img src="${doc.imageData}" alt="Document" onclick="viewDocument(${doc.id})">
+                    <div class="doc-info">
+                        <span class="doc-status">Enregistré</span>
+                        <div class="doc-name">${doc.documentTypeName}</div>
+                        <div class="doc-patient">Patient: ${doc.patientName} (${doc.patientId})</div>
+                        <div class="doc-date">Capturé le: ${new Date(doc.captureDate).toLocaleDateString()}</div>
+                    </div>
+                    <div class="doc-actions">
+                        <button onclick="downloadDocument(${doc.id})" style="background-color: #3498db;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </button>
+                        <button onclick="deleteDocument(${doc.id})" style="background-color: #e74c3c;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                        <button onclick="viewDocument(${doc.id})" style="background-color: #2ecc71;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                documentList.appendChild(item);
+            });
+        }
+        
+        // Mettre à jour la liste des patients pour le filtre
+        function updatePatientFilter() {
+            filterPatient.innerHTML = '<option value="">Tous les patients</option>';
+            
+            const uniquePatients = [...new Set(documents.map(doc => doc.patientName))];
+            
+            uniquePatients.forEach(patient => {
+                if (patient) {
+                    const option = document.createElement('option');
+                    option.value = patient;
+                    option.textContent = patient;
+                    filterPatient.appendChild(option);
+                }
+            });
+        }
+        
+        // Mettre à jour la galerie
+        function updateGallery() {
+            if (documents.length === 0) {
+                gallery.innerHTML = `
+                    <div class="empty-gallery">
+                        <h3>Aucun document disponible</h3>
+                        <p>Utilisez l'onglet "Capture" pour ajouter des documents.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let filteredDocs = documents;
+            const selectedPatient = filterPatient.value;
+            
+            if (selectedPatient) {
+                filteredDocs = documents.filter(doc => doc.patientName === selectedPatient);
+            }
+            
+            if (filteredDocs.length === 0) {
+                gallery.innerHTML = `
+                    <div class="empty-gallery">
+                        <h3>Aucun document trouvé</h3>
+                        <p>Essayez un autre filtre.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const grid = document.createElement('div');
+            grid.className = 'gallery-grid';
+            
+            filteredDocs.forEach(doc => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                
+                item.innerHTML = `
+                    <div class="gallery-img-container" onclick="viewDocument(${doc.id})">
+                        <img src="${doc.imageData}" alt="Document" class="gallery-img">
+                    </div>
+                    <div class="gallery-info">
+                        <div class="gallery-title">${doc.documentTypeName}</div>
+                        <div class="gallery-patient">${doc.patientName}</div>
+                    </div>
+                    <div class="gallery-actions">
+                        <button onclick="event.stopPropagation(); downloadDocument(${doc.id})" class="download-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Télécharger
+                        </button>
+                        <button onclick="event.stopPropagation(); deleteDocument(${doc.id})" class="delete-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            Supprimer
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(item);
+            });
+            
+            gallery.innerHTML = '';
+            gallery.appendChild(grid);
+        }
+        
+        // Visualiser un document
+        function viewDocument(id) {
+            const doc = documents.find(d => d.id === id);
+            if (!doc) return;
+            
+            viewerImage.src = doc.imageData;
+            documentViewer.style.display = 'flex';
+        }
+        
+        // Télécharger un document
+        function downloadDocument(id) {
+            const doc = documents.find(d => d.id === id);
+            if (!doc) return;
+            
+            const link = document.createElement('a');
+            const dateStr = new Date(doc.captureDate).toISOString().split('T')[0];
+            link.download = `${doc.patientName}_${doc.documentTypeName}_${dateStr}.jpg`;
+            link.href = doc.imageData;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Supprimer un document
+        function deleteDocument(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce document?')) return;
+            
+            const index = documents.findIndex(d => d.id === id);
+            if (index !== -1) {
+                documents.splice(index, 1);
+                saveToStorage();
+                updateDocumentList();
+                updateGallery();
+                updatePatientFilter();
+                documentCount.textContent = documents.length;
+                alert('Document supprimé avec succès.');
+            }
+        }
+        
+        // Nettoyage avant de quitter la page
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>
