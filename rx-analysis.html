@@ -3287,7 +3287,7 @@ function switchCamera() {
     
     // Ajuster l'angle selon l'orientation (en fonction de l'image)
     // Dans une radiographie latérale typique, la pente est positive si le plateau s'incline vers le bas et l'avant
-    if (s1Vector.y < 0) ss = -ss;
+    if (s1Vector.y > 0) ss = -ss;
     
     // 2. VERSION PELVIENNE (PT): angle entre une ligne verticale du centre des têtes fémorales 
     // et la ligne joignant ce point au centre du plateau S1
@@ -3295,7 +3295,7 @@ function switchCamera() {
     
     // Ajuster le signe selon l'orientation
     // La PT est positive si le centre des têtes fémorales est en arrière (à gauche sur l'image) du centre S1
-    if (hipCenter.x < s1Center.x) pt = -pt;
+    if (hipCenter.x > s1Center.x) pt = -pt;
     
     // 3. INCIDENCE PELVIENNE (PI): somme arithmétique de SS et PT
     // PI = PT + SS (exactement comme vous l'avez défini)
