@@ -3285,13 +3285,13 @@ function switchCamera() {
     let ss = angleBetweenVectors(s1Vector, horizontalRight);
     
     // Ajuster l'angle selon l'orientation
-    if (s1Vector.y > 0) ss = -ss; // Inversé par rapport à la condition originale
+    if (s1Vector.y < 0) ss = -ss; // Inversé par rapport à la condition originale
     
     // 2. VERSION PELVIENNE (PT): angle entre une ligne verticale et la ligne reliant le centre des têtes fémorales au centre du plateau S1
     let pt = angleBetweenVectors(hipToS1Vector, verticalUp);
     
     // Ajuster le signe selon l'orientation
-    if (hipCenter.x > s1Center.x) pt = -pt; // Inversé par rapport à la condition originale
+    if (hipCenter.x < s1Center.x) pt = -pt; // Inversé par rapport à la condition originale
     
     // AJOUT: Calcul direct de l'incidence pelvienne (PI)
     // Calculer un vecteur perpendiculaire au plateau sacré
