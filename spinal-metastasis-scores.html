@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeurosurgerySpine.healthcenter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .module-card {
+            transition: transform 0.3s ease;
+        }
+        .module-card:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gray-800 text-white p-4">
+        <h1 class="text-2xl font-bold text-center">NeurosurgerySpine.healthcenter</h1>
+        <p class="text-center text-gray-300 italic">Solutions avancées pour la chirurgie vertébrale</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4">
+        <!-- App Container -->
+        <div id="app-container" class="max-w-6xl mx-auto">
+            <!-- Home Screen (Welcome message and module selection) -->
+            <div id="welcome-screen">
+                <h2 class="text-3xl font-bold mb-8 text-center">Bienvenue dans notre suite d'applications</h2>
+                <p class="text-xl mb-12 text-center">Sélectionnez l'application que vous souhaitez utiliser</p>
+            
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <!-- SINS Module Card -->
+                    <button onclick="showModule('sins-module')" class="module-card h-48 bg-green-500 hover:bg-green-600 rounded-lg p-6 flex flex-col items-center justify-center text-white shadow-lg">
+                        <div class="text-xl font-bold text-center">Score d'Instabilité (SINS)</div>
+                    </button>
+                    
+                    <!-- RTS Module Card -->
+                    <button onclick="showModule('rts-module')" class="module-card h-48 bg-red-500 hover:bg-red-600 rounded-lg p-6 flex flex-col items-center justify-center text-white shadow-lg">
+                        <div class="text-xl font-bold text-center">Score de Tokuhashi Révisé (RTS)</div>
+                    </button>
+                    
+                    <!-- ESCC Module Card -->
+                    <button onclick="showModule('escc-module')" class="module-card h-48 bg-blue-500 hover:bg-blue-600 rounded-lg p-6 flex flex-col items-center justify-center text-white shadow-lg">
+                        <div class="text-xl font-bold text-center">Échelle de Bilsky (ESCC)</div>
+                    </button>
+                    
+                    <!-- NOMS Module Card -->
+                    <button onclick="showModule('noms-module')" class="module-card h-48 bg-yellow-500 hover:bg-yellow-600 rounded-lg p-6 flex flex-col items-center justify-center text-white shadow-lg">
+                        <div class="text-xl font-bold text-center">Framework NOMS</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Module Containers (Hidden by default) -->
+            <div id="module-containers">
+                <!-- SINS Module -->
+                <div id="sins-module" class="module bg-white p-6 rounded-lg shadow-md mt-6 hidden">
+                    <h2 class="text-2xl font-bold text-center mb-6">Score d'Instabilité Néoplasique du Rachis (SINS)</h2>
+                    
+                    <div class="space-y-6">
+                        <!-- Location -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Localisation</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="location" value="3" id="loc-3" class="mr-2 sins-input" data-category="location">
+                                    <label for="loc-3">Jonctionnelle (O-C2; C7-T2; T11-L1; L5-S1)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="location" value="2" id="loc-2" class="mr-2 sins-input" data-category="location">
+                                    <label for="loc-2">Mobile (C3-6; L2-4)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="location" value="1" id="loc-1" class="mr-2 sins-input" data-category="location">
+                                    <label for="loc-1">Semi-rigide (T3-10)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="location" value="0" id="loc-0" class="mr-2 sins-input" data-category="location">
+                                    <label for="loc-0">Rigide (S2-S5)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pain -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Douleur mécanique</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="pain" value="3" id="pain-3" class="mr-2 sins-input" data-category="pain">
+                                    <label for="pain-3">Oui</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="pain" value="2" id="pain-2" class="mr-2 sins-input" data-category="pain">
+                                    <label for="pain-2">Non</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="pain" value="1" id="pain-1" class="mr-2 sins-input" data-category="pain">
+                                    <label for="pain-1">Lésion indolore</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bone Lesion -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Type de lésion osseuse</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="boneType" value="2" id="bone-2" class="mr-2 sins-input" data-category="boneType">
+                                    <label for="bone-2">Lytique</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="boneType" value="1" id="bone-1" class="mr-2 sins-input" data-category="boneType">
+                                    <label for="bone-1">Mixte (lytique/blastique)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="boneType" value="0" id="bone-0" class="mr-2 sins-input" data-category="boneType">
+                                    <label for="bone-0">Blastique</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alignment -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Alignement radiographique du rachis</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="alignment" value="4" id="align-4" class="mr-2 sins-input" data-category="alignment">
+                                    <label for="align-4">Subluxation/translation présente</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="alignment" value="2" id="align-2" class="mr-2 sins-input" data-category="alignment">
+                                    <label for="align-2">Déformation (cyphose/scoliose)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="alignment" value="0" id="align-0" class="mr-2 sins-input" data-category="alignment">
+                                    <label for="align-0">Normal</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vertebral Body Collapse -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Effondrement du corps vertébral</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="collapse" value="3" id="collapse-3" class="mr-2 sins-input" data-category="collapse">
+                                    <label for="collapse-3">>50% d'effondrement</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="collapse" value="2" id="collapse-2" class="mr-2 sins-input" data-category="collapse">
+                                    <label for="collapse-2"><50% d'effondrement</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="collapse" value="1" id="collapse-1" class="mr-2 sins-input" data-category="collapse">
+                                    <label for="collapse-1">Pas d'effondrement avec >50% du corps impliqué</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="collapse" value="0" id="collapse-0" class="mr-2 sins-input" data-category="collapse">
+                                    <label for="collapse-0">Aucun des cas ci-dessus</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Posterolateral Involvement -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Atteinte postérolatérale</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="involvement" value="3" id="involve-3" class="mr-2 sins-input" data-category="involvement">
+                                    <label for="involve-3">Bilatérale</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="involvement" value="1" id="involve-1" class="mr-2 sins-input" data-category="involvement">
+                                    <label for="involve-1">Unilatérale</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="involvement" value="0" id="involve-0" class="mr-2 sins-input" data-category="involvement">
+                                    <label for="involve-0">Aucune des deux</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results -->
+                        <div class="mt-8">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold">Score SINS total:</h3>
+                                <span class="text-2xl font-bold" id="sins-total-score">0</span>
+                            </div>
+
+                            <div id="sins-interpretation" class="hidden p-4 rounded-lg border mt-4">
+                                <h4 class="font-bold mb-2">Interprétation:</h4>
+                                <p class="font-semibold">Stabilité: <span id="sins-stability"></span></p>
+                                <p class="mt-1">Recommandation: <span id="sins-recommendation"></span></p>
+                                <div class="mt-4 text-sm">
+                                    <p class="italic">Note: Ce score est un outil d'aide à la décision et ne remplace pas le jugement clinique. Consultez toujours un spécialiste pour une évaluation complète.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-center gap-4 mt-8">
+                        <button onclick="showHome()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            Retour à l'accueil
+                        </button>
+                        <button onclick="resetModule('sins')" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                            Réinitialiser
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RTS Module -->
+                <div id="rts-module" class="module bg-white p-6 rounded-lg shadow-md mt-6 hidden">
+                    <h2 class="text-2xl font-bold text-center mb-6">Score de Tokuhashi Révisé (RTS)</h2>
+                    
+                    <div class="space-y-6">
+                        <!-- General Condition -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">État général (statut de performance)</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="generalCondition" value="0" id="gen-0" class="mr-2 rts-input" data-category="generalCondition">
+                                    <label for="gen-0">Mauvais (PS 10-40%)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="generalCondition" value="1" id="gen-1" class="mr-2 rts-input" data-category="generalCondition">
+                                    <label for="gen-1">Modéré (PS 50-70%)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="generalCondition" value="2" id="gen-2" class="mr-2 rts-input" data-category="generalCondition">
+                                    <label for="gen-2">Bon (PS 80-100%)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Extraspinal Bone Metastases -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Nombre de foyers métastatiques osseux extrarachidiens</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="extraspinalMets" value="0" id="extra-0" class="mr-2 rts-input" data-category="extraspinalMets">
+                                    <label for="extra-0">≥3</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="extraspinalMets" value="1" id="extra-1" class="mr-2 rts-input" data-category="extraspinalMets">
+                                    <label for="extra-1">1-2</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="extraspinalMets" value="2" id="extra-2" class="mr-2 rts-input" data-category="extraspinalMets">
+                                    <label for="extra-2">0</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Spinal Metastases -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Nombre de métastases dans le corps vertébral</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="spinalMets" value="0" id="spinal-0" class="mr-2 rts-input" data-category="spinalMets">
+                                    <label for="spinal-0">≥3</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="spinalMets" value="1" id="spinal-1" class="mr-2 rts-input" data-category="spinalMets">
+                                    <label for="spinal-1">1-2</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="spinalMets" value="2" id="spinal-2" class="mr-2 rts-input" data-category="spinalMets">
+                                    <label for="spinal-2">0</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metastases to Major Internal Organs -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Métastases aux organes internes majeurs</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="organMets" value="0" id="organ-0" class="mr-2 rts-input" data-category="organMets">
+                                    <label for="organ-0">Non résécables</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="organMets" value="1" id="organ-1" class="mr-2 rts-input" data-category="organMets">
+                                    <label for="organ-1">Résécables</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="organMets" value="2" id="organ-2" class="mr-2 rts-input" data-category="organMets">
+                                    <label for="organ-2">Aucune</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Primary Site of Cancer -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Site primaire du cancer</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="primarySite" value="0" id="primary-0" class="mr-2 rts-input" data-category="primarySite">
+                                    <label for="primary-0">Poumon, ostéosarcome, estomac, vessie, œsophage, pancréas</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="primarySite" value="1" id="primary-1" class="mr-2 rts-input" data-category="primarySite">
+                                    <label for="primary-1">Foie, vésicule biliaire, non identifié</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="primarySite" value="2" id="primary-2" class="mr-2 rts-input" data-category="primarySite">
+                                    <label for="primary-2">Autres</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="primarySite" value="3" id="primary-3" class="mr-2 rts-input" data-category="primarySite">
+                                    <label for="primary-3">Rein, utérus</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="primarySite" value="4" id="primary-4" class="mr-2 rts-input" data-category="primarySite">
+                                    <label for="primary-4">Rectum</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="primarySite" value="5" id="primary-5" class="mr-2 rts-input" data-category="primarySite">
+                                    <label for="primary-5">Thyroïde, sein, prostate, tumeur carcinoïde</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Palsy -->
+                        <div class="border-b pb-4">
+                            <h3 class="font-semibold mb-2">Paralysie</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="radio" name="palsy" value="0" id="palsy-0" class="mr-2 rts-input" data-category="palsy">
+                                    <label for="palsy-0">Complète (Frankel A, B)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="palsy" value="1" id="palsy-1" class="mr-2 rts-input" data-category="palsy">
+                                    <label for="palsy-1">Incomplète (Frankel C, D)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="radio" name="palsy" value="2" id="palsy-2" class="mr-2 rts-input" data-category="palsy">
+                                    <label for="palsy-2">Aucune (Frankel E)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results -->
+                        <div class="mt-8">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold">Score RTS total:</h3>
+                                <span class="text-2xl font-bold" id="rts-total-score">0</span>
+                            </div>
+
+                            <div id="rts-interpretation" class="hidden p-4 rounded-lg border mt-4">
+                                <h4 class="font-bold mb-2">Interprétation:</h4>
+                                <p class="font-semibold">Survie estimée: <span id="rts-survival"></span></p>
+                                <p class="mt-1">Recommandation: <span id="rts-recommendation"></span></p>
+                                <div class="mt-4 text-sm">
+                                    <p class="italic">Note: Ce score est un outil pronostique et d'aide à la décision. La prise en charge doit être individualisée selon le contexte clinique.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-center gap-4 mt-8">
+                        <button onclick="showHome()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            Retour à l'accueil
+                        </button>
+                        <button onclick="resetModule('rts')" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                            Réinitialiser
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ESCC Module -->
+                <div id="escc-module" class="module bg-white p-6 rounded-lg shadow-md mt-6 hidden">
+                    <h2 class="text-2xl font-bold text-center mb-6">Échelle de Compression Épidurale de la Moelle Épinière (ESCC) / Échelle de Bilsky</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <!-- Grade Images and Selection -->
+                        <div class="flex flex-col">
+                           <div class="flex items-center justify-center rounded-lg mb-4">
+    <img src="images/bilsky-grades.jpg" alt="Échelle de Bilsky - Grades de compression épidurale" class="rounded-lg max-w-full h-auto shadow-md" style="max-height: 400px;">
+</div>
+                            <p class="text-sm text-gray-600 mb-4">Sélectionnez le grade qui correspond le mieux à l'image radiologique du patient</p>
+                            
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="selectEsccGrade(0)" class="border py-2 px-4 rounded-lg hover:bg-blue-50 escc-button" data-grade="0">Grade 0</button>
+                                <button onclick="selectEsccGrade('1a')" class="border py-2 px-4 rounded-lg hover:bg-blue-50 escc-button" data-grade="1a">Grade 1a</button>
+                                <button onclick="selectEsccGrade('1b')" class="border py-2 px-4 rounded-lg hover:bg-blue-50 escc-button" data-grade="1b">Grade 1b</button>
+                                <button onclick="selectEsccGrade('1c')" class="border py-2 px-4 rounded-lg hover:bg-blue-50 escc-button" data-grade="1c">Grade 1c</button>
+                                <button onclick="selectEsccGrade(2)" class="border py-2 px-4 rounded-lg hover:bg-blue-50 escc-button" data-grade="2">Grade 2</button>
+                                <button onclick="selectEsccGrade(3)" class="border py-2 px-4 rounded-lg hover:bg-blue-50 escc-button" data-grade="3">Grade 3</button>
+                            </div>
+                        </div>
+
+                        <!-- Description of Grades -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-bold mb-4">Description des grades</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li><span class="font-semibold">Grade 0:</span> Pas de maladie épidural métastatique</li>
+                                <li><span class="font-semibold">Grade 1a:</span> Maladie épidurale métastatique sans indentation du sac dural</li>
+                                <li><span class="font-semibold">Grade 1b:</span> Maladie épidurale métastatique avec indentation du sac dural, sans contact avec la moelle épinière</li>
+                                <li><span class="font-semibold">Grade 1c:</span> Maladie épidurale métastatique touchant la moelle épinière sans compression ni déplacement</li>
+                                <li><span class="font-semibold">Grade 2:</span> Compression métastatique épidurale de la moelle épinière avec du LCR encore visible au site de compression</li>
+                                <li><span class="font-semibold">Grade 3:</span> Compression métastatique épidurale de la moelle épinière sans LCR visible au site de compression</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="escc-interpretation" class="hidden p-4 rounded-lg border mt-4">
+                        <h4 class="font-bold mb-2">Grade sélectionné: <span id="escc-selected-grade"></span></h4>
+                        <p class="font-semibold" id="escc-description"></p>
+                        <p class="mt-1">Recommandation: <span id="escc-recommendation"></span></p>
+                        <div class="mt-4 text-sm">
+                            <p class="italic">Note: Cette classification guide le traitement mais doit être intégrée aux autres paramètres cliniques pour une décision thérapeutique optimale.</p>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-center gap-4 mt-8">
+                        <button onclick="showHome()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            Retour à l'accueil
+                        </button>
+                        <button onclick="resetModule('escc')" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                            Réinitialiser
+                        </button>
+                    </div>
+                </div>
+
+                <!-- NOMS Module -->
+                <div id="noms-module" class="module bg-white p-6 rounded-lg shadow-md mt-6 hidden">
+                    <h2 class="text-2xl font-bold text-center mb-6">Framework NOMS</h2>
+                    
+                    <!-- NOMS Overview -->
+                    <div id="noms-overview" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                       <div id="noms-neuro-box" class="bg-purple-100 p-4 rounded-lg border border-purple-300 cursor-pointer hover:bg-purple-200" onclick="showNomsComponent('neurologic')">
+    <h3 class="font-bold text-purple-700">N - Neurologique</h3>
+    <p class="text-sm text-gray-700">Évaluation ESCC/Bilsky</p>
+    <p id="noms-neuro-result" class="mt-2 text-sm text-purple-800 font-semibold hidden"></p>
+</div>
+                        
+                        <div id="noms-onco-box" class="bg-blue-100 p-4 rounded-lg border border-blue-300 cursor-pointer hover:bg-blue-200" onclick="showNomsComponent('oncologic')">
+                            <h3 class="font-bold text-blue-700">O - Oncologique</h3>
+                            <p class="text-sm text-gray-700">Radiosensibilité tumorale</p>
+                            <p id="noms-onco-result" class="mt-2 text-sm text-blue-800 font-semibold hidden"></p>
+                        </div>
+                        
+                        <div id="noms-mech-box" class="bg-green-100 p-4 rounded-lg border border-green-300 cursor-pointer hover:bg-green-200" onclick="showNomsComponent('mechanical')">
+                            <h3 class="font-bold text-green-700">M - Mécanique</h3>
+                            <p class="text-sm text-gray-700">Stabilité (SINS)</p>
+                            <p id="noms-mech-result" class="mt-2 text-sm text-green-800 font-semibold hidden"></p>
+                        </div>
+                        
+                        <div id="noms-sys-box" class="bg-yellow-100 p-4 rounded-lg border border-yellow-300 cursor-pointer hover:bg-yellow-200" onclick="showNomsComponent('systemic')">
+                            <h3 class="font-bold text-yellow-700">S - Systémique</h3>
+                            <p class="text-sm text-gray-700">Capacité à tolérer le traitement</p>
+                            <p id="noms-sys-result" class="mt-2 text-sm text-yellow-800 font-semibold hidden"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- NOMS Component Container -->
+                    <div id="noms-component-container" class="hidden">
+                        <!-- Neurologic Component -->
+                       <div id="noms-neurologic-component" class="noms-component bg-purple-50 p-4 rounded-lg hidden">
+    <h3 class="text-xl font-bold mb-6 text-purple-700">N - Évaluation Neurologique</h3>
+    <p class="mb-4">Cette évaluation est basée sur l'échelle ESCC/Bilsky.</p>
+    <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
+        <button type="button" onclick="setNomsValue('neurologic', 'low-grade')" class="px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg border border-purple-300">
+    Compression de bas grade (0-1c)
+</button>
+<button type="button" onclick="setNomsValue('neurologic', 'high-grade')" class="px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg border border-purple-300">
+    Compression de haut grade (2-3)
+</button>
+    </div>
+    <button onclick="hideNomsComponent()" class="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">
+        Annuler
+    </button>
+</div>
+                            <button onclick="hideNomsComponent()" class="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">
+                                Annuler
+                            </button>
+                        </div>
+
+                        <!-- Oncologic Component -->
+                        <div id="noms-oncologic-component" class="noms-component bg-blue-50 p-4 rounded-lg hidden">
+                            <h3 class="text-xl font-bold mb-6 text-blue-700">O - Évaluation Oncologique</h3>
+                            <p class="mb-4">Sélectionnez la radiosensibilité de la tumeur primaire:</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="border p-4 rounded-lg hover:bg-blue-50 cursor-pointer" onclick="setNomsValue('oncologic', 'radiosensitive')">
+                                    <h5 class="font-medium text-lg">Tumeurs radiosensibles</h5>
+                                    <ul class="list-disc list-inside text-sm mt-2 text-gray-600">
+                                        <li>Lymphome</li>
+                                        <li>Myélome multiple</li>
+                                        <li>Séminome</li>
+                                        <li>Cancer à petites cellules (poumon)</li>
+                                        <li>Cancer de la thyroïde</li>
+                                        <li>Cancer du sein</li>
+                                        <li>Cancer de la prostate</li>
+                                        <li>Tumeur carcinoïde</li>
+                                    </ul>
+                                </div>
+                                <div class="border p-4 rounded-lg hover:bg-blue-50 cursor-pointer" onclick="setNomsValue('oncologic', 'radioresistant')">
+                                    <h5 class="font-medium text-lg">Tumeurs radiorésistantes</h5>
+                                    <ul class="list-disc list-inside text-sm mt-2 text-gray-600">
+                                        <li>Sarcome</li>
+                                        <li>Mélanome</li>
+                                        <li>Cancer rénal</li>
+                                        <li>Corticosurrénalome</li>
+                                        <li>Lésion précédemment irradiée</li>
+                                        <li>Cancer colorectal</li>
+                                        <li>Cancer du poumon non à petites cellules</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <button onclick="hideNomsComponent()" class="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">
+                                Annuler
+                            </button>
+                        </div>
+
+                        <!-- Mechanical Component -->
+                        <div id="noms-mechanical-component" class="noms-component bg-green-50 p-4 rounded-lg hidden">
+                            <h3 class="text-xl font-bold mb-6 text-green-700">M - Évaluation Mécanique</h3>
+                            <p class="mb-4">Cette évaluation est basée sur le score SINS:</p>
+                           <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
+    <button type="button" onclick="setNomsValue('mechanical', 'stable')" class="px-4 py-2 bg-green-100 hover:bg-green-200 rounded-lg border border-green-300">
+        Stable (SINS 0-6)
+    </button>
+    <button type="button" onclick="setNomsValue('mechanical', 'unstable')" class="px-4 py-2 bg-green-100 hover:bg-green-200 rounded-lg border border-green-300">
+        Instable (SINS 7-18)
+    </button>
+</div>
+                            <button onclick="hideNomsComponent()" class="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">
+                                Annuler
+                            </button>
+                        </div>
+
+                        <!-- Systemic Component -->
+                       <div id="noms-systemic-component" class="noms-component bg-yellow-50 p-4 rounded-lg hidden">
+    <h3 class="text-xl font-bold mb-6 text-yellow-700">S - Évaluation Systémique</h3>
+    <p class="mb-4">Évaluez la capacité du patient à tolérer une intervention chirurgicale:</p>
+    <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
+        <button type="button" onclick="setNomsValue('systemic', 'able')" class="px-4 py-2 bg-yellow-100 hover:bg-yellow-200 rounded-lg border border-yellow-300">
+    Capable de tolérer la chirurgie
+</button>
+<button type="button" onclick="setNomsValue('systemic', 'unable')" class="px-4 py-2 bg-yellow-100 hover:bg-yellow-200 rounded-lg border border-yellow-300">
+    Incapable de tolérer la chirurgie
+</button>
+    </div>
+    <button onclick="hideNomsComponent()" class="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg">
+        Annuler
+    </button>
+</div>
+
+                    <!-- NOMS Recommendation Panel -->
+                    <div id="noms-recommendation-panel" class="hidden p-4 rounded-lg border mt-6">
+                        <h4 class="font-bold mb-2">Recommandation NOMS:</h4>
+                        <p id="noms-recommendation" class="font-semibold"></p>
+                        <div class="mt-4 text-sm">
+                            <p class="italic">Note: Cette recommandation est basée sur le framework NOMS et doit être adaptée au contexte clinique individuel.</p>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-center gap-4 mt-8">
+                        <button onclick="showHome()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                            Retour à l'accueil
+                        </button>
+                        <button onclick="resetModule('noms')" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                            Réinitialiser
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-200 p-2 text-center text-sm text-gray-600">
+        © <span id="current-year"></span> NeurosurgerySpine.healthcenter - Tous droits réservés
+    </footer>
+    <script>
+        // Set current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Show home screen
+        function showHome() {
+            // Hide all modules
+            document.querySelectorAll('.module').forEach(module => {
+                module.classList.add('hidden');
+            });
+            
+            // Show home screen
+            document.getElementById('welcome-screen').classList.remove('hidden');
+        }
+
+        // Show module by id
+        function showModule(moduleId) {
+            // Hide welcome screen
+            document.getElementById('welcome-screen').classList.add('hidden');
+            
+            // Hide all modules
+            document.querySelectorAll('.module').forEach(module => {
+                module.classList.add('hidden');
+            });
+            
+            // Show selected module
+            document.getElementById(moduleId).classList.remove('hidden');
+        }
+
+        // Reset module by type
+        function resetModule(moduleType) {
+            switch(moduleType) {
+                case 'sins':
+                    // Reset SINS inputs
+                    document.querySelectorAll('.sins-input').forEach(input => {
+                        input.checked = false;
+                    });
+                    
+                    // Reset SINS data
+                    sinsData = {
+                        location: null,
+                        pain: null,
+                        boneType: null,
+                        alignment: null,
+                        collapse: null,
+                        involvement: null
+                    };
+                    
+                    // Reset UI
+                    document.getElementById('sins-total-score').textContent = '0';
+                    document.getElementById('sins-interpretation').classList.add('hidden');
+                    break;
+                
+                case 'rts':
+                    // Reset RTS inputs
+                    document.querySelectorAll('.rts-input').forEach(input => {
+                        input.checked = false;
+                    });
+                    
+                    // Reset RTS data
+                    rtsData = {
+                        generalCondition: null,
+                        extraspinalMets: null,
+                        spinalMets: null,
+                        organMets: null,
+                        primarySite: null,
+                        palsy: null
+                    };
+                    
+                    // Reset UI
+                    document.getElementById('rts-total-score').textContent = '0';
+                    document.getElementById('rts-interpretation').classList.add('hidden');
+                    break;
+                
+                case 'escc':
+                    // Reset ESCC buttons
+                    document.querySelectorAll('.escc-button').forEach(button => {
+                        button.classList.remove('bg-blue-200', 'font-bold');
+                    });
+                    
+                    // Reset UI
+                    document.getElementById('escc-interpretation').classList.add('hidden');
+                    break;
+                
+                case 'noms':
+                    // Reset NOMS data
+                    nomsData = {
+                        neurologic: null,
+                        oncologic: null,
+                        mechanical: null,
+                        systemic: null
+                    };
+                    
+                    // Reset UI
+                    document.querySelectorAll('#noms-neuro-result, #noms-onco-result, #noms-mech-result, #noms-sys-result').forEach(el => {
+                        el.textContent = '';
+                        el.classList.add('hidden');
+                    });
+                    
+                    document.querySelectorAll('#noms-neuro-box, #noms-onco-box, #noms-mech-box, #noms-sys-box').forEach(box => {
+                        box.classList.remove('ring-2', 'ring-purple-500', 'ring-blue-500', 'ring-green-500', 'ring-yellow-500');
+                    });
+                    
+                    // Hide component container and recommendation
+                    document.getElementById('noms-component-container').classList.add('hidden');
+                    document.getElementById('noms-recommendation-panel').classList.add('hidden');
+                    
+                    // Hide all components
+                    document.querySelectorAll('.noms-component').forEach(comp => {
+                        comp.classList.add('hidden');
+                    });
+                    break;
+            }
+        }
+
+        // SINS Score calculation
+        let sinsData = {
+            location: null,
+            pain: null,
+            boneType: null,
+            alignment: null,
+            collapse: null,
+            involvement: null
+        };
+
+        document.querySelectorAll('.sins-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const category = this.dataset.category;
+                sinsData[category] = parseInt(this.value);
+                updateSinsScore();
+            });
+        });
+
+        function updateSinsScore() {
+            const total = Object.values(sinsData).reduce((sum, value) => sum + (value !== null ? value : 0), 0);
+            document.getElementById('sins-total-score').textContent = total;
+            
+            // Check if all questions are answered
+            const allAnswered = Object.values(sinsData).every(value => value !== null);
+            
+            if (allAnswered) {
+                const interpretation = interpretSins(total);
+                document.getElementById('sins-stability').textContent = interpretation.stability;
+                document.getElementById('sins-recommendation').textContent = interpretation.recommendation;
+                document.getElementById('sins-interpretation').classList.remove('hidden');
+                document.getElementById('sins-interpretation').className = `p-4 rounded-lg border ${interpretation.class} mt-4`;
+            }
+        }
+
+        function interpretSins(score) {
+            if (score >= 13) {
+                return {
+                    stability: "Très instable",
+                    recommendation: "Consultation en chirurgie du rachis fortement recommandée pour envisager une stabilisation.",
+                    class: "bg-red-100 border-red-500 text-red-800"
+                };
+            } else if (score >= 7) {
+                return {
+                    stability: "Potentiellement instable",
+                    recommendation: "Consultation en chirurgie du rachis recommandée.",
+                    class: "bg-yellow-100 border-yellow-500 text-yellow-800"
+                };
+            } else {
+                return {
+                    stability: "Stable",
+                    recommendation: "Traitement conservateur peut être envisagé. Surveillance régulière recommandée.",
+                    class: "bg-green-100 border-green-500 text-green-800"
+                };
+            }
+        }
+
+        // RTS Score calculation
+        let rtsData = {
+            generalCondition: null,
+            extraspinalMets: null,
+            spinalMets: null,
+            organMets: null,
+            primarySite: null,
+            palsy: null
+        };
+
+        document.querySelectorAll('.rts-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const category = this.dataset.category;
+                rtsData[category] = parseInt(this.value);
+                updateRtsScore();
+            });
+        });
+
+        function updateRtsScore() {
+            const total = Object.values(rtsData).reduce((sum, value) => sum + (value !== null ? value : 0), 0);
+            document.getElementById('rts-total-score').textContent = total;
+            
+            // Check if all questions are answered
+            const allAnswered = Object.values(rtsData).every(value => value !== null);
+            
+            if (allAnswered) {
+                const interpretation = interpretRts(total);
+                document.getElementById('rts-survival').textContent = interpretation.survival;
+                document.getElementById('rts-recommendation').textContent = interpretation.recommendation;
+                document.getElementById('rts-interpretation').classList.remove('hidden');
+                document.getElementById('rts-interpretation').className = `p-4 rounded-lg border ${interpretation.class} mt-4`;
+            }
+        }
+
+        function interpretRts(score) {
+            if (score >= 12) {
+                return {
+                    survival: "Plus de 12 mois",
+                    recommendation: "Traitement chirurgical avec intention curative si techniquement faisable.",
+                    class: "bg-green-100 border-green-500 text-green-800"
+                };
+            } else if (score >= 9) {
+                return {
+                    survival: "6 à 12 mois",
+                    recommendation: "Traitement chirurgical palliatif. Considérer une décompression avec stabilisation.",
+                    class: "bg-yellow-100 border-yellow-500 text-yellow-800"
+                };
+            } else {
+                return {
+                    survival: "Moins de 6 mois",
+                    recommendation: "Traitement conservateur ou radiothérapie seule. Chirurgie uniquement en cas de compression médullaire aiguë en l'absence d'autres options.",
+                    class: "bg-red-100 border-red-500 text-red-800"
+                };
+            }
+        }
+
+        // ESCC Grade selection
+        function selectEsccGrade(grade) {
+            // Update button styles
+            document.querySelectorAll('.escc-button').forEach(button => {
+                button.classList.remove('bg-blue-200', 'font-bold');
+                if (button.dataset.grade == grade) {
+                    button.classList.add('bg-blue-200', 'font-bold');
+                }
+            });
+            
+            // Interpret grade
+            const interpretation = interpretEscc(grade);
+            
+            // Update UI
+            document.getElementById('escc-selected-grade').textContent = typeof grade === 'number' ? `Grade ${grade}` : `Grade ${grade}`;
+            document.getElementById('escc-description').textContent = interpretation.description;
+            document.getElementById('escc-recommendation').textContent = interpretation.recommendation;
+            document.getElementById('escc-interpretation').classList.remove('hidden');
+            document.getElementById('escc-interpretation').className = `p-4 rounded-lg border ${interpretation.class} mt-4`;
+        }
+
+        function interpretEscc(grade) {
+            switch (grade) {
+                case 0:
+                    return {
+                        description: "Pas de maladie épidural métastatique",
+                        recommendation: "Surveillance et traitement systémique selon l'indication primaire.",
+                        class: "bg-green-100 border-green-500 text-green-800"
+                    };
+                case '1a':
+                    return {
+                        description: "Maladie épidurale métastatique sans indentation du sac dural",
+                        recommendation: "Considérer une radiothérapie préventive. Surveillance rapprochée.",
+                        class: "bg-green-100 border-green-500 text-green-800"
+                    };
+                case '1b':
+                    return {
+                        description: "Maladie épidurale métastatique avec indentation du sac dural, sans contact avec la moelle épinière",
+                        recommendation: "Radiothérapie recommandée. Évaluation neurologique régulière.",
+                        class: "bg-yellow-100 border-yellow-500 text-yellow-800"
+                    };
+                case '1c':
+                    return {
+                        description: "Maladie épidurale métastatique touchant la moelle épinière sans compression ni déplacement",
+                        recommendation: "Radiothérapie urgente. Considérer une décompression chirurgicale si progression rapide.",
+                        class: "bg-yellow-100 border-yellow-500 text-yellow-800"
+                    };
+                case 2:
+                    return {
+                        description: "Compression métastatique épidurale de la moelle épinière avec du LCR encore visible au site de compression",
+                        recommendation: "Décompression chirurgicale fortement recommandée, suivie de radiothérapie. Traitement stéroïdien en urgence.",
+                        class: "bg-red-100 border-red-500 text-red-800"
+                    };
+                case 3:
+                    return {
+                        description: "Compression métastatique épidurale de la moelle épinière sans LCR visible au site de compression",
+                        recommendation: "Décompression chirurgicale urgente, suivie de radiothérapie. Traitement stéroïdien à haute dose en urgence.",
+                        class: "bg-red-100 border-red-500 text-red-800"
+                    };
+                default:
+                    return {
+                        description: "",
+                        recommendation: "",
+                        class: ""
+                    };
+            }
+        }
+
+        // NOMS Framework
+        let nomsData = {
+            neurologic: null,
+            oncologic: null,
+            mechanical: null,
+            systemic: null
+        };
+
+        function showNomsComponent(component) {
+            // Show component container
+            document.getElementById('noms-component-container').classList.remove('hidden');
+            
+            // Hide all components
+            document.querySelectorAll('.noms-component').forEach(comp => {
+                comp.classList.add('hidden');
+            });
+            
+            // Show selected component
+            document.getElementById(`noms-${component}-component`).classList.remove('hidden');
+        }
+
+        function hideNomsComponent() {
+            document.getElementById('noms-component-container').classList.add('hidden');
+        }
+
+   function setNomsValue(component, value) {
+    // Logging pour debug
+    console.log(`Setting ${component} to ${value}`);
+    
+    // Update data
+    nomsData[component] = value;
+    
+    // Format display value
+    let displayValue = '';
+    switch (component) {
+        case 'neurologic':
+            displayValue = value === 'low-grade' ? 'Compression de bas grade' : 'Compression de haut grade';
+            break;
+        case 'oncologic':
+            displayValue = value === 'radiosensitive' ? 'Radiosensible' : 'Radiorésistant';
+            break;
+        case 'mechanical':
+            displayValue = value === 'stable' ? 'Stable' : 'Instable';
+            break;
+        case 'systemic':
+            displayValue = value === 'able' ? 'Capable de tolérer' : 'Incapable de tolérer';
+            break;
+    }
+    
+    // Définir explicitement les ID corrects pour chaque composant
+    let resultId;
+    let boxId;
+    let ringClass;
+    
+    switch (component) {
+        case 'neurologic':
+            resultId = 'noms-neuro-result';
+            boxId = 'noms-neuro-box';
+            ringClass = 'ring-purple-500';
+            break;
+        case 'oncologic':
+            resultId = 'noms-onco-result';
+            boxId = 'noms-onco-box';
+            ringClass = 'ring-blue-500';
+            break;
+        case 'mechanical':
+            resultId = 'noms-mech-result';
+            boxId = 'noms-mech-box';
+            ringClass = 'ring-green-500';
+            break;
+        case 'systemic':
+            resultId = 'noms-sys-result';
+            boxId = 'noms-sys-box';
+            ringClass = 'ring-yellow-500';
+            break;
+    }
+    
+    // Update UI using explicit IDs
+    const resultElement = document.getElementById(resultId);
+    if (resultElement) {
+        resultElement.textContent = displayValue;
+        resultElement.classList.remove('hidden');
+    } else {
+        console.error(`Element ${resultId} not found`);
+    }
+    
+    // Add highlight to box using explicit IDs
+    const box = document.getElementById(boxId);
+    if (box) {
+        // Remove any existing ring
+        box.classList.remove('ring-2', 'ring-purple-500', 'ring-blue-500', 'ring-green-500', 'ring-yellow-500');
+        
+        // Add appropriate ring based on component
+        box.classList.add('ring-2', ringClass);
+    } else {
+        console.error(`Element ${boxId} not found`);
+    }
+    
+    // Hide component container
+    hideNomsComponent();
+    
+    // Check if all components are evaluated
+    const allEvaluated = Object.values(nomsData).every(val => val !== null);
+    console.log("All components evaluated:", allEvaluated, nomsData);
+    
+    if (allEvaluated) {
+        generateNomsRecommendation();
+    }
+}
+        function generateNomsRecommendation() {
+            let recommendation = "";
+            let bgColor = "";
+            
+            // Decision tree based on NOMS framework
+            if (nomsData.neurologic === "low-grade" && nomsData.mechanical === "stable") {
+                if (nomsData.oncologic === "radiosensitive") {
+                    recommendation = "Radiothérapie conventionnelle (cEBRT) recommandée.";
+                    bgColor = "bg-green-100 border-green-500 text-green-800";
+                } else {
+                    recommendation = "Radiochirurgie stéréotaxique (SRS) recommandée.";
+                    bgColor = "bg-green-100 border-green-500 text-green-800";
+                }
+            } else if (nomsData.neurologic === "high-grade" && nomsData.mechanical === "stable") {
+                if (nomsData.oncologic === "radiosensitive") {
+                    recommendation = "Radiothérapie conventionnelle (cEBRT) recommandée. Consultation neurochirurgicale pour évaluation.";
+                    bgColor = "bg-yellow-100 border-yellow-500 text-yellow-800";
+                } else {
+                    if (nomsData.systemic === "able") {
+                        recommendation = "Chirurgie de séparation suivie de radiochirurgie stéréotaxique (SRS) recommandée.";
+                        bgColor = "bg-red-100 border-red-500 text-red-800";
+                    } else {
+                        recommendation = "Radiochirurgie stéréotaxique (SRS) recommandée. Considérer une chirurgie minimalement invasive.";
+                        bgColor = "bg-yellow-100 border-yellow-500 text-yellow-800";
+                    }
+                }
+            } else if (nomsData.mechanical === "unstable") {
+                if (nomsData.systemic === "able") {
+                    recommendation = "Stabilisation chirurgicale recommandée, suivie du traitement radiothérapeutique approprié.";
+                    bgColor = "bg-red-100 border-red-500 text-red-800";
+                } else {
+                    recommendation = "Stabilisation minimalement invasive à considérer. Traitement médical optimal et orthèses.";
+                    bgColor = "bg-yellow-100 border-yellow-500 text-yellow-800";
+                }
+            }
+            
+            // Update UI
+            const panel = document.getElementById('noms-recommendation-panel');
+            panel.classList.remove('hidden');
+            panel.className = `p-4 rounded-lg border ${bgColor} mt-6`;
+            document.getElementById('noms-recommendation').textContent = recommendation;
+        }
+// Debug function to check NOMS data
+function checkNomsData() {
+    console.log("Current NOMS data:", nomsData);
+    console.log("All evaluated:", Object.values(nomsData).every(val => val !== null));
+}
+
+// Add a debug button to the NOMS module for testing
+document.addEventListener('DOMContentLoaded', function() {
+    const nomsModule = document.getElementById('noms-module');
+    if (nomsModule) {
+        const debugButton = document.createElement('button');
+        debugButton.textContent = "Check NOMS Data";
+        debugButton.className = "mt-4 bg-gray-300 text-gray-800 px-4 py-1 rounded text-sm";
+        debugButton.onclick = checkNomsData;
+        
+        const buttonContainer = nomsModule.querySelector('.flex.justify-center.gap-4.mt-8');
+        if (buttonContainer) {
+            buttonContainer.appendChild(debugButton);
+        }
+    }
+});
+    </script>
+</body>
+</html>
