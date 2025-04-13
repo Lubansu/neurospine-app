@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeurosurgerySpine.healthcenter - Classification AOSpine des Fractures Sacrées</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .step-content {
+            display: none;
+        }
+        .step-content.active {
+            display: block;
+        }
+        .btn-nav {
+            transition: all 0.3s ease;
+        }
+        .btn-nav:hover {
+            transform: scale(1.05);
+        }
+        .selected {
+            border: 3px solid #1E40AF;
+            background-color: #DBEAFE;
+        }
+        .injury-type-a {
+            background-color: #EDE9FE;
+            border-left: 5px solid #6D28D9;
+        }
+        .injury-type-b {
+            background-color: #DCFCE7;
+            border-left: 5px solid #15803D;
+        }
+        .injury-type-c {
+            background-color: #FEE2E2;
+            border-left: 5px solid #DC2626;
+        }
+        .back-to-home {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gray-800 text-white p-4">
+        <h1 class="text-2xl font-bold text-center">NeurosurgerySpine.healthcenter</h1>
+        <p class="text-center text-gray-300 italic">Solutions avancées pour la chirurgie vertébrale</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4">
+        <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6">
+            <!-- Title -->
+            <h2 class="text-3xl font-bold mb-6 text-center">Classification AOSpine des Fractures Sacrées</h2>
+            
+            <!-- Progress Steps -->
+            <div class="flex justify-center items-center mb-10">
+                <div id="step1-indicator" class="h-12 w-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg cursor-pointer" onclick="if(selectedType) restartClassification()">1</div>
+                <div class="h-1 w-16 bg-gray-300" id="step1-2-line"></div>
+                <div id="step2-indicator" class="h-12 w-12 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg cursor-pointer" onclick="if(selectedType) moveToStep(2)">2</div>
+                <div class="h-1 w-16 bg-gray-300" id="step2-3-line"></div>
+                <div id="step3-indicator" class="h-12 w-12 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg cursor-pointer" onclick="if(selectedSubtype) moveToStep(3)">3</div>
+            </div>
+
+            <!-- Main step title -->
+            <h3 class="text-2xl font-bold mb-6">Étape 1: Identifiez le type principal de lésion</h3>
+            
+            <!-- Step 1: Main Type Selection -->
+            <div id="step1" class="step-content active">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <button id="type-a" class="btn-nav p-6 injury-type-a rounded-lg shadow hover:opacity-90 flex flex-col items-center">
+                        <div class="text-xl font-semibold text-center">Type A</div>
+                        <div class="my-4 text-center">Lésions Sacrococcygiennes Basses</div>
+                        <div class="text-sm text-center italic">Sans impact sur la stabilité pelvienne postérieure ou spino-pelvienne</div>
+                    </button>
+                    
+                    <button id="type-b" class="btn-nav p-6 injury-type-b rounded-lg shadow hover:opacity-90 flex flex-col items-center">
+                        <div class="text-xl font-semibold text-center">Type B</div>
+                        <div class="my-4 text-center">Lésions Pelviennes Postérieures</div>
+                        <div class="text-sm text-center italic">Impact principal sur la stabilité pelvienne postérieure</div>
+                    </button>
+                    
+                    <button id="type-c" class="btn-nav p-6 injury-type-c rounded-lg shadow hover:opacity-90 flex flex-col items-center">
+                        <div class="text-xl font-semibold text-center">Type C</div>
+                        <div class="my-4 text-center">Lésions Spino-Pelviennes</div>
+                        <div class="text-sm text-center italic">Instabilité spino-pelvienne</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Button to return to index -->
+    <a href="index-ao-classification.html" class="back-to-home bg-gray-800 text-white py-2 px-4 rounded-full shadow-lg hover:bg-gray-700 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+        Retour à l'accueil
+    </a>
+    
+    <footer class="bg-gray-800 text-white p-4 text-center">
+        <p>&copy; 2025 NeurosurgerySpine.healthcenter - Tous droits réservés</p>
+        <p class="text-gray-400 text-sm mt-2">Classification AOSpine des fractures vertébrales</p>
+    </footer>
+
+    <script>
+        // Global variables to store selected choices
+        let selectedType = '';
+        let selectedSubtype = '';
+        let selectedNeurologicalStatus = '';
+        let selectedModifiers = [];
+
+        // Main type information with image paths
+        const mainTypes = {
+            'a': { 
+                title: 'Type A', 
+                description: 'Lésions Sacrococcygiennes Basses', 
+                subtitle: 'Sans impact sur la stabilité pelvienne postérieure ou spino-pelvienne',
+                class: 'injury-type-a',
+                imagePath: 'images/sacral-type-a.png'
+            },
+            'b': { 
+                title: 'Type B', 
+                description: 'Lésions Pelviennes Postérieures', 
+                subtitle: 'Impact principal sur la stabilité pelvienne postérieure',
+                class: 'injury-type-b',
+                imagePath: 'images/sacral-type-b.png'
+            },
+            'c': { 
+                title: 'Type C', 
+                description: 'Lésions Spino-Pelviennes', 
+                subtitle: 'Instabilité spino-pelvienne',
+                class: 'injury-type-c',
+                imagePath: 'images/sacral-type-c.png'
+            }
+        };
+
+        // Subtypes definition
+        const subtypes = {
+            'a': [
+                { value: 'A1', title: 'A1', description: 'Fractures coccygiennes ou par compression vs avulsion ligamentaire', imagePath: 'images/sacral-a1.png' },
+                { value: 'A2', title: 'A2', description: 'Fractures transverses non déplacées sous l\'articulation sacro-iliaque', imagePath: 'images/sacral-a2.png' },
+                { value: 'A3', title: 'A3', description: 'Fractures transverses déplacées sous l\'articulation sacro-iliaque', imagePath: 'images/sacral-a3.png' }
+            ],
+            'b': [
+                { value: 'B1', title: 'B1', description: 'Fracture centrale - implique le canal rachidien', imagePath: 'images/sacral-b1.png' },
+                { value: 'B2', title: 'B2', description: 'Fracture transalaire - n\'implique ni les foramens ni le canal rachidien', imagePath: 'images/sacral-b2.png' },
+                { value: 'B3', title: 'B3', description: 'Fracture transforaminale - implique les foramens mais pas le canal rachidien', imagePath: 'images/sacral-b3.png' }
+            ],
+            'c': [
+                { value: 'C0', title: 'C0', description: 'Variante en U du sacrum non déplacée', imagePath: 'images/sacral-c0.png' },
+                { value: 'C1', title: 'C1', description: 'Variante en U du sacrum sans instabilité pelvienne postérieure', imagePath: 'images/sacral-c1.png' },
+                { value: 'C2', title: 'C2', description: 'Lésions bilatérales complètes de Type B sans fracture transverse', imagePath: 'images/sacral-c2.png' },
+                { value: 'C3', title: 'C3', description: 'Fracture sacrée en U déplacée', imagePath: 'images/sacral-c3.png' }
+            ]
+        };
+
+        // Treatment recommendations (simplified examples)
+        const treatmentRecommendations = {
+            'A1': 'Traitement conservateur avec analgésie simple. Repos relatif aux douleurs. Pronostic excellent.',
+            'A2': 'Traitement conservateur avec limitation des activités pour 6-8 semaines. Suivi radiologique à 4-6 semaines.',
+            'A3': 'Traitement conservateur avec limitation stricte des activités ou, en cas de déplacement significatif, fixation chirurgicale percutanée. Analgésie multimodale recommandée.',
+            'B1': 'Traitement généralement conservateur si pas de déficit neurologique. Fixation percutanée ou ouverte si déficit radiculaire progressif ou déplacement significatif.',
+            'B2': 'Traitement conservateur possible si stable. Fixation percutanée ou par plaque si déficit neurologique ou instabilité associée.',
+            'B3': 'Traitement par fixation percutanée ou chirurgicale ouverte selon le degré de déplacement et les symptômes radiculaires. Décompression foraminale parfois nécessaire.',
+            'C0': 'Traitement conservateur rigide avec surveillance étroite pour détecter un déplacement secondaire.',
+            'C1': 'Traitement chirurgical généralement recommandé : fixation ilio-sacrée bilatérale ou lumbopelvienne selon l\'état neurologique et osseux.',
+            'C2': 'Traitement chirurgical indiqué : fixation lumbopelvienne généralement nécessaire pour stabiliser cette lésion hautement instable.',
+            'C3': 'Traitement chirurgical urgent avec réduction et fixation lumbopelvienne. Décompression neurologique souvent nécessaire.'
+        };
+
+        // Description détaillée des lésions
+        const injuryDescriptions = {
+            'A1': 'Fractures isolées du coccyx ou de la partie basse du sacrum, généralement par compression directe ou par avulsion ligamentaire lors d\'un mécanisme d\'hyperflexion ou d\'hyperextension.',
+            'A2': 'Fractures horizontales traversant le sacrum sous le niveau de l\'articulation sacro-iliaque. Ces fractures sont non déplacées et ont un impact limité sur la stabilité globale.',
+            'A3': 'Fractures horizontales traversant le sacrum sous le niveau de l\'articulation sacro-iliaque, mais avec déplacement des fragments. Peuvent entraîner une douleur significative et une mobilité réduite.',
+            'B1': 'Fracture verticale traversant la partie centrale du sacrum et impliquant le canal rachidien. Présente un risque de lésion neurologique des racines de la queue de cheval ou du cône médullaire.',
+            'B2': 'Fracture verticale traversant l\'aile du sacrum sans impliquer les foramens sacrés ni le canal rachidien. Affecte principalement la stabilité pelvienne postérieure.',
+            'B3': 'Fracture verticale traversant la région des foramens sacrés sans s\'étendre au canal rachidien. Présente un risque élevé de lésion des racines nerveuses sacrées émergentes.',
+            'C0': 'Configuration en "U" sans déplacement, correspondant à des fractures bilatérales verticales du sacrum reliées par une fracture horizontale. Potentiellement instable.',
+            'C1': 'Fracture en "U" du sacrum sans instabilité pelvienne postérieure associée. La partie centrale du sacrum reste connectée à L5 mais est séparée du reste de l\'anneau pelvien.',
+            'C2': 'Lésions bilatérales complètes de type B (verticales) sans fracture transverse les reliant. Crée une instabilité spino-pelvienne significative.',
+            'C3': 'Fracture en "U" du sacrum avec déplacement significatif. La portion centrale incluant le canal rachidien est déplacée par rapport au reste du pelvis, créant une instabilité majeure et un risque neurologique élevé.'
+        };
+
+        // Modifier impact descriptions
+        const modifierImpacts = {
+            'M1': 'Lésion des tissus mous adjacents. Ces lésions peuvent compliquer la prise en charge chirurgicale et augmenter le risque d\'infection ou de problèmes de cicatrisation.',
+            'M2': 'Maladie osseuse métabolique (ostéoporose, ostéomalacie, etc.). La qualité osseuse réduite peut influencer le choix des implants et la stratégie de fixation.',
+            'M3': 'Lésion associée de l\'anneau pelvien antérieur. Nécessite une évaluation globale de la stabilité pelvienne et peut modifier l\'approche thérapeutique.',
+            'M4': 'Lésion de l\'articulation sacro-iliaque. Affecte la stabilité de la jonction lombo-pelvienne et peut nécessiter une fixation spécifique.'
+        };
+
+        // Neurological impact on treatment
+        const neuroImpacts = {
+            'N0': 'Absence de déficit neurologique.',
+            'N1': 'Déficit neurologique transitoire, résolu à l\'évaluation.',
+            'N2': 'Symptômes radiculaires persistants, nécessitant une évaluation de la compression nerveuse.',
+            'N3': 'Lésion incomplète de la queue de cheval. Une décompression urgente peut être indiquée en cas de compression persistante.',
+            'NX': 'Statut neurologique non évaluable. Une évaluation neurologique complète devrait être réalisée dès que possible.',
+            '+': 'Compression neurologique continue. Une décompression chirurgicale urgente est généralement indiquée.'
+        };
+
+        // Type codes for classification
+        const typeCodes = {
+            'a': 'A',
+            'b': 'B',
+            'c': 'C'
+        };
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Type selection buttons
+            document.getElementById('type-a').addEventListener('click', function() {
+                selectType('a');
+            });
+            
+            document.getElementById('type-b').addEventListener('click', function() {
+                selectType('b');
+            });
+            
+            document.getElementById('type-c').addEventListener('click', function() {
+                selectType('c');
+            });
+        });
+
+        // Function to select a main type
+        function selectType(type) {
+            selectedType = type;
+            
+            // Update UI for type selection
+            document.querySelectorAll('#step1 button').forEach(button => {
+                button.classList.remove('selected');
+            });
+            document.getElementById('type-' + type).classList.add('selected');
+            
+            // Create and add step 2 content
+            const mainContent = document.querySelector('main .max-w-6xl');
+            
+            // Create step 2 div if it doesn't exist
+            let step2Div = document.getElementById('step2');
+            if (!step2Div) {
+                step2Div = document.createElement('div');
+                step2Div.id = 'step2';
+                step2Div.className = 'step-content';
+                mainContent.appendChild(step2Div);
+            }
+            
+            // Clear and set content for step 2
+            step2Div.innerHTML = `
+                <p id="selected-type-text" class="text-lg mb-6 font-semibold">Type sélectionné: ${mainTypes[type].title} - ${mainTypes[type].description}</p>
+                <p class="text-md mb-6 italic">${mainTypes[type].subtitle}</p>
+                
+                <div id="subtype-options" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    ${subtypes[type].map(subtype => `
+                        <button class="btn-nav p-6 ${mainTypes[type].class} rounded-lg shadow hover:opacity-90 flex flex-col items-center subtype-button" data-subtype="${subtype.value}">
+                            <div class="text-xl font-semibold text-center">${subtype.title}</div>
+                            <div class="my-4 text-center">${subtype.description}</div>
+                            <img src="${subtype.imagePath}" alt="${subtype.title}" class="mt-4 rounded w-full">
+                        </button>
+                    `).join('')}
+                </div>
+                
+                <div class="flex justify-between mt-8">
+                    <button id="back-to-step1" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg text-lg">
+                        ← Retour
+                    </button>
+                </div>
+            `;
+            
+            // Add event listeners to new buttons
+            document.getElementById('back-to-step1').addEventListener('click', function() {
+                moveToStep(1);
+            });
+            
+            document.querySelectorAll('.subtype-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    selectSubtype(this.getAttribute('data-subtype'));
+                });
+            });
+            
+            // Reset subtype selection and neurological selections when changing main type
+            selectedSubtype = '';
+            selectedNeurologicalStatus = '';
+            selectedModifiers = [];
+            
+            // Create step 3 if it doesn't exist
+            if (!document.getElementById('step3')) {
+                createStep3();
+            }
+            
+            // Hide result if visible
+            const resultElement = document.getElementById('result');
+            if (resultElement) {
+                resultElement.classList.add('hidden');
+            }
+            
+            // Move to step 2
+            moveToStep(2);
+        }
+        
+        // Function to create step 3
+        function createStep3() {
+            const mainContent = document.querySelector('main .max-w-6xl');
+            
+            const step3Div = document.createElement('div');
+            step3Div.id = 'step3';
+            step3Div.className = 'step-content';
+            
+            step3Div.innerHTML = `
+                <p id="selected-subtype-text" class="text-lg mb-6 font-semibold"></p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- Neurological Status -->
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h4 class="text-xl font-bold mb-4">Statut Neurologique</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="N0" class="h-5 w-5">
+                                <span class="text-lg">N0 - Neurologie intacte</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="N1" class="h-5 w-5">
+                                <span class="text-lg">N1 - Déficit neurologique transitoire</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="N2" class="h-5 w-5">
+                                <span class="text-lg">N2 - Symptômes radiculaires</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="N3" class="h-5 w-5">
+                                <span class="text-lg">N3 - Lésion incomplète de la queue de cheval</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="NX" class="h-5 w-5">
+                                <span class="text-lg">NX - Ne peut être examiné</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="+" class="h-5 w-5">
+                                <span class="text-lg">+ - Compression neurologique continue</span>
+                            </label>
+                        </div>
+                        <p class="mt-4 text-sm italic text-gray-600">Note: Le grade N4 (lésion médullaire complète) n'est pas applicable aux fractures sacrées car anatomiquement impossible à ce niveau.</p>
+                    </div>
+                    
+                    <!-- Modifiers -->
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h4 class="text-xl font-bold mb-4">Modificateurs (sélection multiple)</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="modifier" value="M1" class="h-5 w-5">
+                                <span class="text-lg">M1 - Lésion des tissus mous</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="modifier" value="M2" class="h-5 w-5">
+                                <span class="text-lg">M2 - Maladie osseuse métabolique</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="modifier" value="M3" class="h-5 w-5">
+                                <span class="text-lg">M3 - Lésion de l'anneau pelvien antérieur</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="modifier" value="M4" class="h-5 w-5">
+                                <span class="text-lg">M4 - Lésion de l'articulation sacro-iliaque</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between mt-8">
+                    <button id="back-to-step2" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg text-lg">
+                        ← Retour
+                    </button>
+                    <button id="generate-result" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl">
+                        Générer la classification
+                    </button>
+                </div>
+            `;
+            
+            mainContent.appendChild(step3Div);
+            
+            // Add event listeners to new buttons
+            document.getElementById('back-to-step2').addEventListener('click', function() {
+                moveToStep(2);
+            });
+            
+            document.getElementById('generate-result').addEventListener('click', generateClassification);
+        }
+
+        // Function to select subtype
+        function selectSubtype(subtype) {
+            selectedSubtype = subtype;
+            
+            // Update UI for subtype selection
+            document.querySelectorAll('.subtype-button').forEach(button => {
+                button.classList.remove('selected');
+                if (button.getAttribute('data-subtype') === subtype) {
+                    button.classList.add('selected');
+                }
+            });
+            
+            // Update selected subtype text in step 3
+            let subtypeObj;
+            for (let sub of subtypes[selectedType]) {
+                if (sub.value === subtype) {
+                    subtypeObj = sub;
+                    break;
+                }
+            }
+            
+            if (document.getElementById('selected-subtype-text')) {
+                document.getElementById('selected-subtype-text').textContent = `Type sélectionné: ${subtype} - ${subtypeObj.description}`;
+            }
+            
+            // Move to step 3
+            moveToStep(3);
+        }
+
+        // Function to generate classification
+        function generateClassification() {
+            // Get selected neurological status
+            const neuroRadios = document.querySelectorAll('input[name="neuro"]');
+            for (const radio of neuroRadios) {
+                if (radio.checked) {
+                    selectedNeurologicalStatus = radio.value;
+                    break;
+                }
+            }
+            
+            // Get selected modifiers
+            selectedModifiers = [];
+            const modifierCheckboxes = document.querySelectorAll('input[name="modifier"]');
+            for (const checkbox of modifierCheckboxes) {
+                if (checkbox.checked) {
+                    selectedModifiers.push(checkbox.value);
+                }
+            }
+            
+            // Check if neurological status is selected
+            if (!selectedNeurologicalStatus) {
+                alert("Veuillez sélectionner un statut neurologique.");
+                return;
+            }
+            
+            // Generate classification
+            const classification = `${selectedSubtype}, ${selectedNeurologicalStatus}${selectedModifiers.length > 0 ? ', ' + selectedModifiers.join(', ') : ''}`;
+            
+            // Create result element if it doesn't exist
+            let resultElement = document.getElementById('result');
+            if (!resultElement) {
+                const mainContent = document.querySelector('main .max-w-6xl');
+                resultElement = document.createElement('div');
+                resultElement.id = 'result';
+                resultElement.className = 'mt-10 p-6 bg-gray-50 rounded-lg shadow-lg hidden';
+                
+                resultElement.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-4 text-center">Résultat de la Classification</h3>
+                    
+                    <div class="mb-6 p-4 bg-white rounded-lg shadow">
+                        <h4 class="text-xl font-bold mb-2">Classification AOSpine</h4>
+                        <p id="classification-result" class="text-3xl font-bold text-blue-800"></p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-white rounded-lg shadow">
+                            <h4 class="text-xl font-bold mb-2">Description de la lésion</h4>
+                            <p id="injury-description" class="text-lg"></p>
+                        </div>
+                        
+                        <div class="p-4 bg-white rounded-lg shadow">
+                            <h4 class="text-xl font-bold mb-2">Approche thérapeutique suggérée</h4>
+                            <p id="treatment-suggestion" class="text-lg"></p>
+                            <p class="mt-4 text-sm italic text-gray-600">Note: Cette suggestion est basée sur les lignes directrices de l'AOSpine et doit être évaluée par un médecin spécialiste en fonction du contexte clinique complet.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 flex justify-center">
+                        <button id="new-classification" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg text-lg mr-4">
+                            Nouvelle classification
+                        </button>
+                        <button id="back-to-step3" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg text-lg">
+                            Modifier les paramètres
+                        </button>
+                    </div>
+                `;
+                
+                mainContent.appendChild(resultElement);
+                
+                // Add event listeners to new buttons
+                document.getElementById('new-classification').addEventListener('click', restartClassification);
+                document.getElementById('back-to-step3').addEventListener('click', function() {
+                    document.getElementById('result').classList.add('hidden');
+                    moveToStep(3);
+                });
+            }
+            
+            // Display result
+            document.getElementById('classification-result').textContent = classification;
+            
+            // Generate injury description
+            let descriptionText = injuryDescriptions[selectedSubtype];
+            descriptionText += `<br><br><strong>Statut neurologique:</strong> ${neuroImpacts[selectedNeurologicalStatus]}`;
+            
+            // Add modifiers description if any
+            if (selectedModifiers.length > 0) {
+                descriptionText += '<br><br><strong>Modificateurs:</strong>';
+                selectedModifiers.forEach(modifier => {
+                    descriptionText += `<br>- ${modifier}: ${modifierImpacts[modifier]}`;
+                });
+            }
+            
+            document.getElementById('injury-description').innerHTML = descriptionText;
+            
+            // Generate treatment suggestion
+            let treatmentText = treatmentRecommendations[selectedSubtype];
+            
+            // Adjust treatment based on neurological status
+            if (selectedNeurologicalStatus === 'N3' || selectedNeurologicalStatus === '+') {
+                treatmentText += '<br><br><strong>Considération neurologique:</strong> En raison du déficit neurologique, une intervention chirurgicale rapide avec décompression des éléments nerveux est généralement indiquée, quelle que soit la classification de la fracture.';
+            }
+            
+            // Adjust treatment based on modifiers
+            if (selectedModifiers.includes('M1')) {
+                treatmentText += '<br><br><strong>M1:</strong> La présence de lésions des tissus mous nécessite une attention particulière au timing chirurgical et à la planification des voies d\'abord pour minimiser les complications de cicatrisation.';
+            }
+            
+            if (selectedModifiers.includes('M2')) {
+                treatmentText += '<br><br><strong>M2:</strong> La maladie osseuse métabolique peut nécessiter une fixation plus étendue et/ou l\'utilisation de ciment pour augmenter la tenue des implants. Un traitement médical de l\'ostéoporose doit être envisagé.';
+            }
+            
+            if (selectedModifiers.includes('M3')) {
+                treatmentText += '<br><br><strong>M3:</strong> La lésion de l\'anneau pelvien antérieur requiert une évaluation de la stabilité globale du bassin. Une fixation antérieure complémentaire (symphyse pubienne ou branches pubiennes) peut être nécessaire.';
+            }
+            
+            if (selectedModifiers.includes('M4')) {
+                treatmentText += '<br><br><strong>M4:</strong> L\'atteinte de l\'articulation sacro-iliaque nécessite généralement une fixation ilio-sacrée spécifique pour restaurer la stabilité de cette jonction critique.';
+            }
+            
+            document.getElementById('treatment-suggestion').innerHTML = treatmentText;
+            
+            // Show result section
+            resultElement.classList.remove('hidden');
+            
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(element => {
+                element.classList.remove('active');
+            });
+        }
+
+        // Function to move between steps
+        function moveToStep(step) {
+            // Update the title first
+            const titleElement = document.querySelector('h3');
+            if (step === 1) {
+                titleElement.textContent = "Étape 1: Identifiez le type principal de lésion";
+            } else if (step === 2) {
+                titleElement.textContent = "Étape 2: Précisez le sous-type de lésion";
+            } else if (step === 3) {
+                titleElement.textContent = "Étape 3: Définissez le statut neurologique et les modificateurs";
+            }
+            
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(element => {
+                element.classList.remove('active');
+            });
+            
+            // Show selected step
+            const stepElement = document.getElementById('step' + step);
+            if (stepElement) {
+                stepElement.classList.add('active');
+            } else {
+                console.error(`Element with id 'step${step}' not found`);
+            }
+            
+            // Update indicators
+            document.querySelectorAll('[id^="step"]').forEach(element => {
+                if (element.id.includes('-indicator')) {
+                    element.classList.remove('bg-blue-600', 'text-white');
+                    element.classList.add('bg-gray-300', 'text-gray-600');
+                }
+            });
+            
+            for (let i = 1; i <= step; i++) {
+                const indicator = document.getElementById('step' + i + '-indicator');
+                if (indicator) {
+                    indicator.classList.remove('bg-gray-300', 'text-gray-600');
+                    indicator.classList.add('bg-blue-600', 'text-white');
+                }
+                
+                if (i < step) {
+                    const line = document.getElementById('step' + i + '-' + (i+1) + '-line');
+                    if (line) {
+                        line.classList.remove('bg-gray-300');
+                        line.classList.add('bg-blue-600');
+                    }
+                }
+            }
+            
+            // Hide result if any
+            const resultElement = document.getElementById('result');
+            if (resultElement) {
+                resultElement.classList.add('hidden');
+            }
+            
+            // Scroll to top of content
+            window.scrollTo(0, 0);
+        }
+
+        // Function to restart classification
+        function restartClassification() {
+            // Reset selections
+            selectedType = '';
+            selectedSubtype = '';
+            selectedNeurologicalStatus = '';
+            selectedModifiers = [];
+            
+            // Reset UI
+            document.querySelectorAll('#step1 button').forEach(button => {
+                button.classList.remove('selected');
+            });
+            
+            // Hide steps 2 and 3 if they exist
+            const step2Element = document.getElementById('step2');
+            if (step2Element) {
+                step2Element.remove();
+            }
+            
+            const step3Element = document.getElementById('step3');
+            if (step3Element) {
+                step3Element.remove();
+            }
+            
+            // Hide result
+            const resultElement = document.getElementById('result');
+            if (resultElement) {
+                resultElement.classList.add('hidden');
+            }
+            
+            // Go back to step 1
+            moveToStep(1);
+        }
+    </script>
+</body>
+</html>

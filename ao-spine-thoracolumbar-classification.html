@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeurosurgerySpine.healthcenter - Classification AOSpine Thoraco-Lombaire</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .step-content {
+            display: none;
+        }
+        .step-content.active {
+            display: block;
+        }
+        .btn-nav {
+            transition: all 0.3s ease;
+        }
+        .btn-nav:hover {
+            transform: scale(1.05);
+        }
+        .selected {
+            border: 3px solid #1E40AF;
+            background-color: #DBEAFE;
+        }
+        .injury-type-a {
+            background-color: #EDE9FE;
+            border-left: 5px solid #6D28D9;
+        }
+        .injury-type-b {
+            background-color: #DCFCE7;
+            border-left: 5px solid #15803D;
+        }
+        .injury-type-c {
+            background-color: #FEE2E2;
+            border-left: 5px solid #DC2626;
+        }
+        .back-to-home {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gray-800 text-white p-4">
+        <h1 class="text-2xl font-bold text-center">NeurosurgerySpine.healthcenter</h1>
+        <p class="text-center text-gray-300 italic">Solutions avancées pour la chirurgie vertébrale</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4">
+        <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6">
+            <!-- Title -->
+            <h2 class="text-3xl font-bold mb-6 text-center">Classification AOSpine du Rachis Thoraco-Lombaire</h2>
+            
+            <!-- Progress Steps -->
+            <div class="flex justify-center items-center mb-10">
+                <div id="step1-indicator" class="h-12 w-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg cursor-pointer" onclick="if(selectedType) restartClassification()">1</div>
+                <div class="h-1 w-16 bg-gray-300" id="step1-2-line"></div>
+                <div id="step2-indicator" class="h-12 w-12 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg cursor-pointer" onclick="if(selectedType) moveToStep(2)">2</div>
+                <div class="h-1 w-16 bg-gray-300" id="step2-3-line"></div>
+                <div id="step3-indicator" class="h-12 w-12 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-bold text-lg cursor-pointer" onclick="if(selectedSubtype) moveToStep(3)">3</div>
+            </div>
+
+            <!-- Main step title -->
+            <h3 class="text-2xl font-bold mb-6">Étape 1: Identifiez le type principal de lésion</h3>
+            
+            <!-- Step 1: Main Type Selection -->
+            <div id="step1" class="step-content active">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <button id="type-a" class="btn-nav p-6 injury-type-a rounded-lg shadow hover:opacity-90 flex flex-col items-center">
+                        <div class="text-xl font-semibold text-center">Type A</div>
+                        <div class="my-4 text-center">Lésions de compression</div>
+                    </button>
+                    
+                    <button id="type-b" class="btn-nav p-6 injury-type-b rounded-lg shadow hover:opacity-90 flex flex-col items-center">
+                        <div class="text-xl font-semibold text-center">Type B</div>
+                        <div class="my-4 text-center">Lésions de distraction</div>
+                    </button>
+                    
+                    <button id="type-c" class="btn-nav p-6 injury-type-c rounded-lg shadow hover:opacity-90 flex flex-col items-center">
+                        <div class="text-xl font-semibold text-center">Type C</div>
+                        <div class="my-4 text-center">Lésions avec translation</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Button to return to index -->
+    <a href="index-ao-classification.html" class="back-to-home bg-gray-800 text-white py-2 px-4 rounded-full shadow-lg hover:bg-gray-700 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+        Retour à l'accueil
+    </a>
+    
+    <footer class="bg-gray-800 text-white p-4 text-center">
+        <p>&copy; 2025 NeurosurgerySpine.healthcenter - Tous droits réservés</p>
+        <p class="text-gray-400 text-sm mt-2">Classification AOSpine des fractures vertébrales</p>
+    </footer>
+
+    <script>
+        // Global variables to store selected choices
+        let selectedType = '';
+        let selectedSubtype = '';
+        let selectedNeurologicalStatus = '';
+        let selectedModifiers = [];
+
+        // Main type information with image paths
+        const mainTypes = {
+            'a': { 
+                title: 'Type A', 
+                description: 'Lésions de compression', 
+                class: 'injury-type-a',
+                imagePath: 'images/tl-type-a.png'
+            },
+            'b': { 
+                title: 'Type B', 
+                description: 'Lésions de distraction', 
+                class: 'injury-type-b',
+                imagePath: 'images/tl-type-b.png'
+            },
+            'c': { 
+                title: 'Type C', 
+                description: 'Lésions avec translation', 
+                class: 'injury-type-c',
+                imagePath: 'images/tl-type-c.png'
+            }
+        };
+
+        // Subtypes definition
+        const subtypes = {
+            'a': [
+                { value: 'A0', title: 'A0', description: 'Fractures mineures, non structurelles', imagePath: 'images/tl-a0.png' },
+                { value: 'A1', title: 'A1', description: 'Fracture en compression cunéiforme', imagePath: 'images/tl-a1.png' },
+                { value: 'A2', title: 'A2', description: 'Fracture en split / séparation', imagePath: 'images/tl-a2.png' },
+                { value: 'A3', title: 'A3', description: 'Fracture comminutive incomplète (burst incomplet)', imagePath: 'images/tl-a3.png' },
+                { value: 'A4', title: 'A4', description: 'Fracture comminutive complète (burst complet)', imagePath: 'images/tl-a4.png' }
+            ],
+            'b': [
+                { value: 'B1', title: 'B1', description: 'Rupture transosseuse de la bande de tension (Fracture de Chance)', imagePath: 'images/tl-b1.png' },
+                { value: 'B2', title: 'B2', description: 'Rupture de la bande de tension postérieure', imagePath: 'images/tl-b2.png' },
+                { value: 'B3', title: 'B3', description: 'Lésion en hyperextension', imagePath: 'images/tl-b3.png' }
+            ],
+            'c': [
+                { value: 'C', title: 'C', description: 'Lésion avec déplacement ou dislocation', imagePath: 'images/tl-c.png' }
+            ]
+        };
+
+        // Treatment recommendations (simplified examples)
+        const treatmentRecommendations = {
+            'A0': 'Traitement conservateur sans immobilisation spécifique. Analgésie simple et reprise précoce des activités.',
+            'A1': 'Traitement conservateur avec corset TLSO pour 6-12 semaines selon l\'âge et la qualité osseuse. Consolidation généralement bonne.',
+            'A2': 'Traitement conservateur rigide ou, en cas de fragment déplacé, fixation chirurgicale postérieure. La stabilité dépend de l\'intégrité du mur postérieur.',
+            'A3': 'Traitement chirurgical souvent recommandé : fixation postérieure courte par vis pédiculaires. Surveillance de l\'angle de cyphose régionale.',
+            'A4': 'Traitement chirurgical généralement indiqué : fixation postérieure, parfois complétée par une approche antérieure pour les cas avec déficit neurologique significatif.',
+            'B1': 'Traitement chirurgical généralement recommandé : fixation postérieure avec ou sans décompression selon l\'état neurologique.',
+            'B2': 'Traitement chirurgical par voie postérieure (fixation par vis pédiculaires) avec restauration de l\'alignement sagittal.',
+            'B3': 'Traitement chirurgical par voie antérieure et/ou postérieure, selon le type exact de lésion et le niveau atteint.',
+            'C': 'Traitement chirurgical urgent par fixation postérieure étendue (au moins 2 niveaux au-dessus et au-dessous). Réduction anatomique et stabilisation immédiate nécessaires.'
+        };
+
+        // Description détaillée des lésions
+        const injuryDescriptions = {
+            'A0': 'Fractures mineures des processus non porteurs de charge, comme les processus transverses ou épineux, sans impact sur la stabilité de la colonne vertébrale.',
+            'A1': 'Fracture par compression d\'un seul plateau vertébral, entraînant une déformation cunéiforme du corps vertébral. Le mur postérieur reste intact, limitant le risque de compression neurologique.',
+            'A2': 'Fracture verticale complète du corps vertébral dans le plan sagittal ou coronal, séparant le corps en fragments distincts. La stabilité dépend de l\'atteinte des structures postérieures.',
+            'A3': 'Fracture comminutive avec atteinte partielle du mur postérieur, créant un risque potentiel de compression médullaire ou radiculaire par rétropulsion osseuse.',
+            'A4': 'Fracture comminutive avec fragmentation complète du corps vertébral, y compris rupture complète du mur postérieur. Risque élevé d\'instabilité et de compression neurologique.',
+            'B1': 'Rupture horizontale à travers les éléments osseux postérieurs et le corps vertébral (fracture de Chance). Résulte typiquement d\'une flexion forcée avec point de pivot antérieur (ceinture de sécurité).',
+            'B2': 'Rupture de la bande de tension postérieure, impliquant principalement les éléments ligamentaires et capsulaires postérieurs. Souvent associée à une fracture de compression antérieure.',
+            'B3': 'Lésion en hyperextension avec distraction antérieure, touchant le disque et le ligament longitudinal antérieur. Plus fréquente chez les patients avec ankylose préexistante.',
+            'C': 'Lésion avec déplacement dans n\'importe quel plan, résultant en dislocation ou translation d\'une vertèbre par rapport à l\'autre. Implique typiquement une défaillance des trois colonnes vertébrales.'
+        };
+
+        // Modifier impact descriptions
+        const modifierImpacts = {
+            'M1': 'Lésion indéterminée de la bande de tension, visible à l\'IRM mais sans traduction claire sur les radiographies standard. Ce modificateur indique que la lésion pourrait être plus grave qu\'elle n\'apparaît sur les examens initiaux, suggérant une surveillance plus étroite ou une stabilisation chirurgicale préventive.',
+            'M2': 'Comorbidité spécifique au patient qui peut influencer la prise en charge. Exemples : spondylarthrite ankylosante, maladie de Forestier (DISH), ostéoporose sévère, brûlures cutanées sur le site opératoire potentiel.'
+        };
+
+        // Neurological impact on treatment
+        const neuroImpacts = {
+            'N0': 'Absence de déficit neurologique.',
+            'N1': 'Déficit neurologique transitoire, résolu à l\'évaluation.',
+            'N2': 'Symptômes radiculaires persistants, nécessitant une évaluation de la compression nerveuse.',
+            'N3': 'Lésion médullaire incomplète ou atteinte partielle de la queue de cheval. Une décompression urgente peut être indiquée en cas de compression persistante.',
+            'N4': 'Lésion médullaire complète. Le pronostic neurologique est réservé, mais une stabilisation précoce reste généralement indiquée.',
+            'NX': 'Statut neurologique non évaluable. Une évaluation neurologique complète devrait être réalisée dès que possible.',
+            '+': 'Compression médullaire continue. Une décompression chirurgicale urgente est généralement indiquée.'
+        };
+
+        // Region codes for classification
+        const typeCodes = {
+            'a': 'A',
+            'b': 'B',
+            'c': 'C'
+        };
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Type selection buttons
+            document.getElementById('type-a').addEventListener('click', function() {
+                selectType('a');
+            });
+            
+            document.getElementById('type-b').addEventListener('click', function() {
+                selectType('b');
+            });
+            
+            document.getElementById('type-c').addEventListener('click', function() {
+                selectType('c');
+            });
+        });
+
+        // Function to select a main type
+        function selectType(type) {
+            selectedType = type;
+            
+            // Update UI for type selection
+            document.querySelectorAll('#step1 button').forEach(button => {
+                button.classList.remove('selected');
+            });
+            document.getElementById('type-' + type).classList.add('selected');
+            
+            // Create and add step 2 content
+            const mainContent = document.querySelector('main .max-w-6xl');
+            
+            // Create step 2 div if it doesn't exist
+            let step2Div = document.getElementById('step2');
+            if (!step2Div) {
+                step2Div = document.createElement('div');
+                step2Div.id = 'step2';
+                step2Div.className = 'step-content';
+                mainContent.appendChild(step2Div);
+            }
+            
+            // Clear and set content for step 2
+            step2Div.innerHTML = `
+                <p id="selected-type-text" class="text-lg mb-6 font-semibold">Type sélectionné: ${mainTypes[type].title} - ${mainTypes[type].description}</p>
+                
+                <div id="subtype-options" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    ${subtypes[type].map(subtype => `
+                        <button class="btn-nav p-6 ${mainTypes[type].class} rounded-lg shadow hover:opacity-90 flex flex-col items-center subtype-button" data-subtype="${subtype.value}">
+                            <div class="text-xl font-semibold text-center">${subtype.title}</div>
+                            <div class="my-4 text-center">${subtype.description}</div>
+                            <img src="${subtype.imagePath}" alt="${subtype.title}" class="mt-4 rounded w-full">
+                        </button>
+                    `).join('')}
+                </div>
+                
+                <div class="flex justify-between mt-8">
+                    <button id="back-to-step1" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg text-lg">
+                        ← Retour
+                    </button>
+                </div>
+            `;
+            
+            // Add event listeners to new buttons
+            document.getElementById('back-to-step1').addEventListener('click', function() {
+                moveToStep(1);
+            });
+            
+            document.querySelectorAll('.subtype-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    selectSubtype(this.getAttribute('data-subtype'));
+                });
+            });
+            
+            // Reset subtype selection and neurological selections when changing main type
+            selectedSubtype = '';
+            selectedNeurologicalStatus = '';
+            selectedModifiers = [];
+            
+            // Create step 3 if it doesn't exist
+            if (!document.getElementById('step3')) {
+                createStep3();
+            }
+            
+            // Hide result if visible
+            const resultElement = document.getElementById('result');
+            if (resultElement) {
+                resultElement.classList.add('hidden');
+            }
+            
+            // Move to step 2
+            moveToStep(2);
+        }
+        
+        // Function to create step 3
+        function createStep3() {
+            const mainContent = document.querySelector('main .max-w-6xl');
+            
+            const step3Div = document.createElement('div');
+            step3Div.id = 'step3';
+            step3Div.className = 'step-content';
+            
+            step3Div.innerHTML = `
+                <p id="selected-subtype-text" class="text-lg mb-6 font-semibold"></p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- Neurological Status -->
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h4 class="text-xl font-bold mb-4">Statut Neurologique</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="N0" class="h-5 w-5">
+                                <span class="text-lg">N0 - Neurologie intacte</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="N1" class="h-5 w-5">
+                                <span class="text-lg">N1 - Déficit neurologique transitoire</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="N2" class="h-5 w-5">
+                                <span class="text-lg">N2 - Symptômes radiculaires</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="N3" class="h-5 w-5">
+                                <span class="text-lg">N3 - Lésion médullaire incomplète</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="N4" class="h-5 w-5">
+                                <span class="text-lg">N4 - Lésion médullaire complète</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="NX" class="h-5 w-5">
+                                <span class="text-lg">NX - Ne peut être examiné</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="neuro" value="+" class="h-5 w-5">
+                                <span class="text-lg">+ - Compression médullaire continue</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Modifiers -->
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h4 class="text-xl font-bold mb-4">Modificateurs (sélection multiple)</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="modifier" value="M1" class="h-5 w-5">
+                                <span class="text-lg">M1 - Lésion indéterminée de la bande de tension</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="modifier" value="M2" class="h-5 w-5">
+                                <span class="text-lg">M2 - Comorbidité spécifique au patient</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between mt-8">
+                    <button id="back-to-step2" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg text-lg">
+                        ← Retour
+                    </button>
+                    <button id="generate-result" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-xl">
+                        Générer la classification
+                    </button>
+                </div>
+            `;
+            
+            mainContent.appendChild(step3Div);
+            
+            // Add event listeners to new buttons
+            document.getElementById('back-to-step2').addEventListener('click', function() {
+                moveToStep(2);
+            });
+            
+            document.getElementById('generate-result').addEventListener('click', generateClassification);
+        }
+
+        // Function to select subtype
+        function selectSubtype(subtype) {
+            selectedSubtype = subtype;
+            
+            // Update UI for subtype selection
+            document.querySelectorAll('.subtype-button').forEach(button => {
+                button.classList.remove('selected');
+                if (button.getAttribute('data-subtype') === subtype) {
+                    button.classList.add('selected');
+                }
+            });
+            
+            // Update selected subtype text in step 3
+            let subtypeObj;
+            for (let sub of subtypes[selectedType]) {
+                if (sub.value === subtype) {
+                    subtypeObj = sub;
+                    break;
+                }
+            }
+            
+            if (document.getElementById('selected-subtype-text')) {
+                document.getElementById('selected-subtype-text').textContent = `Type sélectionné: ${subtype} - ${subtypeObj.description}`;
+            }
+            
+            // Move to step 3
+            moveToStep(3);
+        }
+
+        // Function to generate classification
+        function generateClassification() {
+            // Get selected neurological status
+            const neuroRadios = document.querySelectorAll('input[name="neuro"]');
+            for (const radio of neuroRadios) {
+                if (radio.checked) {
+                    selectedNeurologicalStatus = radio.value;
+                    break;
+                }
+            }
+            
+            // Get selected modifiers
+            selectedModifiers = [];
+            const modifierCheckboxes = document.querySelectorAll('input[name="modifier"]');
+            for (const checkbox of modifierCheckboxes) {
+                if (checkbox.checked) {
+                    selectedModifiers.push(checkbox.value);
+                }
+            }
+            
+            // Check if neurological status is selected
+            if (!selectedNeurologicalStatus) {
+                alert("Veuillez sélectionner un statut neurologique.");
+                return;
+            }
+            
+            // Generate classification
+            const classification = `${selectedSubtype}, ${selectedNeurologicalStatus}${selectedModifiers.length > 0 ? ', ' + selectedModifiers.join(', ') : ''}`;
+            
+            // Create result element if it doesn't exist
+            let resultElement = document.getElementById('result');
+            if (!resultElement) {
+                const mainContent = document.querySelector('main .max-w-6xl');
+                resultElement = document.createElement('div');
+                resultElement.id = 'result';
+                resultElement.className = 'mt-10 p-6 bg-gray-50 rounded-lg shadow-lg hidden';
+                
+                resultElement.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-4 text-center">Résultat de la Classification</h3>
+                    
+                    <div class="mb-6 p-4 bg-white rounded-lg shadow">
+                        <h4 class="text-xl font-bold mb-2">Classification AOSpine</h4>
+                        <p id="classification-result" class="text-3xl font-bold text-blue-800"></p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-white rounded-lg shadow">
+                            <h4 class="text-xl font-bold mb-2">Description de la lésion</h4>
+                            <p id="injury-description" class="text-lg"></p>
+                        </div>
+                        
+                        <div class="p-4 bg-white rounded-lg shadow">
+                            <h4 class="text-xl font-bold mb-2">Approche thérapeutique suggérée</h4>
+                            <p id="treatment-suggestion" class="text-lg"></p>
+                            <p class="mt-4 text-sm italic text-gray-600">Note: Cette suggestion est basée sur les lignes directrices de l'AOSpine et doit être évaluée par un médecin spécialiste en fonction du contexte clinique complet.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 flex justify-center">
+                        <button id="new-classification" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg text-lg mr-4">
+                            Nouvelle classification
+                        </button>
+                        <button id="back-to-step3" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg text-lg">
+                            Modifier les paramètres
+                        </button>
+                    </div>
+                `;
+                
+                mainContent.appendChild(resultElement);
+                
+                // Add event listeners to new buttons
+                document.getElementById('new-classification').addEventListener('click', restartClassification);
+                document.getElementById('back-to-step3').addEventListener('click', function() {
+                    document.getElementById('result').classList.add('hidden');
+                    moveToStep(3);
+                });
+            }
+            
+            // Display result
+            document.getElementById('classification-result').textContent = classification;
+            
+            // Generate injury description
+            let descriptionText = injuryDescriptions[selectedSubtype];
+            descriptionText += `<br><br><strong>Statut neurologique:</strong> ${neuroImpacts[selectedNeurologicalStatus]}`;
+            
+            // Add modifiers description if any
+            if (selectedModifiers.length > 0) {
+                descriptionText += '<br><br><strong>Modificateurs:</strong>';
+                selectedModifiers.forEach(modifier => {
+                    descriptionText += `<br>- ${modifier}: ${modifierImpacts[modifier]}`;
+                });
+            }
+            
+            document.getElementById('injury-description').innerHTML = descriptionText;
+            
+            // Generate treatment suggestion
+            let treatmentText = treatmentRecommendations[selectedSubtype];
+            
+            // Adjust treatment based on neurological status
+            if (selectedNeurologicalStatus === 'N3' || selectedNeurologicalStatus === 'N4' || selectedNeurologicalStatus === '+') {
+                treatmentText += '<br><br><strong>Considération neurologique:</strong> En raison du déficit neurologique, une intervention chirurgicale rapide avec décompression est généralement indiquée, quelle que soit la classification de la fracture.';
+            }
+            
+            // Adjust treatment based on modifiers
+            if (selectedModifiers.includes('M1')) {
+                treatmentText += '<br><br><strong>M1:</strong> En raison de la lésion indéterminée de la bande de tension, une IRM complémentaire et/ou une surveillance dynamique (clichés en flexion-extension) sont recommandées. Si l\'instabilité est confirmée, une stabilisation chirurgicale peut être envisagée même pour des fractures généralement traitées de manière conservatrice.';
+            }
+            
+            if (selectedModifiers.includes('M2')) {
+                treatmentText += '<br><br><strong>M2:</strong> La présence de comorbidités spécifiques influence significativement l\'approche thérapeutique. Un traitement personnalisé doit être élaboré en tenant compte de ces facteurs (qualité osseuse, risques opératoires, état cutané, etc.).';
+            }
+            
+            document.getElementById('treatment-suggestion').innerHTML = treatmentText;
+            
+            // Show result section
+            resultElement.classList.remove('hidden');
+            
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(element => {
+                element.classList.remove('active');
+            });
+        }
+
+        // Function to move between steps
+        function moveToStep(step) {
+            // Update the title first
+            const titleElement = document.querySelector('h3');
+            if (step === 1) {
+                titleElement.textContent = "Étape 1: Identifiez le type principal de lésion";
+            } else if (step === 2) {
+                titleElement.textContent = "Étape 2: Précisez le sous-type de lésion";
+            } else if (step === 3) {
+                titleElement.textContent = "Étape 3: Définissez le statut neurologique et les modificateurs";
+            }
+            
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(element => {
+                element.classList.remove('active');
+            });
+            
+            // Show selected step
+            const stepElement = document.getElementById('step' + step);
+            if (stepElement) {
+                stepElement.classList.add('active');
+            } else {
+                console.error(`Element with id 'step${step}' not found`);
+            }
+            
+            // Update indicators
+            document.querySelectorAll('[id^="step"]').forEach(element => {
+                if (element.id.includes('-indicator')) {
+                    element.classList.remove('bg-blue-600', 'text-white');
+                    element.classList.add('bg-gray-300', 'text-gray-600');
+                }
+            });
+            
+            for (let i = 1; i <= step; i++) {
+                const indicator = document.getElementById('step' + i + '-indicator');
+                if (indicator) {
+                    indicator.classList.remove('bg-gray-300', 'text-gray-600');
+                    indicator.classList.add('bg-blue-600', 'text-white');
+                }
+                
+                if (i < step) {
+                    const line = document.getElementById('step' + i + '-' + (i+1) + '-line');
+                    if (line) {
+                        line.classList.remove('bg-gray-300');
+                        line.classList.add('bg-blue-600');
+                    }
+                }
+            }
+            
+            // Hide result if any
+            const resultElement = document.getElementById('result');
+            if (resultElement) {
+                resultElement.classList.add('hidden');
+            }
+            
+            // Scroll to top of content
+            window.scrollTo(0, 0);
+        }
+
+        // Function to restart classification
+        function restartClassification() {
+            // Reset selections
+            selectedType = '';
+            selectedSubtype = '';
+            selectedNeurologicalStatus = '';
+            selectedModifiers = [];
+            
+            // Reset UI
+            document.querySelectorAll('#step1 button').forEach(button => {
+                button.classList.remove('selected');
+            });
+            
+            // Hide steps 2 and 3 if they exist
+            const step2Element = document.getElementById('step2');
+            if (step2Element) {
+                step2Element.remove();
+            }
+            
+            const step3Element = document.getElementById('step3');
+            if (step3Element) {
+                step3Element.remove();
+            }
+            
+            // Hide result
+            const resultElement = document.getElementById('result');
+            if (resultElement) {
+                resultElement.classList.add('hidden');
+            }
+            
+            // Go back to step 1
+            moveToStep(1);
+        }
+    </script>
+</body>
+</html>

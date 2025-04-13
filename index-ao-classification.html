@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeurosurgerySpine.healthcenter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .module-card {
+            transition: transform 0.3s ease;
+        }
+        .module-card:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gray-800 text-white p-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold">NeurosurgerySpine.healthcenter</h1>
+            <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+                Retour à l'accueil
+            </a>
+        </div>
+        <p class="text-center text-gray-300 italic">Solutions avancées pour la chirurgie vertébrale</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4">
+        <!-- App Container -->
+        <div id="app-container" class="max-w-6xl mx-auto">
+            <!-- Home Screen (Welcome message and classification selection) -->
+            <div id="welcome-screen">
+                <h2 class="text-3xl font-bold mb-8 text-center">Classification AOSpine des Fractures</h2>
+                <p class="text-xl mb-12 text-center">Sélectionnez la région de la colonne vertébrale à évaluer</p>
+            
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <!-- Upper Cervical Classification Card -->
+                    <a href="ao-spine-cervical-sup-classification.html" class="module-card h-48 bg-blue-500 hover:bg-blue-600 rounded-lg p-6 flex flex-col items-center justify-center text-white shadow-lg no-underline">
+                        <div class="text-xl font-bold text-center">Classification Rachis Cervical Supérieur</div>
+                        <div class="text-sm mt-2 text-center">Occipital-C2</div>
+                    </a>
+                    
+                    <!-- Subaxial Cervical Classification Card -->
+                    <a href="ao-spine-subaxial-classification.html" class="module-card h-48 bg-green-500 hover:bg-green-600 rounded-lg p-6 flex flex-col items-center justify-center text-white shadow-lg no-underline">
+                        <div class="text-xl font-bold text-center">Classification Rachis Cervical Subaxial</div>
+                        <div class="text-sm mt-2 text-center">C3-C7</div>
+                    </a>
+                    
+                    <!-- Thoracolumbar Classification Card -->
+                    <a href="ao-spine-thoracolumbar-classification.html" class="module-card h-48 bg-yellow-500 hover:bg-yellow-600 rounded-lg p-6 flex flex-col items-center justify-center text-white shadow-lg no-underline">
+                        <div class="text-xl font-bold text-center">Classification Rachis Thoraco-Lombaire</div>
+                        <div class="text-sm mt-2 text-center">T1-L5</div>
+                    </a>
+                    
+                    <!-- Sacral Classification Card -->
+                    <a href="ao-spine-sacral-classification.html" class="module-card h-48 bg-red-500 hover:bg-red-600 rounded-lg p-6 flex flex-col items-center justify-center text-white shadow-lg no-underline">
+                        <div class="text-xl font-bold text-center">Classification Fractures Sacrées</div>
+                        <div class="text-sm mt-2 text-center">Sacrum</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="bg-gray-800 text-white p-4 text-center">
+        <p>&copy; 2025 NeurosurgerySpine.healthcenter - Tous droits réservés</p>
+        <p class="text-gray-400 text-sm mt-2">Classification AOSpine des fractures vertébrales</p>
+    </footer>
+</body>
+</html>
