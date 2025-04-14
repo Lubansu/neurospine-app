@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outil de recherche de codes de chirurgie rachidienne</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #2c5282;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 24px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        
+        .toggle-btn {
+            padding: 8px 16px;
+            border: none;
+            background-color: #e2e8f0;
+            cursor: pointer;
+        }
+        
+        .toggle-btn:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .toggle-btn:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .toggle-btn.active {
+            background-color: #3182ce;
+            color: white;
+        }
+        
+        .search-container {
+            margin-bottom: 24px;
+        }
+        
+        .search-input {
+            display: flex;
+            width: 100%;
+        }
+        
+        .search-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .search-input button {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .category-btn {
+            padding: 8px;
+            text-align: left;
+            background-color: #e2e8f0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .category-btn:hover {
+            background-color: #cbd5e0;
+        }
+        
+        .category-btn.active {
+            background-color: #3182ce;
+            color: white;
+        }
+        
+        .results-container {
+            margin-bottom: 24px;
+        }
+        
+        .results-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+        }
+        
+        .result-item {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+        
+        .result-item:hover {
+            background-color: #f7fafc;
+        }
+        
+        .result-item.active {
+            background-color: #ebf8ff;
+        }
+        
+        .procedure-code {
+            font-weight: bold;
+        }
+        
+        .procedure-details {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .detail-row {
+            margin-bottom: 8px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+        }
+        
+        .revision-container {
+            background-color: #f7fafc;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 16px;
+        }
+        
+        .revision-checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .revision-checkbox input {
+            margin-right: 8px;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .revision-code {
+            margin-top: 8px;
+            background-color: #fffaf0;
+            border-radius: 4px;
+            padding: 8px;
+        }
+        
+        .reset-btn-container {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .reset-btn {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .reset-btn:hover {
+            background-color: #c53030;
+        }
+        
+        .info-container {
+            margin-top: 24px;
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Outil de recherche de codes de chirurgie rachidienne</h1>
+        
+        <!-- Toggle mode de recherche -->
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="keywords-toggle">Recherche par mots-clés</button>
+            <button class="toggle-btn" id="categories-toggle">Recherche par catégories</button>
+        </div>
+        
+        <!-- Recherche par mots-clés -->
+        <div class="search-container" id="keywords-container">
+            <div class="search-input">
+                <input type="text" id="search-input" placeholder="Entrez un mot-clé (ex: discectomie, lombaire, cervical...)">
+                <button id="clear-btn">Effacer</button>
+            </div>
+        </div>
+        
+        <!-- Recherche par catégories -->
+        <div class="search-container hidden" id="categories-container">
+            <h2>Sélectionnez une catégorie :</h2>
+            <div class="categories-grid" id="categories-grid">
+                <!-- Les catégories seront ajoutées dynamiquement via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Résultats -->
+        <div class="results-container hidden" id="results-container">
+            <h2>Résultats (<span id="results-count">0</span>) :</h2>
+            <div class="results-list" id="results-list">
+                <!-- Les résultats seront ajoutés dynamiquement via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Détails de la procédure sélectionnée -->
+        <div class="procedure-details hidden" id="procedure-details">
+            <h2>Détails de la procédure sélectionnée :</h2>
+            <div class="detail-row">
+                <span class="detail-label">Code :</span> 
+                <span id="detail-code"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Description :</span> 
+                <span id="detail-description"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Valeur :</span> 
+                <span id="detail-value"></span>
+            </div>
+            
+            <!-- Option pour la révision chirurgicale -->
+            <div class="revision-container hidden" id="revision-container">
+                <label class="revision-checkbox">
+                    <input type="checkbox" id="revision-checkbox">
+                    <span>S'agit-il d'une révision chirurgicale (après 60 jours) ?</span>
+                </label>
+                
+                <div class="revision-code hidden" id="revision-code-container">
+                    <p><strong>Code de révision à ajouter :</strong></p>
+                    <p id="revision-code-value"></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bouton de réinitialisation -->
+        <div class="reset-btn-container">
+            <button class="reset-btn" id="reset-btn">Réinitialiser</button>
+        </div>
+        
+        <!-- Information -->
+        <div class="info-container">
+            <p><strong>Information :</strong> Basé sur l'Arrêté Royal du 17 juin 2022 modifiant la nomenclature des prestations de santé.</p>
+            <p><strong>Remarque :</strong> Cet outil est fourni à titre indicatif. Veuillez toujours vérifier les codes dans les documents officiels.</p>
+        </div>
+    </div>
+
+    <script>
+        // Structure de données pour les procédures rachidiennes
+        const spinalProcedures = [
+            // A. Procédures cervicales
+            {
+                category: "A. Procédures cervicales",
+                procedures: [
+                    { code: "224011-224022", description: "Décompression de la moelle épinière au niveau de la colonne cervicale par voie transorale, transmaxillaire ou transmandibulaire", value: "K 500", revision: "^^" },
+                    { code: "224033-224044", description: "Décompression de la moelle épinière au niveau de la colonne cervicale par voie transorale, transmaxillaire ou transmandibulaire, y compris la reconstruction", value: "K 555", revision: "^^" },
+                    { code: "224055-224066", description: "Fixation de l'odontoïde par vissage antérieur", value: "K 335", revision: "^" },
+                    { code: "224070-224081", description: "Discectomie cervicale par abord antérieur, y compris la reconstruction sur 1 niveau", value: "K 350", revision: "^" },
+                    { code: "224092-224103", description: "Discectomie cervicale par abord antérieur, y compris la reconstruction sur 2 niveaux", value: "K 435", revision: "^" },
+                    { code: "224114-224125", description: "Discectomie cervicale par abord antérieur, y compris la reconstruction sur 3 niveaux ou plus", value: "K 520", revision: "^" },
+                    { code: "224136-224140", description: "Corporectomie de la colonne cervicale par abord antérieur, y compris la reconstruction sur 1 niveau", value: "K 430", revision: "^" },
+                    { code: "224151-224162", description: "Corporectomie de la colonne cervicale par abord antérieur, y compris la reconstruction sur 2 niveaux", value: "K 540", revision: "^" },
+                    { code: "224173-224184", description: "Corporectomie de la colonne cervicale par abord antérieur, y compris la reconstruction sur 3 niveaux ou plus", value: "K 650", revision: "^" },
+                    { code: "224195-224206", description: "Foraminotomie cervicale antérieure ou latérale, avec ou sans décompression de l'artère vertébrale sur 1 niveau", value: "K 350", revision: "^" },
+                    { code: "224210-224221", description: "Foraminotomie cervicale antérieure ou latérale, avec ou sans décompression de l'artère vertébrale sur 2 niveaux", value: "K 435", revision: "^" },
+                    { code: "224232-224243", description: "Foraminotomie cervicale antérieure ou latérale, avec ou sans décompression de l'artère vertébrale sur 3 niveaux ou plus", value: "K 520", revision: "^" },
+                    { code: "224254-224265", description: "Fusion et / ou fixation occipito-cervicale, y compris l'éventuelle décompression", value: "K 310", revision: "^" },
+                    { code: "224276-224280", description: "Fusion et / ou fixation postérieure des vertèbres cervicales C1 et C2 à l'aide de crochets ou de fils", value: "K 170", revision: "^" },
+                    { code: "224291-224302", description: "Fusion et / ou fixation postérieure des vertèbres cervicales C1 et C2 à l'aide de vis", value: "K 310", revision: "^" },
+                    { code: "224313-224324", description: "Laminectomie cervicale quel que soit le nombre de niveaux", value: "K 280", revision: "^" },
+                    { code: "224335-224346", description: "Laminoplastie cervicale sur 1 niveau", value: "K 250", revision: "^" },
+                    { code: "224350-224361", description: "Laminoplastie cervicale sur 2 niveaux", value: "K 310", revision: "^" },
+                    { code: "224372-224383", description: "Laminoplastie cervicale sur 3 niveaux ou plus", value: "K 370", revision: "^" },
+                    { code: "224394-224405", description: "Foraminotomie cervicale postérieure sur 1 niveau", value: "K 350", revision: "^" },
+                    { code: "224416-224420", description: "Foraminotomie cervicale postérieure sur 2 niveaux", value: "K 435", revision: "^" },
+                    { code: "224431-224442", description: "Foraminotomie cervicale postérieure sur 3 niveaux ou plus", value: "K 520", revision: "^" },
+                    { code: "224453-224464", description: "Fixation cervicale ou cervico-thoracique postérieure, y compris l'éventuelle décompression, sur 1 niveau", value: "K 225", revision: "^" },
+                    { code: "224475-224486", description: "Fixation cervicale ou cervico-thoracique postérieure, y compris l'éventuelle décompression, sur 2 niveaux", value: "K 280", revision: "^" },
+                    { code: "224490-224501", description: "Fixation cervicale ou cervico-thoracique postérieure, y compris l'éventuelle décompression, sur 3 niveaux ou plus", value: "K 335", revision: "^" },
+                    { code: "224512-224523", description: "Reconstruction cervicale avec une fixation tant antérieure que postérieure ou une fixation antérieure et une décompression postérieure ou une laminoplastie au cours d'une seule intervention chirurgicale", value: "K 560", revision: "^^" },
+                    { code: "224534-224545", description: "Biopsie par voie chirurgicale d'une masse cervicale extra-durale néoplasique ou inflammatoire", value: "K 95", revision: "" },
+                    { code: "224556-224560", description: "Résection ou debulking d'une masse cervicale rachidienne néoplasique ou inflammatoire", value: "K 300", revision: "^" },
+                    { code: "224571-224582", description: "Résection ou debulking d'une masse cervicale rachidienne néoplasique ou inflammatoire avec reconstruction", value: "K 500", revision: "^^" },
+                    { code: "224593-224604", description: "Spondylectomie cervicale totale en bloc pour une tumeur et reconstruction sur 1 niveau", value: "K 670", revision: "^^" },
+                    { code: "224615-224626", description: "Spondylectomie cervicale totale en bloc pour une tumeur et reconstruction sur 2 niveaux", value: "K 835", revision: "^^" },
+                    { code: "224630-224641", description: "Spondylectomie cervicale totale en bloc pour une tumeur et reconstruction sur 3 niveaux ou plus", value: "K 1000", revision: "^^" },
+                    { code: "224652-224663", description: "Ablation chirurgicale de matériel d'ostéosynthèse, au niveau de la colonne cervicale", value: "K 155", revision: "" },
+                    { code: "224696-224700", description: "Placement chirurgical d'un fixateur ou d'une traction externe pour l'immobilisation de fractures, de luxations ou de fractures-luxations de la colonne cervicale et/ou thoracique haute", value: "K 80", revision: "" },
+                    { code: "224711-224722", description: "Réduction fermée de fractures, luxations ou fractures-luxations, y compris, le cas échéant, le fixateur ou la traction externe pour l'immobilisation de la colonne cervicale et/ou thoracique haute", value: "K 120", revision: "" }
+                ]
+            },
+            // B. Procédures thoraco-lombaires
+            {
+                category: "B. Procédures thoraco-lombaires",
+                procedures: [
+                    { code: "224733-224744", description: "Résection d'une hernie discale thoracique par abord antérieur, par voie chirurgicale ouverte ou endoscopique sur 1 niveau", value: "K 400", revision: "^^" },
+                    { code: "224755-224766", description: "Résection d'une hernie discale thoracique par abord antérieur, par voie chirurgicale ouverte ou endoscopique sur 2 niveaux", value: "K 490", revision: "^^" },
+                    { code: "224770-224781", description: "Résection d'une hernie discale thoracique par abord antérieur, par voie chirurgicale ouverte ou endoscopique sur 3 niveaux ou plus", value: "K 580", revision: "^^" },
+                    { code: "224792-224803", description: "Corporectomie d'une vertèbre thoracique avec reconstruction, par abord antérieur, par voie chirurgicale ouverte ou endoscopique, sur 1 niveau", value: "K 430", revision: "^^" },
+                    { code: "224814-224825", description: "Corporectomie d'une vertèbre thoracique avec reconstruction, par abord antérieur, par voie chirurgicale ouverte ou endoscopique, sur 2 niveaux", value: "K 540", revision: "^^" },
+                    { code: "224836-224840", description: "Corporectomie d'une vertèbre thoracique avec reconstruction, par abord antérieur, par voie chirurgicale ouverte ou endoscopique, sur 3 niveaux ou plus", value: "K 650", revision: "^^" },
+                    { code: "224851-224862", description: "Laminectomie thoracique quel que soit le nombre de niveaux", value: "K 170", revision: "^" },
+                    { code: "224873-224884", description: "Fixation de vertèbre(s) thoracique(s) par abord postérieur, quel que soit le nombre de niveaux", value: "K 250", revision: "^" },
+                    { code: "224895-224906", description: "Fixation du rachis thoracique par abord postérieur, y compris une laminectomie, quel que soit le nombre de niveaux", value: "K 305", revision: "^" },
+                    { code: "224910-224921", description: "Décompression thoracique par voie costo-transversaire", value: "K 335", revision: "^" },
+                    { code: "224932-224943", description: "Décompression thoracique par voie costo-transversaire, y compris la reconstruction", value: "K 390", revision: "^" },
+                    { code: "224954-224965", description: "Biopsie par voie chirurgicale d'une masse extra-durale thoracique néoplasique ou inflammatoire", value: "K 95", revision: "" },
+                    { code: "224976-224980", description: "Résection / debulking d'une masse thoracique rachidienne néoplasique ou inflammatoire", value: "K 300", revision: "^" },
+                    { code: "224991-225002", description: "Résection / debulking d'une masse thoracique rachidienne néoplasique ou inflammatoire, y compris la reconstruction", value: "K 500", revision: "^^" },
+                    { code: "225013-225024", description: "Spondylectomie thoracique totale en bloc pour une tumeur et reconstruction sur 1 niveau", value: "K 670", revision: "^^" },
+                    { code: "225035-225046", description: "Spondylectomie thoracique totale en bloc pour une tumeur et reconstruction sur 2 niveaux", value: "K 835", revision: "^^" },
+                    { code: "225050-225061", description: "Spondylectomie thoracique totale en bloc pour une tumeur et reconstruction sur 3 niveaux ou plus", value: "K 1000", revision: "^^" },
+                    { code: "225072-225083", description: "(Micro)discectomie unilatérale lombaire ou décompression unilatérale (interlaminaire) en cas de sténose foraminale ou du récessus latéral ou de kyste sur 1 niveau", value: "K 200", revision: "^" },
+                    { code: "225094-225105", description: "(Micro)discectomie unilatérale lombaire ou décompression unilatérale (interlaminaire) en cas de sténose foraminale ou du récessus latéral ou de kyste sur 2 niveaux", value: "K 250", revision: "^" },
+                    { code: "225116-225120", description: "(Micro)discectomie unilatérale lombaire ou décompression unilatérale (interlaminaire) en cas de sténose foraminale ou du récessus latéral ou de kyste sur 3 niveaux ou plus", value: "K 300", revision: "^" },
+                    { code: "225131-225142", description: "Discectomie lombaire y compris la reconstruction, par abord antérieur ou latéral, sur 1 niveau", value: "K 350", revision: "^^" },
+                    { code: "225153-225164", description: "Discectomie lombaire y compris la reconstruction, par abord antérieur ou latéral, sur 2 niveaux", value: "K 435", revision: "^^" },
+                    { code: "225175-225186", description: "Discectomie lombaire y compris la reconstruction, par abord antérieur ou latéral, sur 3 niveaux ou plus", value: "K 520", revision: "^^" },
+                    { code: "225190-225201", description: "Discectomie lombaire par abord antérieur ou latéral, y compris la reconstruction antérieure ou latérale et la fixation postérieure complémentaire à l'aide de vis pédiculaires sur 1 niveau", value: "K 460", revision: "^^" },
+                    { code: "225212-225223", description: "Discectomie lombaire par abord antérieur ou latéral, y compris la reconstruction antérieure ou latérale et la fixation postérieure complémentaire à l'aide de vis pédiculaires sur 2 niveaux", value: "K 575", revision: "^^" },
+                    { code: "225234-225245", description: "Discectomie lombaire par abord antérieur ou latéral, y compris la reconstruction antérieure ou latérale et la fixation postérieure complémentaire à l'aide de vis pédiculaires sur 3 niveaux ou plus", value: "K 690", revision: "^^" },
+                    { code: "225256-225260", description: "Corporectomie y compris la reconstruction d'une vertèbre lombaire par abord antérieur ou latéral, sur 1 niveau", value: "K 450", revision: "^^" },
+                    { code: "225271-225282", description: "Corporectomie y compris la reconstruction de vertèbres lombaires par abord antérieur ou latéral, sur 2 niveaux", value: "K 560", revision: "^^" },
+                    { code: "225293-225304", description: "Corporectomie y compris la reconstruction de vertèbres lombaires par abord antérieur ou latéral, sur 3 niveaux ou plus", value: "K 670", revision: "^^" },
+                    { code: "225315-225326", description: "Corporectomie d'une vertèbre lombaire par abord antérieur ou latéral, y compris la reconstruction et la fixation postérieure à l'aide de vis pédiculaires sur 1 niveau", value: "K 560", revision: "^^" },
+                    { code: "225330-225341", description: "Corporectomie de vertèbres lombaires par abord antérieur ou latéral, y compris la reconstruction et la fixation postérieure à l'aide de vis pédiculaires sur 2 niveaux", value: "K 700", revision: "^^" },
+                    { code: "225352-225363", description: "Corporectomie de vertèbres lombaires par abord antérieur ou latéral, y compris la reconstruction et la fixation postérieure à l'aide de vis pédiculaires sur 3 niveaux ou plus", value: "K 840", revision: "^^" },
+                    { code: "225374-225385", description: "Décompression lombaire (interlaminaire ou par laminectomie) bilatérale en cas de sténose centrale ou foraminale ou du récessus latéral ou de kyste, sur 1 niveau", value: "K 250", revision: "^" },
+                    { code: "225396-225400", description: "Décompression lombaire (interlaminaire ou par laminectomie) bilatérale en cas de sténose centrale ou foraminale ou du récessus latéral ou de kyste, sur 2 niveaux", value: "K 325", revision: "^" },
+                    { code: "225411-225422", description: "Décompression lombaire (interlaminaire ou par laminectomie) bilatérale en cas de sténose centrale ou foraminale ou du récessus latéral ou de kyste, sur 3 niveaux ou plus", value: "K 400", revision: "^" },
+                    { code: "225455-225466", description: "Fixation lombaire au moyen de vis pédiculaires par abord postérieur, sur 1 ou plusieurs niveaux", value: "K 280", revision: "^" },
+                    { code: "225470-225481", description: "Fixation lombaire au moyen de vis pédiculaires par abord postérieur et décompression, y compris une éventuelle fusion postérolatérale sur 1 niveau", value: "K 300", revision: "^" },
+                    { code: "225492-225503", description: "Fixation lombaire au moyen de vis pédiculaires par abord postérieur et décompression, y compris une éventuelle fusion postérolatérale sur 2 niveaux", value: "K 380", revision: "^" },
+                    { code: "225514-225525", description: "Fixation lombaire au moyen de vis pédiculaires par abord postérieur et décompression, y compris une éventuelle fusion postérolatérale sur 3 niveaux ou plus", value: "K 460", revision: "^" },
+                    { code: "225536-225540", description: "Arthrodèse lombaire par abord postérieur ou transforaminal au moyen de vis pédiculaires (PLIF, TLIF), sur 1 niveau", value: "K 360", revision: "^^" },
+                    { code: "225551-225562", description: "Arthrodèse lombaire par abord postérieur ou transforaminal au moyen de vis pédiculaires (PLIF, TLIF), sur 2 niveaux", value: "K 450", revision: "^^" },
+                    { code: "225573-225584", description: "Arthrodèse lombaire par abord postérieur ou transforaminal au moyen de vis pédiculaires (PLIF, TLIF), sur 3 niveaux ou plus", value: "K 540", revision: "^^" },
+                    { code: "225595-225606", description: "Cure chirurgicale d'une spondylolyse lombaire", value: "K 280", revision: "^" },
+                    { code: "225610-225621", description: "Cure chirurgicale d'un spondylolisthèse lombaire de grade III ou IV par résection du dôme sacré et reconstruction (classification de Meyerding)", value: "K 560", revision: "^^" },
+                    { code: "225632-225643", description: "Biopsie par voie chirurgicale d'une masse extra-durale lombaire néoplasique ou inflammatoire", value: "K 95", revision: "" },
+                    { code: "225654-225665", description: "Résection ou debulking d'une masse lombaire rachidienne néoplasique ou inflammatoire", value: "K 300", revision: "^" },
+                    { code: "225676-225680", description: "Résection ou debulking d'une masse lombaire néoplasique ou inflammatoire, y compris la reconstruction", value: "K 500", revision: "^^" },
+                    { code: "225691-225702", description: "Spondylectomie lombaire totale en bloc pour une tumeur et reconstruction sur 1 niveau", value: "K 670", revision: "^^" },
+                    { code: "225713-225724", description: "Spondylectomie lombaire totale en bloc pour une tumeur et reconstruction sur 2 niveaux", value: "K 835", revision: "^^" },
+                    { code: "225735-225746", description: "Spondylectomie lombaire totale en bloc pour une tumeur et reconstruction sur 3 niveaux ou plus", value: "K 1000", revision: "^^" },
+                    { code: "225750-225761", description: "Corporectomie thoraco-lombaire et reconstruction par abord postérieur sur 1 niveau", value: "K 670", revision: "^^" },
+                    { code: "225772-225783", description: "Corporectomie thoraco-lombaire et reconstruction par abord postérieur sur 2 niveaux", value: "K 835", revision: "^^" },
+                    { code: "225794-225805", description: "Corporectomie thoraco-lombaire et reconstruction par abord postérieur sur 3 niveaux", value: "K 1000", revision: "^^" },
+                    { code: "225816-225820", description: "Ablation chirurgicale de matériel d'ostéosynthèse au niveau de la colonne thoraco-lombaire, sur 5 niveaux maximum", value: "K 140", revision: "" },
+                    { code: "225831-225842", description: "Ablation chirurgicale de matériel d'ostéosynthèse au niveau de la colonne thoraco-lombaire, sur 6 niveaux ou plus", value: "K 195", revision: "" }
+                ]
+            },
+            // C. Traitement chirurgical des déformations
+            {
+                category: "C. Traitement chirurgical des déformations",
+                procedures: [
+                    { code: "225890-225901", description: "Scoliose thoraco-lombaire de plus de 6 niveaux et de moins de 12 niveaux, y compris le neuromonitoring", value: "K 670", revision: "^^" },
+                    { code: "225912-225923", description: "Correction de l'alignement sagittal au moyen d'une ostéotomie par soustraction pédiculaire en cas de déformation thoraco-lombaire", value: "K 560", revision: "^^" },
+                    { code: "225934-225945", description: "Correction de l'alignement sagittal par ostéotomie vertébrale de soustraction par abord postérieur, sur 1 niveau en cas de déformation thoraco-lombaire", value: "K 300", revision: "^^" },
+                    { code: "225956-225960", description: "Correction de l'alignement sagittal de la colonne par ostéotomie vertébrale de soustraction par abord postérieur, sur 2 niveaux en cas de déformation thoraco-lombaire", value: "K 375", revision: "^^" },
+                    { code: "225971-225982", description: "Correction de l'alignement sagittal de la colonne par ostéotomie vertébrale de soustraction par abord postérieur, sur 3 niveaux ou plus en cas de déformation thoraco-lombaire", value: "K 450", revision: "^^" },
+                    { code: "225993-226004", description: "Scoliose thoraco-lombaire de 12 niveaux ou plus, y compris le neuromonitoring", value: "K 800", revision: "^^" },
+                    { code: "226015-226026", description: "Scoliose par une libération antérieure avec interposition de greffons, sur 3 niveaux ou plus", value: "K 390", revision: "^^" },
+                    { code: "226030-226041", description: "Scoliose à l'aide de tiges de croissance (\"growing rods\") - implantation de tiges", value: "K 140", revision: "^" },
+                    { code: "226052-226063", description: "Scoliose à l'aide de tiges de croissance (\"growing rods\") - implantation d'ancres (\"anchors\")", value: "K 140", revision: "^" },
+                    { code: "226074-226085", description: "Scoliose à l'aide de tiges de croissance (\"growing rods\") - prolongation", value: "K 140", revision: "" }
+                ]
+            },
+            // D. Procédures dans la région sacrée
+            {
+                category: "D. Procédures dans la région sacrée",
+                procedures: [
+                    { code: "226096-226100", description: "Biopsie par voie chirurgicale d'une masse extra-durale sacrée néoplasique ou inflammatoire", value: "K 95", revision: "" },
+                    { code: "226111-226122", description: "Résection d'une masse néoplasique ou inflammatoire du sacrum", value: "K 225", revision: "^" },
+                    { code: "226133-226144", description: "Résection d'une masse néoplasique ou inflammatoire du sacrumavec reconstruction de la charnière lombo-sacrée", value: "K 670", revision: "^^" },
+                    { code: "226155-226166", description: "Sacrectomie totale en bloc pour une tumeur sans reconstruction", value: "K 400", revision: "^^" },
+                    { code: "226170-226181", description: "Sacrectomie totale en bloc pour une tumeur avec reconstruction", value: "K 835", revision: "^^" },
+                    { code: "226214-226225", description: "Coccygectomie", value: "K 80", revision: "" },
+                    { code: "226236-226240", description: "Fixation de l'articulation sacro-iliaque", value: "K 195", revision: "^" }
+                ]
+            },
+            // E. Procédures rachidiennes intra-durales
+            {
+                category: "E. Procédures rachidiennes intra-durales",
+                procedures: [
+                    { code: "226251-226262", description: "Drainage chirurgical d'un hématome intra-dural rachidien", value: "K 500", revision: "^^" },
+                    { code: "226273-226284", description: "Traitement chirurgical d'une fistule ou malformation artério-veineuse rachidienne", value: "K 1000", revision: "^^" },
+                    { code: "226295-226306", description: "Biopsie par voie chirurgicale d'une masse intramédullaire néoplasique ou inflammatoire", value: "K 500", revision: "^^" },
+                    { code: "226310-226321", description: "Résection d'une tumeur intradurale extramédullaire", value: "K 800", revision: "^^" },
+                    { code: "226332-226343", description: "Résection d'une tumeur intramédullaire", value: "K 1000", revision: "^^" },
+                    { code: "226354-226365", description: "Résection d'une tumeur de la gaine du nerf spinal", value: "K 800", revision: "^^" },
+                    { code: "226376-226380", description: "Drainage en cas de syringomyélie", value: "K 500", revision: "^^" },
+                    { code: "226391-226402", description: "Traitement chirurgical d'excroissances arachnoïdiennes en cas de syringomyélie", value: "K 500", revision: "^^" },
+                    { code: "226413-226424", description: "Traitement chirurgical d'une méningomyélocèle congenitale", value: "K 400", revision: "^^" },
+                    { code: "226435-226446", description: "Traitement chirurgical d'une lipoméningomyélocèle (syndrome congénital de la moelle attachée ou \"tethered cord\" congenitale)", value: "K 1000", revision: "^^" },
+                    { code: "226450-226461", description: "Traitement chirurgical du syndrome acquis de la moelle attachée (\"tethered cord\" acquis)", value: "K 600", revision: "^^" }
+                ]
+            },
+            // F. Management de complications spinales
+            {
+                category: "F. Management de complications spinales",
+                procedures: [
+                    { code: "226472-226483", description: "Drainage chirurgical d'un hématome extra-dural rachidien post-opératoire, y compris la décompression", value: "K 170", revision: "" },
+                    { code: "226494-226505", description: "Fermeture d'une brèche de la dure mère", value: "K 200", revision: "" },
+                    { code: "226516-226520", description: "Traitement chirurgical d'une infection profonde, sous-aponévrotique, après une chirurgie rachidienne", value: "K 225", revision: "" },
+                    { code: "226531-226542", description: "Répétition du traitement chirurgical d'une infection profonde, sous aponévrotique, avec débridement supplémentaire, après une chirurgie rachidienne", value: "K 140", revision: "" },
+                    { code: "226553-226564", description: "Traitement chirurgical de plaies superficielles après une chirurgie rachidienne", value: "K 20", revision: "" },
+                    { code: "226575-226586", description: "Ablation ou repositionnnement de vis ou de matériel déplacé ou défectueux", value: "K 50", revision: "" }
+                ]
+            },
+            // G. Divers
+            {
+                category: "G. Divers",
+                procedures: [
+                    { code: "226590-226601", description: "Placement d'un spacer inter-épineux", value: "K 85", revision: "" }
+                ]
+            },
+            // II. Traitements non sanglants
+            {
+                category: "II. Traitements non sanglants",
+                procedures: [
+                    { code: "224674-224685", description: "Traitement non-chirurgical de fractures, luxations ou fractures-luxations de la colonne cervical sans réduction", value: "K 50", revision: "" },
+                    { code: "225853-225864", description: "Traitement non-chirurgical de fractures, luxations ou fractures-luxations de la colonne thoraco-lombaire sans réduction", value: "K 50", revision: "" },
+                    { code: "225875-225886", description: "Traitement non-chirurgical de fractures, luxations ou fractures-luxations de la colonne thoraco-lombaire avec réduction", value: "K 120", revision: "" }
+                ]
+            },
+            // Codes de révision
+            {
+                category: "Codes de révision",
+                procedures: [
+                    { code: "226612-226623", description: "Supplément d'honoraire en cas de révision chirurgicale (après 60 jours) pour les prestations marquées ^", value: "K 70", revision: "" },
+                    { code: "226634-226645", description: "Supplément d'honoraire en cas de révision chirurgicale (après 60 jours) pour les prestations marquées ^^", value: "K 120", revision: "" }
+                ]
+            }
+        ];
+
+        // Keywords pour la recherche
+        const keywords = {
+            cervical: ['cervical', 'cervicale', 'cervicaux', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'],
+            thoracique: ['thoracique', 'thoraciques', 'thoraco', 'thorax', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9', 't10', 't11', 't12'],
+            lombaire: ['lombaire', 'lombaires', 'lombo', 'l1', 'l2', 'l3', 'l4', 'l5'],
+            sacré: ['sacrum', 'sacré', 'sacrée', 'sacro', 's1', 's2'],
+            coccyx: ['coccyx', 'coccygien'],
+            discectomie: ['discectomie', 'disque', 'hernie', 'herniaire'],
+            laminectomie: ['laminectomie', 'lamine'],
+            arthrodèse: ['arthrodèse', 'fusion', 'plif', 'tlif'],
+            fixation: ['fixation', 'ostéosynthèse', 'vis', 'pédiculaire'],
+            décompression: ['décompression', 'sténose', 'canal'],
+            corporectomie: ['corporectomie', 'corps', 'vertèbre'],
+            foraminotomie: ['foraminotomie', 'foramen', 'récessus'],
+            scoliose: ['scoliose', 'déformation', 'déformité'],
+            tumeur: ['tumeur', 'néoplasme', 'cancer', 'métastase', 'métastatique'],
+            biopsie: ['biopsie', 'prélèvement'],
+            fracture: ['fracture', 'traumatique', 'trauma'],
+            syringomyélie: ['syringomyélie', 'kyste'],
+            infection: ['infection', 'abcès', 'infectieux'],
+            révision: ['révision', 'reprise'],
+            laminoplastie: ['laminoplastie'],
+            micro: ['micro', 'microdiscectomie'],
+            spacer: ['spacer', 'inter-épineux', 'interépineux']
+        };
+
+        // Fonction pour filtrer les procédures selon les mots-clés
+        function filterProceduresByKeywords(keyword) {
+            const normalizedKeyword = keyword.toLowerCase().trim();
+            
+            // Si le mot-clé est vide, retourner un tableau vide
+            if (!normalizedKeyword) {
+                return [];
+            }
+
+            // Identifier les catégories de mots-clés qui correspondent
+            const matchingCategories = [];
+            for (const category in keywords) {
+                if (keywords[category].some(word => normalizedKeyword.includes(word))) {
+                    matchingCategories.push(category);
+                }
+            }
+
+            // Si aucune catégorie ne correspond, chercher dans les descriptions
+            if (matchingCategories.length === 0) {
+                return spinalProcedures.flatMap(category => 
+                    category.procedures.filter(procedure => 
+                        procedure.description.toLowerCase().includes(normalizedKeyword)
+                    )
+                );
+            }
+
+            // Filtrer les procédures selon les catégories de mots-clés
+            return spinalProcedures.flatMap(category => 
+                category.procedures.filter(procedure => {
+                    const description = procedure.description.toLowerCase();
+                    return matchingCategories.some(matchingCategory => 
+                        keywords[matchingCategory].some(word => description.includes(word))
+                    );
+                })
+            );
+        }
+
+        // Variables d'état
+        let searchMode = 'keywords';
+        let selectedCategory = null;
+        let selectedProcedure = null;
+        let isRevision = false;
+        let results = [];
+
+        // Éléments DOM
+        const keywordsToggle = document.getElementById('keywords-toggle');
+        const categoriesToggle = document.getElementById('categories-toggle');
+        const keywordsContainer = document.getElementById('keywords-container');
+        const categoriesContainer = document.getElementById('categories-container');
+        const searchInput = document.getElementById('search-input');
+        const clearBtn = document.getElementById('clear-btn');
+        const categoriesGrid = document.getElementById('categories-grid');
+        const resultsContainer = document.getElementById('results-container');
+        const resultsList = document.getElementById('results-list');
+        const resultsCount = document.getElementById('results-count');
+        const procedureDetails = document.getElementById('procedure-details');
+        const detailCode = document.getElementById('detail-code');
+        const detailDescription = document.getElementById('detail-description');
+        const detailValue = document.getElementById('detail-value');
+        const revisionContainer = document.getElementById('revision-container');
+        const revisionCheckbox = document.getElementById('revision-checkbox');
+        const revisionCodeContainer = document.getElementById('revision-code-container');
+        const revisionCodeValue = document.getElementById('revision-code-value');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Initialiser l'application
+        function initApp() {
+            // Remplir la grille des catégories
+            spinalProcedures.forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'category-btn';
+                button.textContent = category.category;
+                button.addEventListener('click', () => handleCategorySelect(category.category));
+                categoriesGrid.appendChild(button);
+            });
+
+            // Ajouter les écouteurs d'événements
+            keywordsToggle.addEventListener('click', () => toggleSearchMode('keywords'));
+            categoriesToggle.addEventListener('click', () => toggleSearchMode('categories'));
+            searchInput.addEventListener('input', handleSearchInput);
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                setResults([]);
+            });
+            revisionCheckbox.addEventListener('change', handleRevisionChange);
+            resetBtn.addEventListener('click', resetSelection);
+        }
+
+        // Changer le mode de recherche
+        function toggleSearchMode(mode) {
+            searchMode = mode;
+            
+            if (mode === 'keywords') {
+                keywordsToggle.classList.add('active');
+                categoriesToggle.classList.remove('active');
+                keywordsContainer.classList.remove('hidden');
+                categoriesContainer.classList.add('hidden');
+            } else {
+                keywordsToggle.classList.remove('active');
+                categoriesToggle.classList.add('active');
+                keywordsContainer.classList.add('hidden');
+                categoriesContainer.classList.remove('hidden');
+            }
+            
+            resetSelection();
+        }
+
+        // Gérer la saisie dans le champ de recherche
+        function handleSearchInput(e) {
+            const value = e.target.value;
+            
+            if (value.length > 2) {
+                const filteredProcedures = filterProceduresByKeywords(value);
+                setResults(filteredProcedures);
+            } else {
+                setResults([]);
+            }
+        }
+
+        // Sélectionner une catégorie
+        function handleCategorySelect(category) {
+            selectedCategory = category;
+            
+            // Mettre à jour l'interface
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.textContent === category) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Filtrer les procédures de la catégorie sélectionnée
+            const proceduresInCategory = spinalProcedures.find(cat => cat.category === category).procedures;
+            setResults(proceduresInCategory);
+        }
+
+        // Mettre à jour les résultats
+        function setResults(newResults) {
+            results = newResults;
+            
+            // Mettre à jour l'interface
+            resultsList.innerHTML = '';
+            resultsCount.textContent = results.length;
+            
+            if (results.length > 0) {
+                resultsContainer.classList.remove('hidden');
+                
+                results.forEach((procedure, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item';
+                    if (selectedProcedure && procedure.code === selectedProcedure.code) {
+                        item.classList.add('active');
+                    }
+                    
+                    const code = document.createElement('div');
+                    code.className = 'procedure-code';
+                    code.textContent = `${procedure.code} (${procedure.value})`;
+                    
+                    const description = document.createElement('div');
+                    description.textContent = procedure.description;
+                    
+                    item.appendChild(code);
+                    item.appendChild(description);
+                    
+                    item.addEventListener('click', () => handleProcedureSelect(procedure));
+                    resultsList.appendChild(item);
+                });
+            } else {
+                resultsContainer.classList.add('hidden');
+            }
+        }
+
+        // Sélectionner une procédure
+        function handleProcedureSelect(procedure) {
+            selectedProcedure = procedure;
+            
+            // Mettre à jour l'interface
+            document.querySelectorAll('.result-item').forEach(item => {
+                if (item.querySelector('.procedure-code').textContent.includes(procedure.code)) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            // Afficher les détails
+            detailCode.textContent = procedure.code;
+            detailDescription.textContent = procedure.description;
+            detailValue.textContent = procedure.value;
+            procedureDetails.classList.remove('hidden');
+            
+            // Gérer l'option de révision
+            if (procedure.revision) {
+                revisionContainer.classList.remove('hidden');
+            } else {
+                revisionContainer.classList.add('hidden');
+            }
+            
+            // Réinitialiser la checkbox et masquer le code de révision
+            revisionCheckbox.checked = false;
+            revisionCodeContainer.classList.add('hidden');
+            isRevision = false;
+        }
+
+        // Gérer le changement de l'option de révision
+        function handleRevisionChange(e) {
+            isRevision = e.target.checked;
+            
+            if (isRevision) {
+                const revisionCode = getRevisionCodeIfApplicable();
+                
+                if (revisionCode) {
+                    revisionCodeValue.textContent = `${revisionCode.code} (${revisionCode.value})`;
+                    revisionCodeContainer.classList.remove('hidden');
+                } else {
+                    revisionCodeContainer.classList.add('hidden');
+                }
+            } else {
+                revisionCodeContainer.classList.add('hidden');
+            }
+        }
+
+        // Déterminer si une révision est applicable et le code correspondant
+        function getRevisionCodeIfApplicable() {
+            if (!isRevision || !selectedProcedure) return null;
+            
+            if (selectedProcedure.revision === '^') {
+                return { code: "226612-226623", value: "K 70" };
+            } else if (selectedProcedure.revision === '^^') {
+                return { code: "226634-226645", value: "K 120" };
+            }
+            
+            return null;
+        }
+
+        // Réinitialiser la sélection
+        function resetSelection() {
+            selectedCategory = null;
+            selectedProcedure = null;
+            isRevision = false;
+            
+            // Réinitialiser l'interface
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            resultsContainer.classList.add('hidden');
+            procedureDetails.classList.add('hidden');
+            revisionContainer.classList.add('hidden');
+            revisionCodeContainer.classList.add('hidden');
+            revisionCheckbox.checked = false;
+            
+            // Si en mode catégories, vider également les résultats
+            if (searchMode === 'categories') {
+                setResults([]);
+            }
+        }
+
+        // Initialiser l'application au chargement
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
