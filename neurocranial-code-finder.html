@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outil de recherche de codes neuro-crâniaux</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #2c5282;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 24px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        
+        .toggle-btn {
+            padding: 8px 16px;
+            border: none;
+            background-color: #e2e8f0;
+            cursor: pointer;
+        }
+        
+        .toggle-btn:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .toggle-btn:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .toggle-btn.active {
+            background-color: #3182ce;
+            color: white;
+        }
+        
+        .search-container {
+            margin-bottom: 24px;
+        }
+        
+        .search-input {
+            display: flex;
+            width: 100%;
+        }
+        
+        .search-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .search-input button {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .category-btn {
+            padding: 8px;
+            text-align: left;
+            background-color: #e2e8f0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .category-btn:hover {
+            background-color: #cbd5e0;
+        }
+        
+        .category-btn.active {
+            background-color: #3182ce;
+            color: white;
+        }
+        
+        .results-container {
+            margin-bottom: 24px;
+        }
+        
+        .results-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+        }
+        
+        .result-item {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+        
+        .result-item:hover {
+            background-color: #f7fafc;
+        }
+        
+        .result-item.active {
+            background-color: #ebf8ff;
+        }
+        
+        .procedure-code {
+            font-weight: bold;
+        }
+        
+        .procedure-details {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .detail-row {
+            margin-bottom: 8px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+        }
+        
+        .majoration-container {
+            background-color: #f7fafc;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 16px;
+        }
+        
+        .majoration-checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .majoration-checkbox input {
+            margin-right: 8px;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .majoration-code {
+            margin-top: 8px;
+            background-color: #fffaf0;
+            border-radius: 4px;
+            padding: 8px;
+        }
+        
+        .reset-btn-container {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .reset-btn {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .reset-btn:hover {
+            background-color: #c53030;
+        }
+        
+        .info-container {
+            margin-top: 24px;
+            color: #718096;
+            font-size: 14px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Outil de recherche de codes neuro-crâniaux</h1>
+        
+        <!-- Toggle mode de recherche -->
+        <div class="toggle-container">
+            <button class="toggle-btn active" id="keywords-toggle">Recherche par mots-clés</button>
+            <button class="toggle-btn" id="categories-toggle">Recherche par catégories</button>
+        </div>
+        
+        <!-- Recherche par mots-clés -->
+        <div class="search-container" id="keywords-container">
+            <div class="search-input">
+                <input type="text" id="search-input" placeholder="Entrez un mot-clé (ex: crâniotomie, tumeur, stimulation...)">
+                <button id="clear-btn">Effacer</button>
+            </div>
+        </div>
+        
+        <!-- Recherche par catégories -->
+        <div class="search-container hidden" id="categories-container">
+            <h2>Sélectionnez une catégorie :</h2>
+            <div class="categories-grid" id="categories-grid">
+                <!-- Les catégories seront ajoutées dynamiquement via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Résultats -->
+        <div class="results-container hidden" id="results-container">
+            <h2>Résultats (<span id="results-count">0</span>) :</h2>
+            <div class="results-list" id="results-list">
+                <!-- Les résultats seront ajoutés dynamiquement via JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Détails de la procédure sélectionnée -->
+        <div class="procedure-details hidden" id="procedure-details">
+            <h2>Détails de la procédure sélectionnée :</h2>
+            <div class="detail-row">
+                <span class="detail-label">Code :</span> 
+                <span id="detail-code"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Description :</span> 
+                <span id="detail-description"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Valeur :</span> 
+                <span id="detail-value"></span>
+            </div>
+            
+            <!-- Option pour la majoration d'honoraires -->
+            <div class="majoration-container hidden" id="majoration-container">
+                <label class="majoration-checkbox">
+                    <input type="checkbox" id="majoration-checkbox">
+                    <span>Majoration d'honoraires applicable ?</span>
+                </label>
+                
+                <div class="majoration-code hidden" id="majoration-code-container">
+                    <p><strong>Code de majoration à ajouter :</strong></p>
+                    <p id="majoration-code-value"></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bouton de réinitialisation -->
+        <div class="reset-btn-container">
+            <button class="reset-btn" id="reset-btn">Réinitialiser</button>
+        </div>
+        
+        <!-- Information -->
+        <div class="info-container">
+            <p><strong>Information :</strong> Basé sur la nomenclature des prestations de santé.</p>
+            <p><strong>Remarque :</strong> Cet outil est fourni à titre indicatif. Veuillez toujours vérifier les codes dans les documents officiels.</p>
+        </div>
+    </div>
+
+    <script>
+        // Structure de données pour les procédures neuro-crâniennes
+        const neuroCranialProcedures = [
+            // A. Crâne - Chirurgie
+            {
+                category: "A. Crâne - Chirurgie",
+                procedures: [
+                    { code: "243122", description: "Trépanation et incision tumeur cérébrale par voie temporale", value: "N 600", majoration: "+" },
+                    { code: "247144", description: "Ablation tumeur de l'orbite avec interv. intracrânienne", value: "N 750", majoration: "+" },
+                    { code: "230484", description: "Interv. par voie de trépanation et proc. expansif intracranien intraorb. (1)(3)(4)", value: "K 700", majoration: "+" },
+                    { code: "232525", description: "Tumorectomie transsphénoidale de l'hypophyse sous microscope opératoire (1)(3)", value: "K 700", majoration: "+" },
+                    { code: "231044", description: "Interv. et lésions expans. de l'angle pontocerebelleux ou processus expansif intraconical intracranien (1)(3)(4)", value: "K 1000", majoration: "+" },
+                    { code: "232047", description: "Décompression microvasculaire du nerf trijumeau", value: "K 1000", majoration: "+" },
+                    { code: "230560", description: "Traitement d'installation d'un anévrysme et/ou d'une communication artérioveineuse de l'encéphale ainsi que par voie enveloppe méningée", value: "K 700", majoration: "+" },
+                    { code: "232594", description: "Craniotomie linéaire simple", value: "K 180", majoration: "" },
+                    { code: "232606", description: "Perméabilité voûte cranienne par défets ostéoclastiques", value: "K 400", majoration: "" },
+                    { code: "232631", description: "Avancement du bandeau orbitaire et front flattenl", value: "K 700", majoration: "" },
+                    { code: "232665", description: "Remplacement ou révision du drain intracranique, sous-cutané ou intra-péritonéal", value: "K 120", majoration: "" },
+                    { code: "232640", description: "Désobstruction du drain intraventriculaire", value: "K 180", majoration: "" },
+                    { code: "232536", description: "Révision complète du système de drainage", value: "K 300", majoration: "" },
+                    { code: "230602", description: "Drainage interne d'une hydrocéphalie", value: "K 400", majoration: "" },
+                    { code: "232582", description: "Stéréotaxie d1 ou + zones endocrâniennes ou médullaires (3)", value: "K 700", majoration: "+" },
+                    { code: "230585", description: "Trépanation décompressive du pour drainage (bic)", value: "K 180", majoration: "" },
+                    { code: "230600", description: "Trépanation pour drainage d'un abcès cérébral", value: "K 180", majoration: "" },
+                    { code: "232724", description: "Réparation brèche ostéoméningée de la base du crâne", value: "K 400", majoration: "" },
+                    { code: "231126", description: "Craniosténose par orifices", value: "K 300", majoration: "" },
+                    { code: "230403", description: "Cure chir. d'1 ou + hématomes extracéréb. par simple trépanation", value: "K 180", majoration: "" },
+                    { code: "230425", description: "Cure chir. d'1 ou + hématomes intracérébraux extracéréb.par grand volet de trépanation", value: "K 400", majoration: "" },
+                    { code: "230440", description: "Cure chir. d'un ou + hématomes intracéréb.aux par grand volet de trépanation (3)", value: "K 400", majoration: "" },
+                    { code: "230452", description: "Trépanation pour fracture de la voûte crânienne, y compris la reconstruction de la voûte", value: "K 180", majoration: "" }
+                ]
+            },
+            // B. Douleur - C.R. 1820
+            {
+                category: "B. Douleur - C.R. 1820",
+                procedures: [
+                    { code: "354040", description: "Implantation d'un réservoir de médicaments sous-cutané lié à un cathéter pour l'administration continue de médicaments via un système de pompe", value: "K 120", majoration: "" },
+                    { code: "230285", description: "Neurotomie rétrogassérienne", value: "K 225", majoration: "" },
+                    { code: "230730", description: "Cordotomie (3)", value: "K 225", majoration: "" },
+                    { code: "230524", description: "Neurotomie ou neurorectomie aux points d'émergence sous orbitaire mentionnier ou auriculo-temporal ou thermocoagulation des nerfs crâniens du massif facial ou de la base du crâne ou cervical", value: "K 120", majoration: "" },
+                    { code: "232503", description: "(Re) mise en place percutanée ou chirurgicale, dans l'espace épidural, d'une ou de tout électrode(s) multipolaire(s) pour la stimulation de la moelle épinière", value: "K 180", majoration: "" },
+                    { code: "232400", description: "(Re) mise en place (par exposition chirurgicale) d'un système de stimulation cérébrale profonde", value: "K 180", majoration: "" },
+                    { code: "230764", description: "Rhizotomie", value: "K 225", majoration: "" },
+                    { code: "232665", description: "Avulsion uni ou bilatérale des nerfs occipitaux", value: "K 180", majoration: "" },
+                    { code: "232341", description: "Implantation stéréotaxique d'une électrode définitive pour la stimulation cérébrale profonde - unilatérale (2)", value: "K 700", majoration: "" },
+                    { code: "232363", description: "Implantation stéréotaxique d'une électrode définitive pour la stimulation cérébrale profonde - bilatérale (2)", value: "K 1050", majoration: "" },
+                    { code: "232422", description: "Enlèvement d'une ou plusieurs électrode(s) multipolaire(s) après l'échec d'une thérapie d'essai ou pour une raison médicale", value: "K 90", majoration: "" },
+                    { code: "232444", description: "Programmation d'une pile interne ou externe d'un neurostimulateur, y compris la mesure des impédances et des paramètres de stimulation", value: "K 15", majoration: "" },
+                    { code: "232466", description: "Mise en place percutanée d'une électrode définitive pour la stimulation du nerf vague chez des patients épileptiques", value: "K 80", majoration: "" },
+                    { code: "354384", description: "Implantation, enlèvement ou remplacement, via une intervention chirurgicale, d'un implant actif avec ou non une ou de câble d'extension éventuels mais sans les électrodes ou avec les accessoires", value: "K 40", majoration: "" },
+                    { code: "275036", description: "Trépanation corticale d'un os superficiel", value: "N 130", majoration: "" }
+                ]
+            },
+            // C. Surveillance Neurologique
+            {
+                category: "C. Surveillance Neurologique",
+                procedures: [
+                    { code: "478321", description: "Surveillance neurologique peropératoire pendant une opération neurochirurgicale du système nerveux central consistant au moins en une surveillance des potentiels évoqués moteurs (PEM) et/ou des potentiels évoqués somatosensoriels (PESS) et/ou une surveillance par EMG du trajet intracranial d'un nerf crânien, tout ceci en continu, avec rédaction obligatoire d'un rapport médical qui contient au moins un tracé préopératoire, peropératoire et postopératoire ainsi que l'indication", value: "K 499", majoration: "" }
+                ]
+            }
+        ];
+
+        // Keywords pour la recherche
+        const keywords = {
+            crâne: ['crâne', 'cranien', 'cranienne', 'crane', 'crânial', 'cranial', 'crâniale', 'craniale'],
+            trépanation: ['trépanation', 'trepanation', 'trépanatoire', 'trepanatoire'],
+            tumeur: ['tumeur', 'tumorale', 'tumorectomie', 'néoplasie', 'néoplasme', 'cancer'],
+            hématome: ['hématome', 'hematome', 'saignement', 'hémorragie', 'hemorragie'],
+            hydrocéphalie: ['hydrocéphalie', 'hydrocephalie', 'liquide céphalo-rachidien', 'LCR', 'drainage'],
+            fracture: ['fracture', 'traumatisme', 'trauma', 'voûte crânienne'],
+            neurochirurgie: ['neurochirurgie', 'neurochirurgical', 'neurochirurgicale'],
+            douleur: ['douleur', 'algique', 'antalgique', 'antalgie'],
+            stimulation: ['stimulation', 'électrode', 'electrode', 'neurostimulateur', 'stimulateur'],
+            nerf: ['nerf', 'nerveux', 'nervus', 'neurotomie', 'neurorexis', 'neurorectomie', 'avulsion'],
+            stéréotaxie: ['stéréotaxie', 'stereotaxie', 'stéréotaxique', 'stereotaxique'],
+            abcès: ['abcès', 'abces', 'infection', 'purulent', 'pus'],
+            craniotomie: ['craniotomie', 'craniectomie'],
+            anévrysme: ['anévrysme', 'anevrysme', 'artérioveineuse', 'arterioveineuse', 'vasculaire'],
+            surveillance: ['surveillance', 'monitoring', 'monitorage', 'peropératoire', 'peroperatoire', 'potentiels évoqués', 'potentiels evoques', 'EMG']
+        };
+
+        // Fonction pour filtrer les procédures selon les mots-clés
+        function filterProceduresByKeywords(keyword) {
+            const normalizedKeyword = keyword.toLowerCase().trim();
+            
+            // Si le mot-clé est vide, retourner un tableau vide
+            if (!normalizedKeyword) {
+                return [];
+            }
+
+            // Identifier les catégories de mots-clés qui correspondent
+            const matchingCategories = [];
+            for (const category in keywords) {
+                if (keywords[category].some(word => normalizedKeyword.includes(word))) {
+                    matchingCategories.push(category);
+                }
+            }
+
+            // Si aucune catégorie ne correspond, chercher dans les descriptions
+            if (matchingCategories.length === 0) {
+                return neuroCranialProcedures.flatMap(category => 
+                    category.procedures.filter(procedure => 
+                        procedure.description.toLowerCase().includes(normalizedKeyword)
+                    )
+                );
+            }
+
+            // Filtrer les procédures selon les catégories de mots-clés
+            return neuroCranialProcedures.flatMap(category => 
+                category.procedures.filter(procedure => {
+                    const description = procedure.description.toLowerCase();
+                    return matchingCategories.some(matchingCategory => 
+                        keywords[matchingCategory].some(word => description.includes(word))
+                    );
+                })
+            );
+        }
+
+        // Variables d'état
+        let searchMode = 'keywords';
+        let selectedCategory = null;
+        let selectedProcedure = null;
+        let isMajoration = false;
+        let results = [];
+
+        // Éléments DOM
+        const keywordsToggle = document.getElementById('keywords-toggle');
+        const categoriesToggle = document.getElementById('categories-toggle');
+        const keywordsContainer = document.getElementById('keywords-container');
+        const categoriesContainer = document.getElementById('categories-container');
+        const searchInput = document.getElementById('search-input');
+        const clearBtn = document.getElementById('clear-btn');
+        const categoriesGrid = document.getElementById('categories-grid');
+        const resultsContainer = document.getElementById('results-container');
+        const resultsList = document.getElementById('results-list');
+        const resultsCount = document.getElementById('results-count');
+        const procedureDetails = document.getElementById('procedure-details');
+        const detailCode = document.getElementById('detail-code');
+        const detailDescription = document.getElementById('detail-description');
+        const detailValue = document.getElementById('detail-value');
+        const majorationContainer = document.getElementById('majoration-container');
+        const majorationCheckbox = document.getElementById('majoration-checkbox');
+        const majorationCodeContainer = document.getElementById('majoration-code-container');
+        const majorationCodeValue = document.getElementById('majoration-code-value');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Initialiser l'application
+        function initApp() {
+            // Remplir la grille des catégories
+            neuroCranialProcedures.forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'category-btn';
+                button.textContent = category.category;
+                button.addEventListener('click', () => handleCategorySelect(category.category));
+                categoriesGrid.appendChild(button);
+            });
+
+            // Ajouter les écouteurs d'événements
+            keywordsToggle.addEventListener('click', () => toggleSearchMode('keywords'));
+            categoriesToggle.addEventListener('click', () => toggleSearchMode('categories'));
+            searchInput.addEventListener('input', handleSearchInput);
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                setResults([]);
+            });
+            majorationCheckbox.addEventListener('change', handleMajorationChange);
+            resetBtn.addEventListener('click', resetSelection);
+        }
+
+        // Changer le mode de recherche
+        function toggleSearchMode(mode) {
+            searchMode = mode;
+            
+            if (mode === 'keywords') {
+                keywordsToggle.classList.add('active');
+                categoriesToggle.classList.remove('active');
+                keywordsContainer.classList.remove('hidden');
+                categoriesContainer.classList.add('hidden');
+            } else {
+                keywordsToggle.classList.remove('active');
+                categoriesToggle.classList.add('active');
+                keywordsContainer.classList.add('hidden');
+                categoriesContainer.classList.remove('hidden');
+            }
+            
+            resetSelection();
+        }
+
+        // Gérer la saisie dans le champ de recherche
+        function handleSearchInput(e) {
+            const value = e.target.value;
+            
+            if (value.length > 2) {
+                const filteredProcedures = filterProceduresByKeywords(value);
+                setResults(filteredProcedures);
+            } else {
+                setResults([]);
+            }
+        }
+
+        // Sélectionner une catégorie
+        function handleCategorySelect(category) {
+            selectedCategory = category;
+            
+            // Mettre à jour l'interface
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.textContent === category) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Filtrer les procédures de la catégorie sélectionnée
+            const proceduresInCategory = neuroCranialProcedures.find(cat => cat.category === category).procedures;
+            setResults(proceduresInCategory);
+        }
+
+        // Mettre à jour les résultats
+        function setResults(newResults) {
+            results = newResults;
+            
+            // Mettre à jour l'interface
+            resultsList.innerHTML = '';
+            resultsCount.textContent = results.length;
+            
+            if (results.length > 0) {
+                resultsContainer.classList.remove('hidden');
+                
+                results.forEach((procedure, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item';
+                    if (selectedProcedure && procedure.code === selectedProcedure.code) {
+                        item.classList.add('active');
+                    }
+                    
+                    const code = document.createElement('div');
+                    code.className = 'procedure-code';
+                    code.textContent = `${procedure.code} (${procedure.value})`;
+                    
+                    const description = document.createElement('div');
+                    description.textContent = procedure.description;
+                    
+                    item.appendChild(code);
+                    item.appendChild(description);
+                    
+                    item.addEventListener('click', () => handleProcedureSelect(procedure));
+                    resultsList.appendChild(item);
+                });
+            } else {
+                resultsContainer.classList.add('hidden');
+            }
+        }
+
+        // Sélectionner une procédure
+        function handleProcedureSelect(procedure) {
+            selectedProcedure = procedure;
+            
+            // Mettre à jour l'interface
+            document.querySelectorAll('.result-item').forEach(item => {
+                if (item.querySelector('.procedure-code').textContent.includes(procedure.code)) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            // Afficher les détails
+            detailCode.textContent = procedure.code;
+            detailDescription.textContent = procedure.description;
+            detailValue.textContent = procedure.value;
+            procedureDetails.classList.remove('hidden');
+            
+            // Gérer l'option de majoration
+            if (procedure.majoration) {
+                majorationContainer.classList.remove('hidden');
+            } else {
+                majorationContainer.classList.add('hidden');
+            }
+            
+            // Réinitialiser la checkbox et masquer le code de majoration
+            majorationCheckbox.checked = false;
+            majorationCodeContainer.classList.add('hidden');
+            isMajoration = false;
+        }
+
+        // Gérer le changement de l'option de majoration
+        function handleMajorationChange(e) {
+            isMajoration = e.target.checked;
+            
+            if (isMajoration) {
+                const majorationCode = getMajorationCodeIfApplicable();
+                
+                if (majorationCode) {
+                    majorationCodeValue.textContent = `${majorationCode.code} (${majorationCode.value})`;
+                    majorationCodeContainer.classList.remove('hidden');
+                } else {
+                    majorationCodeContainer.classList.add('hidden');
+                }
+            } else {
+                majorationCodeContainer.classList.add('hidden');
+            }
+        }
+
+        // Déterminer si une majoration est applicable et le code correspondant
+        function getMajorationCodeIfApplicable() {
+            if (!isMajoration || !selectedProcedure) return null;
+            
+            if (selectedProcedure.majoration === '+') {
+                return { code: "478343", value: "K 125" };
+            }
+            
+            return null;
+        }
+
+        // Réinitialiser la sélection
+        function resetSelection() {
+            selectedCategory = null;
+            selectedProcedure = null;
+            isMajoration = false;
+            
+            // Réinitialiser l'interface
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            resultsContainer.classList.add('hidden');
+            procedureDetails.classList.add('hidden');
+            majorationContainer.classList.add('hidden');
+            majorationCodeContainer.classList.add('hidden');
+            majorationCheckbox.checked = false;
+            
+            // Si en mode catégories, vider également les résultats
+            if (searchMode === 'categories') {
+                setResults([]);
+            }
+        }
+
+        // Initialiser l'application au chargement
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
