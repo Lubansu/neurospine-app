@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module de Gestion de la Pression Intracrânienne</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Style pour le sélecteur de langue (discret) */
+        .language-selector {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 0.5rem;
+        }
+        
+        .lang-select {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.25rem center;
+            background-repeat: no-repeat;
+            background-size: 1em 1em;
+            padding-right: 1.5rem;
+        }
+        
+        .lang-select:hover {
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        
+        .lang-select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="p-4 min-h-screen">
+        <!-- Sélecteur de langue (discret) -->
+        <div class="language-selector max-w-3xl mx-auto">
+            <select id="lang-select" class="lang-select">
+                <option value="fr">Français</option>
+                <option value="nl">Nederlands</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+            </select>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-4 mb-4 max-w-3xl mx-auto">
+            <h1 class="text-xl font-bold text-blue-800 mb-4" id="app-title">Gestion de la Pression Intracrânienne</h1>
+            
+            <div class="flex justify-between items-center mb-6">
+                <div class="text-center">
+                    <span class="text-sm text-gray-600 block" id="current-icp-label">ICP Actuelle</span>
+                    <span class="text-2xl font-bold text-red-600" id="icp-value">
+                        24 mmHg
+                    </span>
+                    <input 
+                        type="range" 
+                        min="5" 
+                        max="40" 
+                        value="24"
+                        id="icp-slider"
+                        class="w-full mt-2"
+                    />
+                </div>
+                
+                <div class="text-center">
+                    <span class="text-sm text-gray-600 block" id="map-label">MAP</span>
+                    <span class="text-2xl font-bold text-blue-600" id="map-value">
+                        85 mmHg
+                    </span>
+                    <input 
+                        type="range" 
+                        min="60" 
+                        max="120" 
+                        value="85"
+                        id="map-slider"
+                        class="w-full mt-2"
+                    />
+                </div>
+                
+                <div class="text-center">
+                    <span class="text-sm text-gray-600 block" id="cpp-label">CPP Calculée</span>
+                    <span class="text-2xl font-bold text-green-600" id="cpp-value">
+                        61 mmHg
+                    </span>
+                </div>
+            </div>
+            
+            <div class="p-3 mb-4 rounded-lg bg-red-50 border border-red-200" id="status-panel">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full mr-2 bg-red-500"></div>
+                    <span class="font-medium text-red-800" id="status-text">
+                        ICP élevée: 24 mmHg - Palier 0 actif
+                    </span>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="flex justify-between">
+                    <h2 class="text-lg font-semibold text-blue-700"><span id="current-tier-label">Palier Actuel</span>: <span id="current-tier">0</span></h2>
+                    <div>
+                        <span class="text-sm bg-blue-100 text-blue-800 py-1 px-2 rounded" id="protocol-label">
+                            Protocole SIBICC
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="w-full bg-gray-200 h-2 mt-2 rounded-full overflow-hidden">
+                    <div 
+                        id="tier-progress"
+                        class="h-full rounded-full bg-green-500"
+                        style="width: 0%"
+                    ></div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-2 mb-4">
+                <button 
+                    id="btn-deescalate"
+                    class="flex-1 py-2 px-4 rounded font-medium bg-gray-300 text-gray-500 cursor-not-allowed"
+                    disabled
+                >
+                    Désescalader
+                </button>
+                
+                <button 
+                    id="btn-escalate"
+                    class="flex-1 py-2 px-4 rounded font-medium bg-red-600 text-white hover:bg-red-700"
+                >
+                    Escalader
+                </button>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-4 mb-4 max-w-3xl mx-auto">
+            <h2 class="text-lg font-semibold text-blue-700 mb-4"><span id="tier-interventions-label">Interventions du Palier</span> <span id="tier-number">0</span></h2>
+            
+            <div class="border border-green-200 rounded-lg p-4 bg-green-50" id="tier-content">
+                <!-- Le contenu du palier sera inséré dynamiquement ici -->
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-4 mb-4 max-w-3xl mx-auto">
+            <h2 class="text-lg font-semibold text-blue-700 mb-3" id="tier-history-label">Historique des Paliers</h2>
+            
+            <p class="text-gray-500 text-sm italic" id="history-empty">Aucun changement de palier enregistré</p>
+            <div class="space-y-2" id="tier-history" style="display: none;">
+                <!-- Historique dynamique sera inséré ici -->
+            </div>
+        </div>
+        
+        <!-- Modal pour Recommandations Inter-Paliers -->
+        <div id="inter-tier-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+            <div class="bg-white rounded-lg p-6 max-w-md">
+                <h3 class="text-lg font-bold text-red-600 mb-3" id="intertier-recommendations-label">Recommandations Inter-Paliers</h3>
+                
+                <div class="mb-4 text-gray-700">
+                    <p class="font-medium mb-2"><span id="before-escalating-label">Avant d'escalader au Palier</span> <span id="next-tier">1</span>, <span id="check-following-label">vérifiez</span>:</p>
+                    <ul class="list-disc pl-5 space-y-1 text-sm" id="escalation-checklist">
+                        <!-- Liste de vérification dynamique sera insérée ici -->
+                    </ul>
+                </div>
+                
+                <div class="flex justify-end space-x-2">
+                    <button 
+                        id="btn-cancel-escalation"
+                        class="py-2 px-4 bg-gray-200 text-gray-700 rounded"
+                    >
+                        Annuler
+                    </button>
+                    <button 
+                        id="btn-confirm-escalation"
+                        class="py-2 px-4 bg-blue-600 text-white rounded"
+                    >
+                        Continuer l'escalade
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables pour suivre l'état actuel
+        let currentTier = 0;
+        let currentICP = 24;
+        let currentMAP = 85;
+        let currentCPP = currentMAP - currentICP;
+        let tierHistory = [];
+        let currentLang = 'fr'; // Langue par défaut
+
+        // Définitions des traductions
+        const translations = {
+            // Français
+            fr: {
+                "app-title": "Gestion de la Pression Intracrânienne",
+                "current-icp-label": "ICP Actuelle",
+                "map-label": "MAP",
+                "cpp-label": "CPP Calculée",
+                "high-icp": "ICP élevée",
+                "normal-icp": "ICP normale",
+                "active-tier": "Palier {tier} actif",
+                "continue-monitoring": "Continuer la surveillance",
+                "current-tier-label": "Palier Actuel",
+                "protocol-label": "Protocole SIBICC",
+                "btn-deescalate": "Désescalader",
+                "btn-escalate": "Escalader",
+                "tier-interventions-label": "Interventions du Palier",
+                "tier-history-label": "Historique des Paliers",
+                "history-empty": "Aucun changement de palier enregistré",
+                "intertier-recommendations-label": "Recommandations Inter-Paliers",
+                "before-escalating-label": "Avant d'escalader au Palier",
+                "check-following-label": "vérifiez",
+                "btn-cancel": "Annuler",
+                "btn-continue": "Continuer l'escalade",
+                
+                // Escalation checks
+                "escalation-checks": [
+                    "Réexaminer le patient et envisager de répéter le scanner cérébral",
+                    "Reconsidérer les options chirurgicales pour les lésions potentiellement opérables",
+                    "Envisager les causes extracrâniennes d'élévation de l'ICP",
+                    "Revoir les paramètres physiologiques de base",
+                    "Envisager consultation avec un niveau de soins supérieur, si applicable"
+                ],
+                
+                // Tier 0
+                "tier0-title": "Palier Zéro - Soins de base en USI",
+                "tier0-items": [
+                    "Admission en USI",
+                    "Intubation et ventilation mécanique",
+                    "Élévation de la tête 30-45°",
+                    "Analgésie pour gérer douleur (non dirigée pour l'ICP)",
+                    "Maintenir CPP initialement ≥ 60 mmHg",
+                    "Maintenir SpO₂ ≥ 94%"
+                ],
+                
+                // Tier 1
+                "tier1-title": "Palier Un",
+                "tier1-items": [
+                    "Maintenir CPP 60-70 mmHg",
+                    "Augmenter analgésie/sédation pour baisser ICP",
+                    "Maintenir PaCO₂ entre 35-38 mmHg",
+                    "Administrer mannitol ou saline hypertonique",
+                    "Drainer LCR si DVE en place"
+                ],
+                
+                // Tier 2
+                "tier2-title": "Palier Deux",
+                "tier2-items": [
+                    "Hypocapnie légère (32-35 mmHg)",
+                    "Curarisation (chez patients adéquatement sédatés)",
+                    "Challenge MAP pour évaluer autorégulation cérébrale"
+                ],
+                "tier2-info": "Infusion vasopresseurs pour augmenter MAP de 10-15 mmHg pendant 20 min max",
+                
+                // Tier 3
+                "tier3-title": "Palier Trois",
+                "tier3-items": [
+                    "Coma barbiturique (pentobarbital/thiopental)",
+                    "Craniectomie décompressive secondaire",
+                    "Hypothermie légère (35-36°C)"
+                ],
+                "tier3-info": "Titrer pour contrôle ICP si efficace",
+                
+                // History entries
+                "deescalation": "Désescalade",
+                "escalation": "Escalade",
+                "from-tier": "du Palier",
+                "to-tier": "au Palier"
+            },
+            
+            // Néerlandais
+            nl: {
+                "app-title": "Beheer van Intracraniële Druk",
+                "current-icp-label": "Huidige ICP",
+                "map-label": "MAP",
+                "cpp-label": "Berekende CPP",
+                "high-icp": "Verhoogde ICP",
+                "normal-icp": "Normale ICP",
+                "active-tier": "Niveau {tier} actief",
+                "continue-monitoring": "Monitoring voortzetten",
+                "current-tier-label": "Huidige Niveau",
+                "protocol-label": "SIBICC Protocol",
+                "btn-deescalate": "De-escaleren",
+                "btn-escalate": "Escaleren",
+                "tier-interventions-label": "Interventies Niveau",
+                "tier-history-label": "Geschiedenis van Niveaus",
+                "history-empty": "Geen niveauwijzigingen geregistreerd",
+                "intertier-recommendations-label": "Tussen-Niveau Aanbevelingen",
+                "before-escalating-label": "Voordat u naar Niveau",
+                "check-following-label": "escaleert, controleer",
+                "btn-cancel": "Annuleren",
+                "btn-continue": "Doorgaan met escalatie",
+                
+                // Escalation checks
+                "escalation-checks": [
+                    "Heronderzoek de patiënt en overweeg herhaling van hersenscans",
+                    "Heroverweeg chirurgische opties voor potentieel operabele laesies",
+                    "Overweeg extracraniële oorzaken van ICP-verhoging",
+                    "Beoordeel opnieuw de basale fysiologische parameters",
+                    "Overweeg overleg met een hoger zorgniveau, indien van toepassing"
+                ],
+                
+                // Tier 0
+                "tier0-title": "Niveau Nul - Basis ICU Zorg",
+                "tier0-items": [
+                    "Opname op de ICU",
+                    "Intubatie en mechanische ventilatie",
+                    "Hoofd elevatie 30-45°",
+                    "Analgesie voor pijnbestrijding (niet gericht op ICP)",
+                    "Handhaaf CPP initieel ≥ 60 mmHg",
+                    "Handhaaf SpO₂ ≥ 94%"
+                ],
+                
+                // Tier 1
+                "tier1-title": "Niveau Een",
+                "tier1-items": [
+                    "Handhaaf CPP 60-70 mmHg",
+                    "Verhoog analgesie/sedatie om ICP te verlagen",
+                    "Handhaaf PaCO₂ tussen 35-38 mmHg",
+                    "Dien mannitol of hypertone zoutoplossing toe",
+                    "Drain CSF indien EVD aanwezig"
+                ],
+                
+                // Tier 2
+                "tier2-title": "Niveau Twee",
+                "tier2-items": [
+                    "Lichte hypocapnie (32-35 mmHg)",
+                    "Neuromusculaire blokkade (bij adequaat gesedeerde patiënten)",
+                    "MAP challenge om cerebrale autoregulatie te evalueren"
+                ],
+                "tier2-info": "Vasopressoren infusie om MAP 10-15 mmHg te verhogen gedurende max 20 min",
+                
+                // Tier 3
+                "tier3-title": "Niveau Drie",
+                "tier3-items": [
+                    "Barbituraat coma (pentobarbital/thiopental)",
+                    "Secundaire decompressieve craniectomie",
+                    "Milde hypothermie (35-36°C)"
+                ],
+                "tier3-info": "Titreren voor ICP controle indien effectief",
+                
+                // History entries
+                "deescalation": "De-escalatie",
+                "escalation": "Escalatie",
+                "from-tier": "van Niveau",
+                "to-tier": "naar Niveau"
+            },
+            
+            // Anglais
+            en: {
+                "app-title": "Intracranial Pressure Management",
+                "current-icp-label": "Current ICP",
+                "map-label": "MAP",
+                "cpp-label": "Calculated CPP",
+                "high-icp": "High ICP",
+                "normal-icp": "Normal ICP",
+                "active-tier": "Tier {tier} active",
+                "continue-monitoring": "Continue monitoring",
+                "current-tier-label": "Current Tier",
+                "protocol-label": "SIBICC Protocol",
+                "btn-deescalate": "De-escalate",
+                "btn-escalate": "Escalate",
+                "tier-interventions-label": "Tier Interventions",
+                "tier-history-label": "Tier History",
+                "history-empty": "No tier changes recorded",
+                "intertier-recommendations-label": "Inter-Tier Recommendations",
+                "before-escalating-label": "Before escalating to Tier",
+                "check-following-label": "check",
+                "btn-cancel": "Cancel",
+                "btn-continue": "Continue escalation",
+                
+                // Escalation checks
+                "escalation-checks": [
+                    "Re-examine the patient and consider repeating brain imaging",
+                    "Reconsider surgical options for potentially operable lesions",
+                    "Consider extracranial causes of ICP elevation",
+                    "Review basic physiological parameters",
+                    "Consider consultation with higher level of care, if applicable"
+                ],
+                
+                // Tier 0
+                "tier0-title": "Tier Zero - Basic ICU Care",
+                "tier0-items": [
+                    "ICU admission",
+                    "Intubation and mechanical ventilation",
+                    "Head elevation 30-45°",
+                    "Analgesia for pain management (not ICP-directed)",
+                    "Maintain CPP initially ≥ 60 mmHg",
+                    "Maintain SpO₂ ≥ 94%"
+                ],
+                
+                // Tier 1
+                "tier1-title": "Tier One",
+                "tier1-items": [
+                    "Maintain CPP 60-70 mmHg",
+                    "Increase analgesia/sedation to lower ICP",
+                    "Maintain PaCO₂ between 35-38 mmHg",
+                    "Administer mannitol or hypertonic saline",
+                    "Drain CSF if EVD in place"
+                ],
+                
+                // Tier 2
+                "tier2-title": "Tier Two",
+                "tier2-items": [
+                    "Mild hypocapnia (32-35 mmHg)",
+                    "Neuromuscular blockade (in adequately sedated patients)",
+                    "MAP challenge to assess cerebral autoregulation"
+                ],
+                "tier2-info": "Vasopressor infusion to increase MAP by 10-15 mmHg for max 20 min",
+                
+                // Tier 3
+                "tier3-title": "Tier Three",
+                "tier3-items": [
+                    "Barbiturate coma (pentobarbital/thiopental)",
+                    "Secondary decompressive craniectomy",
+                    "Mild hypothermia (35-36°C)"
+                ],
+                "tier3-info": "Titrate for ICP control if effective",
+                
+                // History entries
+                "deescalation": "De-escalation",
+                "escalation": "Escalation",
+                "from-tier": "from Tier",
+                "to-tier": "to Tier"
+            },
+            
+            // Espagnol
+            es: {
+                "app-title": "Gestión de la Presión Intracraneal",
+                "current-icp-label": "PIC Actual",
+                "map-label": "PAM",
+                "cpp-label": "PPC Calculada",
+                "high-icp": "PIC elevada",
+                "normal-icp": "PIC normal",
+                "active-tier": "Nivel {tier} activo",
+                "continue-monitoring": "Continuar monitorización",
+                "current-tier-label": "Nivel Actual",
+                "protocol-label": "Protocolo SIBICC",
+                "btn-deescalate": "Desescalar",
+                "btn-escalate": "Escalar",
+                "tier-interventions-label": "Intervenciones del Nivel",
+                "tier-history-label": "Historial de Niveles",
+                "history-empty": "No hay cambios de nivel registrados",
+                "intertier-recommendations-label": "Recomendaciones Entre Niveles",
+                "before-escalating-label": "Antes de escalar al Nivel",
+                "check-following-label": "verifique",
+                "btn-cancel": "Cancelar",
+                "btn-continue": "Continuar escalada",
+                
+                // Escalation checks
+                "escalation-checks": [
+                    "Reexaminar al paciente y considerar repetir la imagen cerebral",
+                    "Reconsiderar opciones quirúrgicas para lesiones potencialmente operables",
+                    "Considerar causas extracraneales de elevación de la PIC",
+                    "Revisar parámetros fisiológicos básicos",
+                    "Considerar consulta con un nivel de atención superior, si es aplicable"
+                ],
+                
+                // Tier 0
+                "tier0-title": "Nivel Cero - Cuidados Básicos en UCI",
+                "tier0-items": [
+                    "Admisión en UCI",
+                    "Intubación y ventilación mecánica",
+                    "Elevación de la cabeza 30-45°",
+                    "Analgesia para manejo del dolor (no dirigida a la PIC)",
+                    "Mantener PPC inicialmente ≥ 60 mmHg",
+                    "Mantener SpO₂ ≥ 94%"
+                ],
+                
+                // Tier 1
+                "tier1-title": "Nivel Uno",
+                "tier1-items": [
+                    "Mantener PPC 60-70 mmHg",
+                    "Aumentar analgesia/sedación para reducir PIC",
+                    "Mantener PaCO₂ entre 35-38 mmHg",
+                    "Administrar manitol o solución salina hipertónica",
+                    "Drenar LCR si DVE está colocado"
+                ],
+                
+                // Tier 2
+                "tier2-title": "Nivel Dos",
+                "tier2-items": [
+                    "Hipocapnia leve (32-35 mmHg)",
+                    "Bloqueo neuromuscular (en pacientes adecuadamente sedados)",
+                    "Prueba de PAM para evaluar autorregulación cerebral"
+                ],
+                "tier2-info": "Infusión de vasopresores para aumentar PAM en 10-15 mmHg durante máx 20 min",
+                
+                // Tier 3
+                "tier3-title": "Nivel Tres",
+                "tier3-items": [
+                    "Coma barbitúrico (pentobarbital/tiopental)",
+                    "Craniectomía descompresiva secundaria",
+                    "Hipotermia leve (35-36°C)"
+                ],
+                "tier3-info": "Titular para control de PIC si es efectivo",
+                
+                // History entries
+                "deescalation": "Desescalada",
+                "escalation": "Escalada",
+                "from-tier": "del Nivel",
+                "to-tier": "al Nivel"
+            }
+        };
+
+        // Éléments DOM
+        const langSelect = document.getElementById('lang-select');
+        const appTitle = document.getElementById('app-title');
+        const currentICPLabel = document.getElementById('current-icp-label');
+        const mapLabel = document.getElementById('map-label');
+        const cppLabel = document.getElementById('cpp-label');
+        const icpSlider = document.getElementById('icp-slider');
+        const icpValue = document.getElementById('icp-value');
+        const mapSlider = document.getElementById('map-slider');
+        const mapValue = document.getElementById('map-value');
+        const cppValue = document.getElementById('cpp-value');
+        const statusPanel = document.getElementById('status-panel');
+        const statusText = document.getElementById('status-text');
+        const currentTierLabel = document.getElementById('current-tier-label');
+        const protocolLabel = document.getElementById('protocol-label');
+        const tierNumber = document.getElementById('tier-number');
+        const currentTierDisplay = document.getElementById('current-tier');
+        const tierProgress = document.getElementById('tier-progress');
+        const btnEscalate = document.getElementById('btn-escalate');
+        const btnDeescalate = document.getElementById('btn-deescalate');
+        const tierInterventionsLabel = document.getElementById('tier-interventions-label');
+        const tierContent = document.getElementById('tier-content');
+        const tierHistoryLabel = document.getElementById('tier-history-label');
+        const tierHistoryContainer = document.getElementById('tier-history');
+        const historyEmpty = document.getElementById('history-empty');
+        const interTierModal = document.getElementById('inter-tier-modal');
+        const intertierRecommendationsLabel = document.getElementById('intertier-recommendations-label');
+        const beforeEscalatingLabel = document.getElementById('before-escalating-label');
+        const checkFollowingLabel = document.getElementById('check-following-label');
+        const nextTier = document.getElementById('next-tier');
+        const escalationChecklist = document.getElementById('escalation-checklist');
+        const btnConfirmEscalation = document.getElementById('btn-confirm-escalation');
+        const btnCancelEscalation = document.getElementById('btn-cancel-escalation');
+
+        // Fonction pour générer le contenu du palier
+        function generateTierContent(tier, lang) {
+            let tierKey = `tier${tier}`;
+            let tierTitle = translations[lang][`${tierKey}-title`];
+            let tierItems = translations[lang][`${tierKey}-items`];
+            
+            let colorClass = "";
+            if (tier === 0) colorClass = "text-green-800";
+            else if (tier === 1) colorClass = "text-yellow-800";
+            else if (tier === 2) colorClass = "text-orange-800";
+            else colorClass = "text-red-800";
+            
+            let html = `<h3 class="font-medium ${colorClass} mb-2">${tierTitle}</h3>
+                <div class="space-y-2">`;
+            
+            tierItems.forEach((item, index) => {
+                html += `
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded" />
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label class="font-medium text-gray-700">${item}</label>
+                            ${(tier === 2 && index === 2) ? `<p class="text-xs text-gray-500 mt-1">${translations[lang]['tier2-info']}</p>` : ''}
+                            ${(tier === 3 && index === 0) ? `<p class="text-xs text-gray-500 mt-1">${translations[lang]['tier3-info']}</p>` : ''}
+                        </div>
+                    </div>`;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        // Fonction pour mettre à jour la langue
+        function updateLanguage(lang) {
+            currentLang = lang;
+            
+            // Mise à jour des éléments textuels statiques
+            appTitle.textContent = translations[lang]['app-title'];
+            currentICPLabel.textContent = translations[lang]['current-icp-label'];
+            mapLabel.textContent = translations[lang]['map-label'];
+            cppLabel.textContent = translations[lang]['cpp-label'];
+            currentTierLabel.textContent = translations[lang]['current-tier-label'];
+            protocolLabel.textContent = translations[lang]['protocol-label'];
+            btnDeescalate.textContent = translations[lang]['btn-deescalate'];
+            btnEscalate.textContent = translations[lang]['btn-escalate'];
+            tierInterventionsLabel.textContent = translations[lang]['tier-interventions-label'];
+            tierHistoryLabel.textContent = translations[lang]['tier-history-label'];
+            historyEmpty.textContent = translations[lang]['history-empty'];
+            intertierRecommendationsLabel.textContent = translations[lang]['intertier-recommendations-label'];
+            beforeEscalatingLabel.textContent = translations[lang]['before-escalating-label'];
+            checkFollowingLabel.textContent = translations[lang]['check-following-label'];
+            btnCancelEscalation.textContent = translations[lang]['btn-cancel'];
+            btnConfirmEscalation.textContent = translations[lang]['btn-continue'];
+            
+            // Mise à jour du statut
+            updateStatusText();
+            
+            // Mise à jour du contenu du palier
+            updateTierContent();
+            
+            // Mise à jour de l'historique
+            updateHistory();
+            
+            // Mise à jour de la liste de vérification d'escalade
+            updateEscalationChecklist();
+        }
+        
+        // Fonction pour mettre à jour la liste de vérification d'escalade
+        function updateEscalationChecklist() {
+            const checkItems = translations[currentLang]['escalation-checks'];
+            
+            let checklistHTML = '';
+            checkItems.forEach(item => {
+                checklistHTML += `<li>${item}</li>`;
+            });
+            
+            escalationChecklist.innerHTML = checklistHTML;
+        }
+        
+        // Mettre à jour le texte de statut selon la langue
+        function updateStatusText() {
+            if (currentICP > 22) {
+                const tierText = translations[currentLang]['active-tier'].replace('{tier}', currentTier);
+                statusText.textContent = `${translations[currentLang]['high-icp']}: ${currentICP} mmHg - ${tierText}`;
+            } else {
+                statusText.textContent = `${translations[currentLang]['normal-icp']}: ${currentICP} mmHg - ${translations[currentLang]['continue-monitoring']}`;
+            }
+        }
+
+        // Mettre à jour l'affichage des valeurs
+        function updateDisplay() {
+            // Mise à jour des valeurs
+            icpValue.textContent = `${currentICP} mmHg`;
+            mapValue.textContent = `${currentMAP} mmHg`;
+            cppValue.textContent = `${currentCPP} mmHg`;
+            
+            // Classes de couleur pour CPP
+            let cppColorClass = 'text-green-600';
+            if (currentCPP < 60) {
+                cppColorClass = 'text-red-600';
+            } else if (currentCPP > 70) {
+                cppColorClass = 'text-yellow-600';
+            }
+            cppValue.className = `text-2xl font-bold ${cppColorClass}`;
+            
+            // Mettre à jour le statut
+            updateStatusText();
+            
+            // Mise à jour du statut panel
+            if (currentICP > 22) {
+                statusPanel.className = 'p-3 mb-4 rounded-lg bg-red-50 border border-red-200';
+                
+                // Mettre à jour le point de couleur
+                const statusPoint = statusPanel.querySelector('div.w-3');
+                if (statusPoint) {
+                    statusPoint.className = 'w-3 h-3 rounded-full mr-2 bg-red-500';
+                }
+                
+                statusText.className = 'font-medium text-red-800';
+            } else {
+                statusPanel.className = 'p-3 mb-4 rounded-lg bg-green-50 border border-green-200';
+                
+                // Mettre à jour le point de couleur
+                const statusPoint = statusPanel.querySelector('div.w-3');
+                if (statusPoint) {
+                    statusPoint.className = 'w-3 h-3 rounded-full mr-2 bg-green-500';
+                }
+                
+                statusText.className = 'font-medium text-green-800';
+            }
+            
+            // Mise à jour du palier actuel
+            tierNumber.textContent = currentTier;
+            currentTierDisplay.textContent = currentTier;
+            
+            // Mise à jour de la barre de progression
+            tierProgress.style.width = `${(currentTier / 3) * 100}%`;
+            if (currentTier === 0) {
+                tierProgress.className = 'h-full rounded-full bg-green-500';
+            } else if (currentTier === 1) {
+                tierProgress.className = 'h-full rounded-full bg-yellow-500';
+            } else if (currentTier === 2) {
+                tierProgress.className = 'h-full rounded-full bg-orange-500';
+            } else {
+                tierProgress.className = 'h-full rounded-full bg-red-500';
+            }
+            
+            // Mise à jour des boutons
+            btnDeescalate.disabled = currentTier === 0;
+            btnDeescalate.className = `flex-1 py-2 px-4 rounded font-medium ${
+                currentTier > 0 
+                    ? 'bg-green-600 text-white hover:bg-green-700' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`;
+            
+            btnEscalate.disabled = currentTier === 3 || currentICP <= 22;
+            btnEscalate.className = `flex-1 py-2 px-4 rounded font-medium ${
+                currentTier < 3 && currentICP > 22
+                    ? 'bg-red-600 text-white hover:bg-red-700' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`;
+        }
+
+        // Fonction pour mettre à jour le contenu du palier
+        function updateTierContent() {
+            // Mise à jour du contenu du palier
+            tierContent.innerHTML = generateTierContent(currentTier, currentLang);
+            tierContent.className = `border rounded-lg p-4 ${
+                currentTier === 0 ? 'border-green-200 bg-green-50' :
+                currentTier === 1 ? 'border-yellow-200 bg-yellow-50' :
+                currentTier === 2 ? 'border-orange-200 bg-orange-50' :
+                'border-red-200 bg-red-50'
+            }`;
+        }
+
+        // Mettre à jour l'historique des paliers
+        function updateHistory() {
+            if (tierHistory.length > 0) {
+                historyEmpty.style.display = 'none';
+                tierHistoryContainer.style.display = 'block';
+                
+                let historyHTML = '';
+                tierHistory.forEach((entry) => {
+                    const colorClass = entry.deescalation ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700';
+                    const actionText = entry.deescalation 
+                        ? `${translations[currentLang]['deescalation']} ${translations[currentLang]['from-tier']} ${entry.tier} ${translations[currentLang]['to-tier']} ${entry.tier - 1}`
+                        : `${translations[currentLang]['escalation']} ${translations[currentLang]['from-tier']} ${entry.tier} ${translations[currentLang]['to-tier']} ${entry.tier + 1}`;
+                    
+                    historyHTML += `
+                        <div class="p-2 rounded text-sm ${colorClass}">
+                            ${entry.time} - ${actionText}
+                        </div>
+                    `;
+                });
+                
+                tierHistoryContainer.innerHTML = historyHTML;
+            } else {
+                historyEmpty.style.display = 'block';
+                tierHistoryContainer.style.display = 'none';
+            }
+        }
+
+        // Événements pour les sliders
+        icpSlider.addEventListener('input', function() {
+            currentICP = parseInt(this.value);
+            currentCPP = currentMAP - currentICP;
+            updateDisplay();
+        });
+
+        mapSlider.addEventListener('input', function() {
+            currentMAP = parseInt(this.value);
+            currentCPP = currentMAP - currentICP;
+            updateDisplay();
+        });
+
+        // Gestionnaire d'événements pour le sélecteur de langue
+        langSelect.addEventListener('change', function() {
+            updateLanguage(this.value);
+        });
+
+        // Escalade de palier
+        btnEscalate.addEventListener('click', function() {
+            if (currentTier < 3 && currentICP > 22) {
+                nextTier.textContent = currentTier + 1;
+                interTierModal.style.display = 'flex';
+            }
+        });
+
+        // Confirmation d'escalade
+        btnConfirmEscalation.addEventListener('click', function() {
+            tierHistory.push({
+                tier: currentTier,
+                time: new Date().toLocaleTimeString(),
+                deescalation: false
+            });
+            
+            currentTier += 1;
+            interTierModal.style.display = 'none';
+            updateDisplay();
+            updateTierContent();
+            updateHistory();
+        });
+
+        // Annulation d'escalade
+        btnCancelEscalation.addEventListener('click', function() {
+            interTierModal.style.display = 'none';
+        });
+
+        // Désescalade de palier
+        btnDeescalate.addEventListener('click', function() {
+            if (currentTier > 0) {
+                tierHistory.push({
+                    tier: currentTier,
+                    time: new Date().toLocaleTimeString(),
+                    deescalation: true
+                });
+                
+                currentTier -= 1;
+                updateDisplay();
+                updateTierContent();
+                updateHistory();
+            }
+        });
+
+        // Initialisation
+        updateDisplay();
+        updateTierContent();
+        updateHistory();
+        updateEscalationChecklist();
+    </script>
+</body>
+</html>

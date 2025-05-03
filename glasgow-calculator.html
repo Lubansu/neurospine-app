@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Évaluation du Score de Glasgow | Glasgow Score Evaluation</title>
+    <style>
+        /* Styles de base */
+        /* Style pour le sélecteur de langue (menu déroulant) */
+        .language-selector {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+        
+        .lang-select {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        
+        .lang-select:hover {
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        
+        .lang-select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background-color: #f3f4f6;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 28rem;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .card-header {
+            background-color: #2563eb;
+            color: white;
+            padding: 1rem;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .card-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        .card-body {
+            padding: 1rem;
+        }
+        
+        /* Section scale type */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+        }
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 0.25rem;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-blue {
+            background-color: #2563eb;
+            color: white;
+        }
+        .btn-gray {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+        
+        /* Patient info */
+        .patient-info {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        .patient-info input {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+        }
+        .patient-info input:first-child {
+            flex: 1;
+            border-radius: 0.25rem 0 0 0.25rem;
+        }
+        .patient-info input:nth-child(2) {
+            width: 5rem;
+            border-left: none;
+            border-right: none;
+        }
+        .patient-info input:last-child {
+            border-radius: 0 0.25rem 0.25rem 0;
+        }
+        .form-text {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        /* Score sections */
+        .score-section {
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1d4ed8;
+            margin-bottom: 0.5rem;
+        }
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .score-grid-single {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        
+        /* Score buttons */
+        .score-btn {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            color: #374151;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+        }
+        .score-btn.selected {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+        .score-indicator {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 9999px;
+            background-color: #e5e7eb;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+        .score-btn.selected .score-indicator {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .score-text {
+            margin-left: 0.5rem;
+        }
+        .score-label {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .score-description {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        /* Results */
+        .results {
+            background-color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.75rem;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .result-box {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            background-color: #f3f4f6;
+        }
+        .result-label {
+            font-size: 0.75rem;
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }
+        .result-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            text-align: center;
+            color: #374151;
+        }
+        .result-box.highlight {
+            background-color: #dbeafe;
+            border-color: #bfdbfe;
+        }
+        .result-box.green {
+            background-color: #dcfce7;
+            border-color: #bbf7d0;
+        }
+        .result-box.green .result-value {
+            color: #166534;
+        }
+        .result-box.yellow {
+            background-color: #fef9c3;
+            border-color: #fef08a;
+        }
+        .result-box.yellow .result-value {
+            color: #854d0e;
+        }
+        .result-box.red {
+            background-color: #fee2e2;
+            border-color: #fecaca;
+        }
+        .result-box.red .result-value {
+            color: #b91c1c;
+        }
+        
+        .severity-indicator {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            text-align: center;
+        }
+        .severity-indicator.green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .severity-indicator.yellow {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+        .severity-indicator.red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            flex: 1;
+            background-color: #2563eb;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        .btn-secondary.active {
+            background-color: #d1d5db;
+            color: #374151;
+        }
+        
+        /* History section */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .section-header h3 {
+            font-weight: 600;
+            color: #374151;
+        }
+        .btn-danger {
+            font-size: 0.75rem;
+            color: #dc2626;
+        }
+        .btn-danger:hover {
+            color: #991b1b;
+        }
+        
+        table {
+            min-width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f9fafb;
+        }
+        th {
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        td {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        .score-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .score-badge.green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .score-badge.yellow {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+        .score-badge.red {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        
+        /* Implications section */
+        .implications {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .implication-title {
+            font-weight: 500;
+        }
+        .implication-title.green {
+            color: #166534;
+        }
+        .implication-title.yellow {
+            color: #854d0e;
+        }
+        .implication-title.red {
+            color: #b91c1c;
+        }
+        .implication-text {
+            color: #4b5563;
+            font-size: 0.875rem;
+        }
+        
+        .info-box {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 0.25rem;
+            padding: 0.75rem;
+            color: #1e40af;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sélecteur de langue -->
+        <div class="language-selector">
+            <select id="lang-select" class="lang-select">
+                <option value="fr">Français</option>
+                <option value="nl">Nederlands</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+            </select>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title" data-translate="app-title">Évaluation du Score de Glasgow</h1>
+                <p class="card-subtitle" data-translate="app-subtitle">Outil standardisé d'évaluation neurologique</p>
+            </div>
+            
+            <div class="card-body">
+                <!-- Type d'échelle -->
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <label class="form-label" data-translate="scale-type">Type d'échelle:</label>
+                        <div class="btn-group">
+                            <button id="adult-btn" class="btn btn-blue" data-translate="adult">Adulte</button>
+                            <button id="pediatric-btn" class="btn btn-gray" data-translate="pediatric">Pédiatrique</button>
+                        </div>
+                    </div>
+                    
+                    <div class="patient-info">
+                        <input type="text" id="patient-id" placeholder="ID Patient" data-translate-placeholder="patient-id">
+                        <input type="number" id="patient-age" placeholder="Âge" data-translate-placeholder="patient-age">
+                        <input type="datetime-local" id="evaluation-time">
+                    </div>
+                    <p class="form-text" data-translate="info-privacy">Les informations resteront dans l'application et ne seront pas transmises</p>
+                </div>
+                
+                <!-- Sections des scores -->
+                <div class="score-section">
+                    <!-- Ouverture des Yeux -->
+                    <h2 class="section-title" data-translate="eye-section">Ouverture des Yeux (E)</h2>
+                    <div class="score-grid" id="eye-score-container">
+                        <button class="score-btn selected" data-score="4" onclick="updateEyeScore(4)">
+                            <div class="score-indicator">4</div>
+                            <div class="score-text">
+                                <div class="score-label">Spontanée</div>
+                                <div class="score-description">Ouvre les yeux spontanément</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="3" onclick="updateEyeScore(3)">
+                            <div class="score-indicator">3</div>
+                            <div class="score-text">
+                                <div class="score-label">À la voix</div>
+                                <div class="score-description">Ouvre les yeux quand on parle au patient</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="2" onclick="updateEyeScore(2)">
+                            <div class="score-indicator">2</div>
+                            <div class="score-text">
+                                <div class="score-label">À la douleur</div>
+                                <div class="score-description">Ouvre les yeux uniquement à la stimulation douloureuse</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="1" onclick="updateEyeScore(1)">
+                            <div class="score-indicator">1</div>
+                            <div class="score-text">
+                                <div class="score-label">Aucune</div>
+                                <div class="score-description">N'ouvre pas les yeux, même à la douleur</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="score-section">
+                    <!-- Réponse Verbale -->
+                    <h2 class="section-title" data-translate="verbal-section">Réponse Verbale (V)</h2>
+                    <div class="score-grid-single" id="verbal-score-container">
+                        <button class="score-btn selected" data-score="5" onclick="updateVerbalScore(5)">
+                            <div class="score-indicator">5</div>
+                            <div class="score-text">
+                                <div class="score-label">Orientée</div>
+                                <div class="score-description">Conversation normale, patient orienté</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="4" onclick="updateVerbalScore(4)">
+                            <div class="score-indicator">4</div>
+                            <div class="score-text">
+                                <div class="score-label">Confuse</div>
+                                <div class="score-description">Peut converser mais est désorienté</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="3" onclick="updateVerbalScore(3)">
+                            <div class="score-indicator">3</div>
+                            <div class="score-text">
+                                <div class="score-label">Mots inappropriés</div>
+                                <div class="score-description">Mots incohérents, pas de conversation suivie</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="2" onclick="updateVerbalScore(2)">
+                            <div class="score-indicator">2</div>
+                            <div class="score-text">
+                                <div class="score-label">Sons incompréhensibles</div>
+                                <div class="score-description">Gémissements, grognements</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="1" onclick="updateVerbalScore(1)">
+                            <div class="score-indicator">1</div>
+                            <div class="score-text">
+                                <div class="score-label">Aucune</div>
+                                <div class="score-description">Pas de réponse verbale, même à la douleur</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="score-section">
+                    <!-- Réponse Motrice -->
+                    <h2 class="section-title" data-translate="motor-section">Réponse Motrice (M)</h2>
+                    <div class="score-grid-single" id="motor-score-container">
+                        <button class="score-btn selected" data-score="6" onclick="updateMotorScore(6)">
+                            <div class="score-indicator">6</div>
+                            <div class="score-text">
+                                <div class="score-label">Obéit aux ordres</div>
+                                <div class="score-description">Exécute des ordres simples</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="5" onclick="updateMotorScore(5)">
+                            <div class="score-indicator">5</div>
+                            <div class="score-text">
+                                <div class="score-label">Localise la douleur</div>
+                                <div class="score-description">Localise et tente d'écarter le stimulus douloureux</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="4" onclick="updateMotorScore(4)">
+                            <div class="score-indicator">4</div>
+                            <div class="score-text">
+                                <div class="score-label">Évitement non adapté</div>
+                                <div class="score-description">Retire le membre à la douleur, mouvement de retrait</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="3" onclick="updateMotorScore(3)">
+                            <div class="score-indicator">3</div>
+                            <div class="score-text">
+                                <div class="score-label">Flexion anormale</div>
+                                <div class="score-description">Décortication, flexion anormale à la douleur</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="2" onclick="updateMotorScore(2)">
+                            <div class="score-indicator">2</div>
+                            <div class="score-text">
+                                <div class="score-label">Extension anormale</div>
+                                <div class="score-description">Décérébration, extension anormale à la douleur</div>
+                            </div>
+                        </button>
+                        <button class="score-btn" data-score="1" onclick="updateMotorScore(1)">
+                            <div class="score-indicator">1</div>
+                            <div class="score-text">
+                                <div class="score-label">Aucune</div>
+                                <div class="score-description">Pas de réponse motrice, même à la douleur</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Résultats -->
+                <div class="results">
+                    <div class="results-grid">
+                        <div class="result-box">
+                            <div class="result-label">Yeux (E)</div>
+                            <div id="eye-result" class="result-value">4</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Verbal (V)</div>
+                            <div id="verbal-result" class="result-value">5</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Moteur (M)</div>
+                            <div id="motor-result" class="result-value">6</div>
+                        </div>
+                        <div id="total-result-box" class="result-box highlight green">
+                            <div class="result-label">TOTAL</div>
+                            <div id="total-result" class="result-value">15</div>
+                        </div>
+                    </div>
+                    
+                    <div id="severity-indicator" class="severity-indicator green">
+                        <p class="font-medium" data-translate="severity-title">Traumatisme Crânien Léger (GCS 13-15)</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="save-btn" class="btn-primary" data-translate="save-btn">Enregistrer</button>
+                    <button id="history-btn" class="btn-secondary" data-translate="history-btn">Historique</button>
+                </div>
+                
+                <!-- Historique (caché par défaut) -->
+                <div id="history-section" style="display: none;">
+                    <div class="section-header">
+                        <h3 data-translate="history-title">Historique des Évaluations</h3>
+                        <button id="clear-history-btn" class="btn-danger" style="display: none;" data-translate="clear-btn">Effacer</button>
+                    </div>
+                    
+                    <div id="history-empty" class="form-text" data-translate="no-records">Aucun enregistrement</div>
+                    
+                    <div id="history-table-container" style="display: none;" class="border rounded overflow-hidden">
+                        <table id="history-table">
+                            <thead>
+                                <tr>
+                                    <th data-translate="date-time">Date/Heure</th>
+                                    <th style="text-align: center;">E</th>
+                                    <th style="text-align: center;">V</th>
+                                    <th style="text-align: center;">M</th>
+                                    <th style="text-align: center;" data-translate="total">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body">
+                                <!-- Les entrées d'historique seront ajoutées ici -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section implications -->
+        <div class="card">
+            <div class="card-body">
+                <h2 class="section-title" data-translate="implications-title">Implications du Score de Glasgow</h2>
+                
+                <div class="implications">
+                    <div>
+                        <h3 class="implication-title green" data-translate="mild-title">GCS 13-15: Traumatisme Crânien Léger</h3>
+                        <p class="implication-text" data-translate="mild-text">
+                            • Habituellement ne nécessite pas d'intervention neurochirurgicale<br>
+                            • Surveillance neurologique recommandée<br>
+                            • Scanner cérébral si facteurs de risque présents<br>
+                            • Instructions de sortie détaillées avec signes d'alerte
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="implication-title yellow" data-translate="moderate-title">GCS 9-12: Traumatisme Crânien Modéré</h3>
+                        <p class="implication-text" data-translate="moderate-text">
+                            • Scanner cérébral généralement indiqué<br>
+                            • Évaluation neurochirurgicale recommandée<br>
+                            • Surveillance neurologique rapprochée<br>
+                            • Risque accru de lésions intracrâniennes
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="implication-title red" data-translate="severe-title">GCS 3-8: Traumatisme Crânien Sévère</h3>
+                        <p class="implication-text" data-translate="severe-text">
+                            • Hospitalisation en soins intensifs<br>
+                            • Scanner cérébral urgent<br>
+                            • Considérer monitoring de la PIC si GCS ≤8 avec lésion cérébrale structurelle<br>
+                            • Risque élevé d'intervention neurochirurgicale<br>
+                            • Gestion avancée des voies respiratoires souvent nécessaire
+                        </p>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p style="font-weight: 500;" data-translate="important-reminder">Rappel important:</p>
+                        <p data-translate="gcs-warning">
+                            Le Score de Glasgow est un outil d'évaluation standardisé, mais ne doit pas être utilisé seul pour les décisions cliniques. 
+                            L'évolution du score dans le temps est souvent plus informative que des valeurs isolées.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let eyeScore = 4;
+        let verbalScore = 5;
+        let motorScore = 6;
+        let totalScore = 15;
+        let previousScores = [];
+        let ageGroup = 'adult';
+        let showHistory = false;
+        let currentLang = 'fr'; // Langue par défaut
+        
+        // Définitions des traductions
+        const translations = {
+            // Français
+            fr: {
+                "app-title": "Évaluation du Score de Glasgow",
+                "app-subtitle": "Outil standardisé d'évaluation neurologique",
+                "scale-type": "Type d'échelle:",
+                "adult": "Adulte",
+                "pediatric": "Pédiatrique",
+                "patient-id": "ID Patient",
+                "patient-age": "Âge",
+                "info-privacy": "Les informations resteront dans l'application et ne seront pas transmises",
+                "eye-section": "Ouverture des Yeux (E)",
+                "verbal-section": "Réponse Verbale (V)",
+                "motor-section": "Réponse Motrice (M)",
+                "save-btn": "Enregistrer",
+                "history-btn": "Historique",
+                "hide-btn": "Masquer",
+                "history-title": "Historique des Évaluations",
+                "clear-btn": "Effacer",
+                "no-records": "Aucun enregistrement",
+                "date-time": "Date/Heure",
+                "total": "Total",
+                "implications-title": "Implications du Score de Glasgow",
+                "mild-title": "GCS 13-15: Traumatisme Crânien Léger",
+                "mild-text": "• Habituellement ne nécessite pas d'intervention neurochirurgicale<br>• Surveillance neurologique recommandée<br>• Scanner cérébral si facteurs de risque présents<br>• Instructions de sortie détaillées avec signes d'alerte",
+                "moderate-title": "GCS 9-12: Traumatisme Crânien Modéré",
+                "moderate-text": "• Scanner cérébral généralement indiqué<br>• Évaluation neurochirurgicale recommandée<br>• Surveillance neurologique rapprochée<br>• Risque accru de lésions intracrâniennes",
+                "severe-title": "GCS 3-8: Traumatisme Crânien Sévère",
+                "severe-text": "• Hospitalisation en soins intensifs<br>• Scanner cérébral urgent<br>• Considérer monitoring de la PIC si GCS ≤8 avec lésion cérébrale structurelle<br>• Risque élevé d'intervention neurochirurgicale<br>• Gestion avancée des voies respiratoires souvent nécessaire",
+                "important-reminder": "Rappel important:",
+                "gcs-warning": "Le Score de Glasgow est un outil d'évaluation standardisé, mais ne doit pas être utilisé seul pour les décisions cliniques. L'évolution du score dans le temps est souvent plus informative que des valeurs isolées.",
+                "confirm-clear": "Êtes-vous sûr de vouloir effacer l'historique des scores?"
+            },
+            
+            // Néerlandais
+            nl: {
+                "app-title": "Glasgow Coma Schaal Evaluatie",
+                "app-subtitle": "Gestandaardiseerd neurologisch evaluatie-instrument",
+                "scale-type": "Schaaltype:",
+                "adult": "Volwassene",
+                "pediatric": "Pediatrisch",
+                "patient-id": "Patiënt ID",
+                "patient-age": "Leeftijd",
+                "info-privacy": "De informatie blijft in de applicatie en wordt niet verzonden",
+                "eye-section": "Ogen Openen (E)",
+                "verbal-section": "Verbale Reactie (V)",
+                "motor-section": "Motorische Reactie (M)",
+                "save-btn": "Opslaan",
+                "history-btn": "Geschiedenis",
+                "hide-btn": "Verbergen",
+                "history-title": "Evaluatiegeschiedenis",
+                "clear-btn": "Wissen",
+                "no-records": "Geen gegevens",
+                "date-time": "Datum/Tijd",
+                "total": "Totaal",
+                "implications-title": "Implicaties van de Glasgow Coma Schaal",
+                "mild-title": "GCS 13-15: Licht Hersenletsel",
+                "mild-text": "• Vereist meestal geen neurochirurgische interventie<br>• Neurologische observatie aanbevolen<br>• CT-scan indien risicofactoren aanwezig zijn<br>• Gedetailleerde ontslaginstructies met waarschuwingssignalen",
+                "moderate-title": "GCS 9-12: Matig Hersenletsel",
+                "moderate-text": "• CT-scan meestal geïndiceerd<br>• Neurochirurgische evaluatie aanbevolen<br>• Nauwlettende neurologische observatie<br>• Verhoogd risico op intracraniële letsels",
+                "severe-title": "GCS 3-8: Ernstig Hersenletsel",
+                "severe-text": "• Opname op intensive care<br>• Spoedige CT-scan<br>• Overweeg ICP-monitoring indien GCS ≤8 met structurele hersenschade<br>• Hoog risico op neurochirurgische interventie<br>• Vaak geavanceerd luchtwegbeheer nodig",
+                "important-reminder": "Belangrijke herinnering:",
+                "gcs-warning": "De Glasgow Coma Schaal is een gestandaardiseerd evaluatie-instrument, maar mag niet alleen worden gebruikt voor klinische beslissingen. De evolutie van de score in de tijd is vaak informatiever dan geïsoleerde waarden.",
+                "confirm-clear": "Weet u zeker dat u de scoregeschiedenis wilt wissen?"
+            },
+            
+            // Anglais
+            en: {
+                "app-title": "Glasgow Coma Scale Assessment",
+                "app-subtitle": "Standardized neurological assessment tool",
+                "scale-type": "Scale type:",
+                "adult": "Adult",
+                "pediatric": "Pediatric",
+                "patient-id": "Patient ID",
+                "patient-age": "Age",
+                "info-privacy": "Information will remain in the application and will not be transmitted",
+                "eye-section": "Eye Opening (E)",
+                "verbal-section": "Verbal Response (V)",
+                "motor-section": "Motor Response (M)",
+                "save-btn": "Save",
+                "history-btn": "History",
+                "hide-btn": "Hide",
+                "history-title": "Assessment History",
+                "clear-btn": "Clear",
+                "no-records": "No records",
+                "date-time": "Date/Time",
+                "total": "Total",
+                "implications-title": "Glasgow Coma Scale Implications",
+                "mild-title": "GCS 13-15: Mild Traumatic Brain Injury",
+                "mild-text": "• Usually does not require neurosurgical intervention<br>• Neurological observation recommended<br>• CT scan if risk factors present<br>• Detailed discharge instructions with warning signs",
+                "moderate-title": "GCS 9-12: Moderate Traumatic Brain Injury",
+                "moderate-text": "• CT scan generally indicated<br>• Neurosurgical evaluation recommended<br>• Close neurological monitoring<br>• Increased risk of intracranial lesions",
+                "severe-title": "GCS 3-8: Severe Traumatic Brain Injury",
+                "severe-text": "• Intensive care unit admission<br>• Urgent CT scan<br>• Consider ICP monitoring if GCS ≤8 with structural brain injury<br>• High risk of neurosurgical intervention<br>• Advanced airway management often necessary",
+                "important-reminder": "Important reminder:",
+                "gcs-warning": "The Glasgow Coma Scale is a standardized assessment tool, but should not be used alone for clinical decisions. The evolution of the score over time is often more informative than isolated values.",
+                "confirm-clear": "Are you sure you want to clear the score history?"
+            },
+            
+            // Espagnol
+            es: {
+                "app-title": "Evaluación de la Escala de Coma de Glasgow",
+                "app-subtitle": "Herramienta estandarizada de evaluación neurológica",
+                "scale-type": "Tipo de escala:",
+                "adult": "Adulto",
+                "pediatric": "Pediátrico",
+                "patient-id": "ID Paciente",
+                "patient-age": "Edad",
+                "info-privacy": "La información permanecerá en la aplicación y no se transmitirá",
+                "eye-section": "Apertura Ocular (E)",
+                "verbal-section": "Respuesta Verbal (V)",
+                "motor-section": "Respuesta Motora (M)",
+                "save-btn": "Guardar",
+                "history-btn": "Historial",
+                "hide-btn": "Ocultar",
+                "history-title": "Historial de Evaluaciones",
+                "clear-btn": "Borrar",
+                "no-records": "Sin registros",
+                "date-time": "Fecha/Hora",
+                "total": "Total",
+                "implications-title": "Implicaciones de la Escala de Coma de Glasgow",
+                "mild-title": "GCS 13-15: Traumatismo Craneal Leve",
+                "mild-text": "• Normalmente no requiere intervención neuroquirúrgica<br>• Observación neurológica recomendada<br>• TAC craneal si hay factores de riesgo presentes<br>• Instrucciones detalladas al alta con signos de alarma",
+                "moderate-title": "GCS 9-12: Traumatismo Craneal Moderado",
+                "moderate-text": "• TAC craneal generalmente indicado<br>• Evaluación neuroquirúrgica recomendada<br>• Monitorización neurológica estrecha<br>• Mayor riesgo de lesiones intracraneales",
+                "severe-title": "GCS 3-8: Traumatismo Craneal Grave",
+                "severe-text": "• Ingreso en unidad de cuidados intensivos<br>• TAC craneal urgente<br>• Considerar monitorización de PIC si GCS ≤8 con lesión cerebral estructural<br>• Alto riesgo de intervención neuroquirúrgica<br>• Gestión avanzada de vías respiratorias a menudo necesaria",
+                "important-reminder": "Recordatorio importante:",
+                "gcs-warning": "La Escala de Coma de Glasgow es una herramienta de evaluación estandarizada, pero no debe utilizarse sola para decisiones clínicas. La evolución de la puntuación en el tiempo suele ser más informativa que los valores aislados.",
+                "confirm-clear": "¿Está seguro que desea borrar el historial de puntuaciones?"
+            }
+        };
+        
+        // Récupération des éléments du DOM
+        const adultBtn = document.getElementById('adult-btn');
+        const pediatricBtn = document.getElementById('pediatric-btn');
+        const patientIdInput = document.getElementById('patient-id');
+        const patientAgeInput = document.getElementById('patient-age');
+        const evaluationTimeInput = document.getElementById('evaluation-time');
+        const eyeScoreContainer = document.getElementById('eye-score-container');
+        const verbalScoreContainer = document.getElementById('verbal-score-container');
+        const motorScoreContainer = document.getElementById('motor-score-container');
+        const eyeResult = document.getElementById('eye-result');
+        const verbalResult = document.getElementById('verbal-result');
+        const motorResult = document.getElementById('motor-result');
+        const totalResult = document.getElementById('total-result');
+        const totalResultBox = document.getElementById('total-result-box');
+        const severityIndicator = document.getElementById('severity-indicator');
+        const saveBtn = document.getElementById('save-btn');
+        const historyBtn = document.getElementById('history-btn');
+        const historySection = document.getElementById('history-section');
+        const clearHistoryBtn = document.getElementById('clear-history-btn');
+        const historyEmpty = document.getElementById('history-empty');
+        const historyTableContainer = document.getElementById('history-table-container');
+        const historyTableBody = document.getElementById('history-table-body');
+        const langSelect = document.getElementById('lang-select');
+        
+        // Initialisation de la date et heure
+        const now = new Date();
+        const formattedDateTime = now.toISOString().slice(0, 16);
+        evaluationTimeInput.value = formattedDateTime;
+        
+        // Fonction pour mettre à jour la langue de l'interface
+        function updateLanguage(lang) {
+            currentLang = lang;
+            
+            // Mise à jour de tous les éléments avec attribut data-translate
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[lang][key]) {
+                    element.innerHTML = translations[lang][key];
+                }
+            });
+            
+            // Mise à jour des placeholders
+            document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-translate-placeholder');
+                if (translations[lang][key]) {
+                    element.placeholder = translations[lang][key];
+                }
+            });
+            
+            // Mise à jour du bouton d'historique (cas spécial)
+            if (showHistory) {
+                historyBtn.textContent = translations[lang]["hide-btn"];
+            } else {
+                historyBtn.textContent = translations[lang]["history-btn"];
+            }
+            
+            // Mise à jour des descriptions des échelles
+            updateScaleType();
+            
+            // Mise à jour du texte de sévérité
+            updateResults();
+        }
+        
+        // Gestionnaire d'événements pour le sélecteur de langue
+        langSelect.addEventListener('change', function() {
+            const lang = this.value;
+            
+            // Changement de langue
+            updateLanguage(lang);
+        });
+        
+        // Fonctions pour mettre à jour les scores
+        function updateEyeScore(score) {
+            eyeScore = score;
+            updateSelectedButton(eyeScoreContainer, score);
+            updateResults();
+        }
+        
+        function updateVerbalScore(score) {
+            verbalScore = score;
+            updateSelectedButton(verbalScoreContainer, score);
+            updateResults();
+        }
+        
+        function updateMotorScore(score) {
+            motorScore = score;
+            updateSelectedButton(motorScoreContainer, score);
+            updateResults();
+        }
+        
+        function updateSelectedButton(container, score) {
+            const buttons = container.querySelectorAll('.score-btn');
+            buttons.forEach(button => {
+                if (parseInt(button.dataset.score) === score) {
+                    button.classList.add('selected');
+                } else {
+                    button.classList.remove('selected');
+                }
+            });
+        }
+        
+        function updateResults() {
+            totalScore = eyeScore + verbalScore + motorScore;
+            
+            // Mise à jour des résultats affichés
+            eyeResult.textContent = eyeScore;
+            verbalResult.textContent = verbalScore;
+            motorResult.textContent = motorScore;
+            totalResult.textContent = totalScore;
+            
+            // Mise à jour de la couleur et du texte de sévérité
+            let severity, colorClass;
+            
+            if (totalScore >= 13) {
+                colorClass = 'green';
+                if (currentLang === 'fr') severity = 'Léger (GCS 13-15)';
+                else if (currentLang === 'nl') severity = 'Licht (GCS 13-15)';
+                else if (currentLang === 'en') severity = 'Mild (GCS 13-15)';
+                else if (currentLang === 'es') severity = 'Leve (GCS 13-15)';
+            } else if (totalScore >= 9) {
+                colorClass = 'yellow';
+                if (currentLang === 'fr') severity = 'Modéré (GCS 9-12)';
+                else if (currentLang === 'nl') severity = 'Matig (GCS 9-12)';
+                else if (currentLang === 'en') severity = 'Moderate (GCS 9-12)';
+                else if (currentLang === 'es') severity = 'Moderado (GCS 9-12)';
+            } else {
+                colorClass = 'red';
+                if (currentLang === 'fr') severity = 'Sévère (GCS 3-8)';
+                else if (currentLang === 'nl') severity = 'Ernstig (GCS 3-8)';
+                else if (currentLang === 'en') severity = 'Severe (GCS 3-8)';
+                else if (currentLang === 'es') severity = 'Grave (GCS 3-8)';
+            }
+            
+            // Supprimer les classes de couleur précédentes
+            totalResultBox.classList.remove('green', 'yellow', 'red');
+            severityIndicator.classList.remove('green', 'yellow', 'red');
+            
+            // Ajouter la nouvelle classe de couleur
+            totalResultBox.classList.add(colorClass);
+            severityIndicator.classList.add(colorClass);
+            
+            // Mettre à jour le texte selon la langue
+            let traumaText = '';
+            if (currentLang === 'fr') traumaText = 'Traumatisme Crânien ';
+            else if (currentLang === 'nl') traumaText = 'Hersenletsel ';
+            else if (currentLang === 'en') traumaText = 'Traumatic Brain Injury ';
+            else if (currentLang === 'es') traumaText = 'Traumatismo Craneal ';
+            
+            severityIndicator.innerHTML = `<p class="font-medium">${traumaText}${severity}</p>`;
+        }
+        
+        // Gestion du changement d'échelle (adulte/pédiatrique)
+        adultBtn.addEventListener('click', function() {
+            if (ageGroup !== 'adult') {
+                ageGroup = 'adult';
+                adultBtn.classList.add('btn-blue');
+                adultBtn.classList.remove('btn-gray');
+                pediatricBtn.classList.add('btn-gray');
+                pediatricBtn.classList.remove('btn-blue');
+                updateScaleType();
+            }
+        });
+        
+        pediatricBtn.addEventListener('click', function() {
+            if (ageGroup !== 'pediatric') {
+                ageGroup = 'pediatric';
+                pediatricBtn.classList.add('btn-blue');
+                pediatricBtn.classList.remove('btn-gray');
+                adultBtn.classList.add('btn-gray');
+                adultBtn.classList.remove('btn-blue');
+                updateScaleType();
+            }
+        });
+        
+        // Fonction pour mettre à jour les descriptions d'échelle
+        function updateScaleType() {
+            if (ageGroup === 'adult') {
+                // Mise à jour des descriptions pour l'échelle adulte selon la langue choisie
+                updateEyeScaleForAdult(currentLang);
+                updateVerbalScaleForAdult(currentLang);
+                updateMotorScaleForAdult(currentLang);
+            } else {
+                // Mise à jour des descriptions pour l'échelle pédiatrique selon la langue choisie
+                updateEyeScaleForPediatric(currentLang);
+                updateVerbalScaleForPediatric(currentLang);
+                updateMotorScaleForPediatric(currentLang);
+            }
+        }
+        
+        function updateEyeScaleForAdult(lang) {
+            const eyeButtons = eyeScoreContainer.querySelectorAll('.score-btn');
+            
+            // Descriptions pour l'échelle des yeux (adulte) en fonction de la langue
+            const eyeDescriptions = {
+                fr: [
+                    {label: "Spontanée", desc: "Ouvre les yeux spontanément"},
+                    {label: "À la voix", desc: "Ouvre les yeux quand on parle au patient"},
+                    {label: "À la douleur", desc: "Ouvre les yeux uniquement à la stimulation douloureuse"},
+                    {label: "Aucune", desc: "N'ouvre pas les yeux, même à la douleur"}
+                ],
+                nl: [
+                    {label: "Spontaan", desc: "Opent de ogen spontaan"},
+                    {label: "Op aanspreken", desc: "Opent de ogen als men tegen de patiënt praat"},
+                    {label: "Op pijnprikkels", desc: "Opent de ogen alleen bij pijnprikkels"},
+                    {label: "Geen", desc: "Opent de ogen niet, zelfs niet bij pijnprikkels"}
+                ],
+                en: [
+                    {label: "Spontaneous", desc: "Opens eyes spontaneously"},
+                    {label: "To voice", desc: "Opens eyes when spoken to"},
+                    {label: "To pain", desc: "Opens eyes only to painful stimulation"},
+                    {label: "None", desc: "Does not open eyes, even to pain"}
+                ],
+                es: [
+                    {label: "Espontánea", desc: "Abre los ojos espontáneamente"},
+                    {label: "A la voz", desc: "Abre los ojos cuando se le habla"},
+                    {label: "Al dolor", desc: "Abre los ojos solo ante estímulos dolorosos"},
+                    {label: "Ninguna", desc: "No abre los ojos, ni siquiera ante el dolor"}
+                ]
+            };
+            
+            // Mise à jour des textes
+            eyeButtons.forEach((button, index) => {
+                const labelElem = button.querySelector('.score-label');
+                const descElem = button.querySelector('.score-description');
+                
+                if (eyeDescriptions[lang] && eyeDescriptions[lang][index]) {
+                    labelElem.textContent = eyeDescriptions[lang][index].label;
+                    descElem.textContent = eyeDescriptions[lang][index].desc;
+                }
+            });
+        }
+        
+        function updateEyeScaleForPediatric(lang) {
+            const eyeButtons = eyeScoreContainer.querySelectorAll('.score-btn');
+            
+            // Descriptions pour l'échelle des yeux (pédiatrique)
+            const eyeDescriptionsPed = {
+                fr: [
+                    {label: "Spontanée", desc: "Ouvre les yeux spontanément"},
+                    {label: "À la voix", desc: "Ouvre les yeux quand on parle à l'enfant"},
+                    {label: "À la douleur", desc: "Ouvre les yeux uniquement à la stimulation douloureuse"},
+                    {label: "Aucune", desc: "N'ouvre pas les yeux, même à la douleur"}
+                ],
+                nl: [
+                    {label: "Spontaan", desc: "Opent de ogen spontaan"},
+                    {label: "Op aanspreken", desc: "Opent de ogen als men tegen het kind praat"},
+                    {label: "Op pijnprikkels", desc: "Opent de ogen alleen bij pijnprikkels"},
+                    {label: "Geen", desc: "Opent de ogen niet, zelfs niet bij pijnprikkels"}
+                ],
+                en: [
+                    {label: "Spontaneous", desc: "Opens eyes spontaneously"},
+                    {label: "To voice", desc: "Opens eyes when spoken to"},
+                    {label: "To pain", desc: "Opens eyes only to painful stimulation"},
+                    {label: "None", desc: "Does not open eyes, even to pain"}
+                ],
+                es: [
+                    {label: "Espontánea", desc: "Abre los ojos espontáneamente"},
+                    {label: "A la voz", desc: "Abre los ojos cuando se le habla al niño"},
+                    {label: "Al dolor", desc: "Abre los ojos solo ante estímulos dolorosos"},
+                    {label: "Ninguna", desc: "No abre los ojos, ni siquiera ante el dolor"}
+                ]
+            };
+            
+            // Mise à jour des textes
+            eyeButtons.forEach((button, index) => {
+                const labelElem = button.querySelector('.score-label');
+                const descElem = button.querySelector('.score-description');
+                
+                if (eyeDescriptionsPed[lang] && eyeDescriptionsPed[lang][index]) {
+                    labelElem.textContent = eyeDescriptionsPed[lang][index].label;
+                    descElem.textContent = eyeDescriptionsPed[lang][index].desc;
+                }
+            });
+        }
+        
+        function updateVerbalScaleForAdult(lang) {
+            const verbalButtons = verbalScoreContainer.querySelectorAll('.score-btn');
+            
+            // Descriptions pour l'échelle verbale (adulte)
+            const verbalDescriptions = {
+                fr: [
+                    {label: "Orientée", desc: "Conversation normale, patient orienté"},
+                    {label: "Confuse", desc: "Peut converser mais est désorienté"},
+                    {label: "Mots inappropriés", desc: "Mots incohérents, pas de conversation suivie"},
+                    {label: "Sons incompréhensibles", desc: "Gémissements, grognements"},
+                    {label: "Aucune", desc: "Pas de réponse verbale, même à la douleur"}
+                ],
+                nl: [
+                    {label: "Georiënteerd", desc: "Normale conversatie, patiënt is georiënteerd"},
+                    {label: "Verward", desc: "Kan converseren maar is gedesoriënteerd"},
+                    {label: "Inadequate woorden", desc: "Onsamenhangende woorden, geen vloeiende conversatie"},
+                    {label: "Onbegrijpelijke geluiden", desc: "Kreunen, grommen"},
+                    {label: "Geen", desc: "Geen verbale reactie, zelfs niet op pijn"}
+                ],
+                en: [
+                    {label: "Oriented", desc: "Normal conversation, patient oriented"},
+                    {label: "Confused", desc: "Can converse but is disoriented"},
+                    {label: "Inappropriate words", desc: "Incoherent words, no sustained conversation"},
+                    {label: "Incomprehensible sounds", desc: "Moaning, groaning"},
+                    {label: "None", desc: "No verbal response, even to pain"}
+                ],
+                es: [
+                    {label: "Orientada", desc: "Conversación normal, paciente orientado"},
+                    {label: "Confusa", desc: "Puede conversar pero está desorientado"},
+                    {label: "Palabras inapropiadas", desc: "Palabras incoherentes, sin conversación continuada"},
+                    {label: "Sonidos incomprensibles", desc: "Gemidos, gruñidos"},
+                    {label: "Ninguna", desc: "Sin respuesta verbal, incluso ante el dolor"}
+                ]
+            };
+            
+            // Mise à jour des textes
+            verbalButtons.forEach((button, index) => {
+                const labelElem = button.querySelector('.score-label');
+                const descElem = button.querySelector('.score-description');
+                
+                if (verbalDescriptions[lang] && verbalDescriptions[lang][index]) {
+                    labelElem.textContent = verbalDescriptions[lang][index].label;
+                    descElem.textContent = verbalDescriptions[lang][index].desc;
+                }
+            });
+        }
+        
+        function updateVerbalScaleForPediatric(lang) {
+            const verbalButtons = verbalScoreContainer.querySelectorAll('.score-btn');
+            
+            // Descriptions pour l'échelle verbale (pédiatrique)
+            const verbalDescriptionsPed = {
+                fr: [
+                    {label: "Sourit, suit du regard, interagit", desc: "Enfant orienté, interagit normalement"},
+                    {label: "Pleure mais consolable", desc: "Interactions inappropriées"},
+                    {label: "Inconsolable, gémissements", desc: "Pleure de façon inconsistante"},
+                    {label: "Agité, inconsolable", desc: "Comportement agité, irritable"},
+                    {label: "Aucune réponse verbale", desc: "Absence de vocalisation"}
+                ],
+                nl: [
+                    {label: "Glimlacht, volgt met de ogen, interactie", desc: "Kind is georiënteerd, normale interactie"},
+                    {label: "Huilt maar te troosten", desc: "Ongepaste interacties"},
+                    {label: "Ontroostbaar, kreunt", desc: "Huilt inconsistent"},
+                    {label: "Geagiteerd, ontroostbaar", desc: "Geagiteerd gedrag, prikkelbaar"},
+                    {label: "Geen verbale reactie", desc: "Afwezigheid van vocalisatie"}
+                ],
+                en: [
+                    {label: "Smiles, tracks, interacts", desc: "Child oriented, interacts normally"},
+                    {label: "Cries but consolable", desc: "Inappropriate interactions"},
+                    {label: "Inconsolable, moaning", desc: "Cries inconsistently"},
+                    {label: "Agitated, inconsolable", desc: "Agitated behavior, irritable"},
+                    {label: "No verbal response", desc: "Absence of vocalization"}
+                ],
+                es: [
+                    {label: "Sonríe, sigue con la mirada, interactúa", desc: "Niño orientado, interactúa normalmente"},
+                    {label: "Llora pero consolable", desc: "Interacciones inapropiadas"},
+                    {label: "Inconsolable, gemidos", desc: "Llora de forma inconsistente"},
+                    {label: "Agitado, inconsolable", desc: "Comportamiento agitado, irritable"},
+                    {label: "Sin respuesta verbal", desc: "Ausencia de vocalización"}
+                ]
+            };
+            
+            // Mise à jour des textes
+            verbalButtons.forEach((button, index) => {
+                const labelElem = button.querySelector('.score-label');
+                const descElem = button.querySelector('.score-description');
+                
+                if (verbalDescriptionsPed[lang] && verbalDescriptionsPed[lang][index]) {
+                    labelElem.textContent = verbalDescriptionsPed[lang][index].label;
+                    descElem.textContent = verbalDescriptionsPed[lang][index].desc;
+                }
+            });
+        }
+        
+        function updateMotorScaleForAdult(lang) {
+            const motorButtons = motorScoreContainer.querySelectorAll('.score-btn');
+            
+            // Descriptions pour l'échelle motrice (adulte)
+            const motorDescriptions = {
+                fr: [
+                    {label: "Obéit aux ordres", desc: "Exécute des ordres simples"},
+                    {label: "Localise la douleur", desc: "Localise et tente d'écarter le stimulus douloureux"},
+                    {label: "Évitement non adapté", desc: "Retire le membre à la douleur, mouvement de retrait"},
+                    {label: "Flexion anormale", desc: "Décortication, flexion anormale à la douleur"},
+                    {label: "Extension anormale", desc: "Décérébration, extension anormale à la douleur"},
+                    {label: "Aucune", desc: "Pas de réponse motrice, même à la douleur"}
+                ],
+                nl: [
+                    {label: "Voert opdrachten uit", desc: "Voert eenvoudige opdrachten uit"},
+                    {label: "Lokaliseert pijn", desc: "Lokaliseert en probeert pijnprikkel weg te duwen"},
+                    {label: "Onaangepaste terugtrekking", desc: "Trekt ledemaat terug bij pijn, terugtrekkingsbeweging"},
+                    {label: "Abnormale flexie", desc: "Decorticatie, abnormale flexie bij pijn"},
+                    {label: "Abnormale extensie", desc: "Decerebratie, abnormale extensie bij pijn"},
+                    {label: "Geen", desc: "Geen motorische respons, zelfs niet bij pijn"}
+                ],
+                en: [
+                    {label: "Obeys commands", desc: "Follows simple commands"},
+                    {label: "Localizes pain", desc: "Localizes and tries to remove painful stimulus"},
+                    {label: "Withdrawal", desc: "Withdraws limb from pain, withdrawal movement"},
+                    {label: "Abnormal flexion", desc: "Decorticate posturing, abnormal flexion to pain"},
+                    {label: "Abnormal extension", desc: "Decerebrate posturing, abnormal extension to pain"},
+                    {label: "None", desc: "No motor response, even to pain"}
+                ],
+                es: [
+                    {label: "Obedece órdenes", desc: "Ejecuta órdenes simples"},
+                    {label: "Localiza el dolor", desc: "Localiza e intenta apartar el estímulo doloroso"},
+                    {label: "Retirada no adaptada", desc: "Retira el miembro ante el dolor, movimiento de retirada"},
+                    {label: "Flexión anormal", desc: "Decorticación, flexión anormal ante el dolor"},
+                    {label: "Extensión anormal", desc: "Descerebración, extensión anormal ante el dolor"},
+                    {label: "Ninguna", desc: "Sin respuesta motora, incluso ante el dolor"}
+                ]
+            };
+            
+// Mise à jour des textes
+            motorButtons.forEach((button, index) => {
+                const labelElem = button.querySelector('.score-label');
+                const descElem = button.querySelector('.score-description');
+                
+                if (motorDescriptions[lang] && motorDescriptions[lang][index]) {
+                    labelElem.textContent = motorDescriptions[lang][index].label;
+                    descElem.textContent = motorDescriptions[lang][index].desc;
+                }
+            });
+        }
+        
+        function updateMotorScaleForPediatric(lang) {
+            const motorButtons = motorScoreContainer.querySelectorAll('.score-btn');
+            
+            // Descriptions pour l'échelle motrice (pédiatrique)
+            const motorDescriptionsPed = {
+                fr: [
+                    {label: "Mouvements spontanés/adaptés", desc: "Mouvements intentionnels normaux pour l'âge"},
+                    {label: "Se retire au toucher", desc: "Retire le membre au toucher"},
+                    {label: "Se retire à la douleur", desc: "Retire le membre à la douleur"},
+                    {label: "Flexion anormale", desc: "Décortication chez le nourrisson"},
+                    {label: "Extension anormale", desc: "Décérébration chez le nourrisson"},
+                    {label: "Aucune réponse motrice", desc: "Absence de mouvement"}
+                ],
+                nl: [
+                    {label: "Spontane/aangepaste bewegingen", desc: "Normale doelbewuste bewegingen voor de leeftijd"},
+                    {label: "Terugtrekt bij aanraking", desc: "Trekt ledemaat terug bij aanraking"},
+                    {label: "Terugtrekt bij pijn", desc: "Trekt ledemaat terug bij pijn"},
+                    {label: "Abnormale flexie", desc: "Decorticatie bij zuigeling"},
+                    {label: "Abnormale extensie", desc: "Decerebratie bij zuigeling"},
+                    {label: "Geen motorische respons", desc: "Afwezigheid van beweging"}
+                ],
+                en: [
+                    {label: "Spontaneous/purposeful movements", desc: "Normal intentional movements for age"},
+                    {label: "Withdraws to touch", desc: "Withdraws limb to touch"},
+                    {label: "Withdraws to pain", desc: "Withdraws limb to painful stimulus"},
+                    {label: "Abnormal flexion", desc: "Decorticate posturing in infant"},
+                    {label: "Abnormal extension", desc: "Decerebrate posturing in infant"},
+                    {label: "No motor response", desc: "Absence of movement"}
+                ],
+                es: [
+                    {label: "Movimientos espontáneos/adaptados", desc: "Movimientos intencionales normales para la edad"},
+                    {label: "Se retira al tacto", desc: "Retira el miembro al tacto"},
+                    {label: "Se retira al dolor", desc: "Retira el miembro ante el dolor"},
+                    {label: "Flexión anormal", desc: "Decorticación en lactante"},
+                    {label: "Extensión anormal", desc: "Descerebración en lactante"},
+                    {label: "Sin respuesta motora", desc: "Ausencia de movimiento"}
+                ]
+            };
+            
+            // Mise à jour des textes
+            motorButtons.forEach((button, index) => {
+                const labelElem = button.querySelector('.score-label');
+                const descElem = button.querySelector('.score-description');
+                
+                if (motorDescriptionsPed[lang] && motorDescriptionsPed[lang][index]) {
+                    labelElem.textContent = motorDescriptionsPed[lang][index].label;
+                    descElem.textContent = motorDescriptionsPed[lang][index].desc;
+                }
+            });
+        }
+        
+        // Gestion de l'enregistrement des scores
+        saveBtn.addEventListener('click', function() {
+            const currentDate = new Date();
+            const dateStr = currentDate.toLocaleDateString();
+            const timeStr = currentDate.toLocaleTimeString();
+            
+            const severity = totalScore >= 13 ? 'léger' : totalScore >= 9 ? 'modéré' : 'sévère';
+            
+            const newScore = {
+                time: timeStr,
+                date: dateStr,
+                eye: eyeScore,
+                verbal: verbalScore,
+                motor: motorScore,
+                total: totalScore,
+                severity: severity
+            };
+            
+            previousScores.unshift(newScore);
+            updateHistoryTable();
+            
+            // Si l'historique est caché, l'afficher automatiquement
+            if (!showHistory) {
+                toggleHistory();
+            }
+        });
+        
+        // Gestion de l'affichage de l'historique
+        historyBtn.addEventListener('click', toggleHistory);
+        
+        function toggleHistory() {
+            showHistory = !showHistory;
+            
+            if (showHistory) {
+                historySection.style.display = 'block';
+                historyBtn.textContent = translations[currentLang]["hide-btn"];
+                historyBtn.classList.add('active');
+            } else {
+                historySection.style.display = 'none';
+                historyBtn.textContent = translations[currentLang]["history-btn"];
+                historyBtn.classList.remove('active');
+            }
+        }
+        
+        function updateHistoryTable() {
+            if (previousScores.length > 0) {
+                historyEmpty.style.display = 'none';
+                historyTableContainer.style.display = 'block';
+                clearHistoryBtn.style.display = 'block';
+                
+                // Vider le tableau
+                historyTableBody.innerHTML = '';
+                
+                // Ajouter les entrées
+                previousScores.forEach((score, index) => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-50');
+                    
+                    let severityClass = '';
+                    if (score.severity === 'léger') {
+                        severityClass = 'green';
+                    } else if (score.severity === 'modéré') {
+                        severityClass = 'yellow';
+                    } else {
+                        severityClass = 'red';
+                    }
+                    
+                    row.innerHTML = `
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                            ${score.date} ${score.time}
+                        </td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-center">${score.eye}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-center">${score.verbal}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-center">${score.motor}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-xs text-center font-medium">
+                            <span class="score-badge ${severityClass}">
+                                ${score.total}
+                            </span>
+                        </td>
+                    `;
+                    
+                    historyTableBody.appendChild(row);
+                });
+            } else {
+                historyEmpty.style.display = 'block';
+                historyTableContainer.style.display = 'none';
+                clearHistoryBtn.style.display = 'none';
+            }
+        }
+        
+        // Gestion de l'effacement de l'historique
+        clearHistoryBtn.addEventListener('click', function() {
+            if (confirm(translations[currentLang]["confirm-clear"])) {
+                previousScores = [];
+                updateHistoryTable();
+            }
+        });
+        
+        // Initialisation des résultats et de la langue
+        updateResults();
+        
+        // Traduire l'interface au chargement
+        updateLanguage(currentLang);
+    </script>
+</body>
+</html>
