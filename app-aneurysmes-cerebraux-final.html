@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aide à la Décision pour la Prise en Charge des Anévrysmes Cérébraux</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-item input {
+            width: auto;
+            margin-right: 10px;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 30px auto;
+            width: 250px;
+            text-align: center;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .result-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .reference-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .reference-table th, .reference-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .reference-table th {
+            background-color: #f2f7ff;
+        }
+        .reference-guide {
+            margin-top: 15px;
+            display: none;
+        }
+        .reference-toggle {
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .recommendation-list {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        .disclaimer {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>NeuroSurgerySpinehealthcenter</h1>
+    </div>
+    
+    <div class="container">
+        <h1>Aide à la Décision pour la Prise en Charge des Anévrysmes Cérébraux</h1>
+        
+        <!-- Informations sur le patient -->
+        <div class="card">
+            <h2>Informations patient</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="age">Âge</label>
+                    <input type="number" id="age" name="age">
+                </div>
+                <div class="form-group">
+                    <label for="mode-decouverte">Mode de découverte</label>
+                    <select id="mode-decouverte" name="mode-decouverte">
+                        <option value="fortuit">Découverte fortuite</option>
+                        <option value="aigu">Aigu post-rupture (HSA)</option>
+                        <option value="massEffect">Effet de masse (symptômes compressifs)</option>
+                        <option value="ischemic">Événement ischémique associé</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Comorbidités</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hta" name="comorbidites" value="Hypertension">
+                        <label for="hta">Hypertension</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tabac" name="comorbidites" value="Tabagisme">
+                        <label for="tabac">Tabagisme</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pkd" name="comorbidites" value="Polykystose rénale">
+                        <label for="pkd">Polykystose rénale</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ante-hsa" name="comorbidites" value="Antécédent HSA">
+                        <label for="ante-hsa">Antécédent HSA</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="anticoag" name="comorbidites" value="Anticoagulation">
+                        <label for="anticoag">Anticoagulation</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="cardio" name="comorbidites" value="Cardiopathie">
+                        <label for="cardio">Cardiopathie</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Caractéristiques de l'anévrysme -->
+        <div class="card">
+            <h2>Caractéristiques de l'anévrysme</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="taille">Taille (mm)</label>
+                    <input type="number" id="taille" name="taille" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="rapport">Rapport dôme/collet</label>
+                    <input type="number" id="rapport" name="rapport" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="localisation">Localisation</label>
+                    <select id="localisation" name="localisation">
+                        <option value="">Sélectionner</option>
+                        <option value="ACoA">ACoA (Artère communicante antérieure)</option>
+                        <option value="ACoP">ACoP (Artère communicante postérieure)</option>
+                        <option value="ACM bifurcation">ACM bifurcation</option>
+                        <option value="ACM M1">ACM segment M1</option>
+                        <option value="Terminaison basilaire">Terminaison basilaire</option>
+                        <option value="Pericalleux">Péricalleux</option>
+                        <option value="Carotide cave">Carotide cave</option>
+                        <option value="PICA">PICA (Artère cérébelleuse postéro-inférieure)</option>
+                        <option value="Circulation postérieure">Autre circulation postérieure</option>
+                        <option value="Carotide ophtalmique">Carotide - segment ophtalmique</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="forme">Forme</label>
+                    <select id="forme" name="forme">
+                        <option value="sacciforme">Sacciforme</option>
+                        <option value="multilobe">Multilobé/complexe</option>
+                        <option value="fusiforme">Fusiforme</option>
+                        <option value="dissequant">Disséquant</option>
+                        <option value="blister">Blister-like</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="paroi">Paroi</label>
+                    <select id="paroi" name="paroi">
+                        <option value="régulière">Régulière</option>
+                        <option value="irrégulière">Irrégulière</option>
+                        <option value="calcifiée">Calcifiée</option>
+                        <option value="thrombosée">Partiellement thrombosée</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Classifications cliniques -->
+        <div class="card">
+            <h2>Classifications cliniques</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="hunt-hess">Score de <span class="reference-toggle" onclick="toggleReference('hunt-hess-guide')">Hunt & Hess</span></label>
+                    <select id="hunt-hess" name="hunt-hess">
+                        <option value="1">Grade I: Asymptomatique ou légère céphalée</option>
+                        <option value="2">Grade II: Céphalée modérée à sévère, raideur nucale</option>
+                        <option value="3">Grade III: Somnolence, confusion, déficit focal léger</option>
+                        <option value="4">Grade IV: Stupeur, hémiparésie modérée à sévère</option>
+                        <option value="5">Grade V: Coma profond, rigidité décérébrée</option>
+                    </select>
+                    
+                    <div id="hunt-hess-guide" class="reference-guide">
+                        <h3>Classification de Hunt & Hess</h3>
+                        <table class="reference-table">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>I</td>
+                                    <td>Asymptomatique ou légère céphalée</td>
+                                </tr>
+                                <tr>
+                                    <td>II</td>
+                                    <td>Céphalée modérée à sévère, raideur nucale, pas de déficit autre que paralysie nerfs crâniens</td>
+                                </tr>
+                                <tr>
+                                    <td>III</td>
+                                    <td>Somnolence, confusion, déficit focal léger</td>
+                                </tr>
+                                <tr>
+                                    <td>IV</td>
+                                    <td>Stupeur, hémiparésie modérée à sévère</td>
+                                </tr>
+                                <tr>
+                                    <td>V</td>
+                                    <td>Coma profond, rigidité décérébrée, aspect moribond</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><i>Référence: Hunt WE, Hess RM. Surgical risk as related to time of intervention in the repair of intracranial aneurysms. J Neurosurg. 1968;28(1):14-20.</i></p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="wfns">Score <span class="reference-toggle" onclick="toggleReference('wfns-guide')">WFNS</span></label>
+                    <select id="wfns" name="wfns">
+                        <option value="1">Grade I: GCS 15, pas de déficit moteur</option>
+                        <option value="2">Grade II: GCS 13-14, pas de déficit moteur</option>
+                        <option value="3">Grade III: GCS 13-14, avec déficit moteur</option>
+                        <option value="4">Grade IV: GCS 7-12, avec ou sans déficit moteur</option>
+                        <option value="5">Grade V: GCS 3-6, avec ou sans déficit moteur</option>
+                    </select>
+                    
+                    <div id="wfns-guide" class="reference-guide">
+                        <h3>Classification WFNS (World Federation of Neurological Surgeons)</h3>
+                        <table class="reference-table">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>GCS</th>
+                                    <th>Déficit moteur</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>I</td>
+                                    <td>15</td>
+                                    <td>Absent</td>
+                                </tr>
+                                <tr>
+                                    <td>II</td>
+                                    <td>13-14</td>
+                                    <td>Absent</td>
+                                </tr>
+                                <tr>
+                                    <td>III</td>
+                                    <td>13-14</td>
+                                    <td>Présent</td>
+                                </tr>
+                                <tr>
+                                    <td>IV</td>
+                                    <td>7-12</td>
+                                    <td>Présent ou absent</td>
+                                </tr>
+                                <tr>
+                                    <td>V</td>
+                                    <td>3-6</td>
+                                    <td>Présent ou absent</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><i>Référence: Report of World Federation of Neurological Surgeons Committee on a Universal Subarachnoid Hemorrhage Grading Scale. J Neurosurg. 1988;68:985-986.</i></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Classifications radiologiques -->
+        <div class="card">
+            <h2>Classifications radiologiques</h2>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="fisher">Score de <span class="reference-toggle" onclick="toggleReference('fisher-guide')">Fisher</span></label>
+                    <select id="fisher" name="fisher">
+                        <option value="1">Grade 1: Pas de sang visible au scanner</option>
+                        <option value="2">Grade 2: HSA diffuse, sans caillot &lt;1mm</option>
+                        <option value="3">Grade 3: Caillots localisés et/ou couches de sang ≥1mm</option>
+                        <option value="4">Grade 4: Hémorragie intracérébrale ou intraventriculaire</option>
+                    </select>
+                    
+                    <div id="fisher-guide" class="reference-guide">
+                        <h3>Échelle de Fisher</h3>
+                        <table class="reference-table">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>Description</th>
+                                    <th>Risque de vasospasme</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Pas de sang visible au scanner</td>
+                                    <td>Faible</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>HSA diffuse, sans caillot &lt;1mm d'épaisseur</td>
+                                    <td>Intermédiaire</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Caillots localisés et/ou couches de sang ≥1mm d'épaisseur</td>
+                                    <td>Élevé</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Hémorragie intracérébrale ou intraventriculaire avec ou sans HSA diffuse</td>
+                                    <td>Intermédiaire</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><i>Référence: Fisher CM, Kistler JP, Davis JM. Relation of cerebral vasospasm to subarachnoid hemorrhage visualized by computerized tomographic scanning. Neurosurgery. 1980;6(1):1-9.</i></p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modified-fisher">Score de <span class="reference-toggle" onclick="toggleReference('modified-fisher-guide')">Fisher modifié</span></label>
+                    <select id="modified-fisher" name="modified-fisher">
+                        <option value="0">Grade 0: Pas d'HSA ni d'HIV</option>
+                        <option value="1">Grade 1: HSA minime, pas d'HIV</option>
+                        <option value="2">Grade 2: HSA importante, pas d'HIV</option>
+                        <option value="3">Grade 3: HSA minime avec HIV</option>
+                        <option value="4">Grade 4: HSA importante avec HIV</option>
+                    </select>
+                    
+                    <div id="modified-fisher-guide" class="reference-guide">
+                        <h3>Échelle de Fisher modifiée</h3>
+                        <table class="reference-table">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>Description</th>
+                                    <th>Risque d'ischémie cérébrale retardée</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>0</td>
+                                    <td>Pas d'HSA ni d'HIV</td>
+                                    <td>0%</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>HSA minime, pas d'HIV</td>
+                                    <td>12%</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>HSA importante, pas d'HIV</td>
+                                    <td>21%</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>HSA minime avec HIV</td>
+                                    <td>19%</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>HSA importante avec HIV</td>
+                                    <td>40%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><i>Référence: Frontera JA, Claassen J, Schmidt JM, et al. Prediction of symptomatic vasospasm after subarachnoid hemorrhage: the modified Fisher scale. Neurosurgery. 2006;59(1):21-27.</i></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bouton de génération de recommandation -->
+        <button id="generate-btn" class="btn">Générer la recommandation</button>
+        
+        <!-- Résultats et recommandations -->
+        <div id="results" class="card" style="display: none;">
+            <h2>Recommandation</h2>
+            
+            <div class="grid">
+                <div>
+                    <div class="result-title">Traitement recommandé:</div>
+                    <div id="result-traitement" class="result-item"></div>
+                </div>
+                <div>
+                    <div class="result-title">Urgence:</div>
+                    <div id="result-urgence" class="result-item"></div>
+                </div>
+            </div>
+            
+            <div class="result-title">Approche technique:</div>
+            <div id="result-approche" class="result-item"></div>
+            
+            <div class="result-title">Rationnel:</div>
+            <div id="result-rationnel" class="result-item">
+                <ul id="rationnel-list" class="recommendation-list"></ul>
+            </div>
+            
+            <div class="result-title">Points importants à considérer:</div>
+            <div id="result-points" class="result-item">
+                <ul id="points-list" class="recommendation-list"></ul>
+            </div>
+            
+            <div class="result-title">Surveillance post-traitement:</div>
+            <div id="result-surveillance" class="result-item"></div>
+            
+            <div class="result-title">Échelles utilisées:</div>
+            <div id="result-echelles" class="result-item">
+                <ul id="echelles-list" class="recommendation-list"></ul>
+            </div>
+            
+            <div class="disclaimer">
+                Note: Cette recommandation est fournie à titre indicatif et ne remplace pas le jugement clinique ou la discussion multidisciplinaire.
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2025 NeuroSurgerySpine.healthcenter. Développé par Dr Lubansu. Tous droits réservés.</p>
+    </div>
+
+    <script>
+        // Fonction pour afficher/masquer les guides de référence
+        function toggleReference(id) {
+            const guide = document.getElementById(id);
+            if (guide.style.display === 'block') {
+                guide.style.display = 'none';
+            } else {
+                guide.style.display = 'block';
+            }
+        }
+        
+        // Fonction pour générer les recommandations
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            // Récupération des données du formulaire
+            const patientInfo = {
+                age: document.getElementById('age').value,
+                modeDécouverte: document.getElementById('mode-decouverte').value,
+                comorbidités: Array.from(document.querySelectorAll('input[name="comorbidites"]:checked')).map(cb => cb.value)
+            };
+            
+            const aneurysmeInfo = {
+                taille: document.getElementById('taille').value,
+                localisation: document.getElementById('localisation').value,
+                forme: document.getElementById('forme').value,
+                rapportDome: document.getElementById('rapport').value,
+                paroi: document.getElementById('paroi').value
+            };
+            
+            const clinicalScore = {
+                huntHess: document.getElementById('hunt-hess').value,
+                wfns: document.getElementById('wfns').value
+            };
+            
+            const radiologicalScore = {
+                fisher: document.getElementById('fisher').value,
+                modifiedFisher: document.getElementById('modified-fisher').value
+            };
+            
+            // Génération de la recommandation
+            const recommendation = generateRecommendation(patientInfo, aneurysmeInfo, clinicalScore, radiologicalScore);
+            
+            // Affichage des résultats
+            document.getElementById('result-traitement').textContent = recommendation.traitement;
+            document.getElementById('result-urgence').textContent = recommendation.urgence;
+            document.getElementById('result-approche').textContent = recommendation.approche;
+            document.getElementById('result-surveillance').textContent = recommendation.surveillance;
+            
+            // Mise à jour des listes
+            const rationnelList = document.getElementById('rationnel-list');
+            rationnelList.innerHTML = '';
+            recommendation.rationnel.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                rationnelList.appendChild(li);
+            });
+            
+            const pointsList = document.getElementById('points-list');
+            pointsList.innerHTML = '';
+            recommendation.points.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                pointsList.appendChild(li);
+            });
+            
+            const echellesList = document.getElementById('echelles-list');
+            echellesList.innerHTML = '';
+            recommendation.échelles.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                echellesList.appendChild(li);
+            });
+            
+            // Affichage de la section de résultats
+            document.getElementById('results').style.display = 'block';
+            
+            // Scroll vers les résultats
+            document.getElementById('results').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+        
+        // Logique pour générer les recommandations
+        function generateRecommendation(patientInfo, aneurysmeInfo, clinicalScore, radiologicalScore) {
+            let result = {
+                traitement: '',
+                approche: '',
+                urgence: '',
+                rationnel: [],
+                surveillance: '',
+                points: [],
+                échelles: []
+            };
+            
+            // Ajout des informations sur les échelles
+            result.échelles.push(`Hunt & Hess: Grade ${clinicalScore.huntHess}`);
+            result.échelles.push(`WFNS: Grade ${clinicalScore.wfns}`);
+            result.échelles.push(`Fisher: Grade ${radiologicalScore.fisher}`);
+            result.échelles.push(`Fisher modifié: Grade ${radiologicalScore.modifiedFisher}`);
+            
+            // Évaluation en cas de rupture
+            const ruptureMode = patientInfo.modeDécouverte === 'aigu';
+            if (ruptureMode) {
+                result.urgence = 'Haute - Traitement dans les 24-72h';
+                result.points.push('Anévrysme rompu: risque élevé de resaignement dans les premières 24-72h');
+                
+                // Score WFNS pour déterminer le pronostic
+                const wfnsScore = parseInt(clinicalScore.wfns);
+                if (wfnsScore >= 4) {
+                    result.points.push('WFNS élevé (≥4): mauvais pronostic, considérer drainage ventriculaire externe en cas d\'hydrocéphalie');
+                }
+                
+                // Score de Fisher pour le risque de vasospasme
+                const fisherScore = parseInt(radiologicalScore.fisher);
+                if (fisherScore === 3) {
+                    result.points.push('Fisher grade 3: risque maximal de vasospasme');
+                    result.surveillance = 'Surveillance étroite du vasospasme entre J3-J14, considérer Nimodipine';
+                } else if (fisherScore === 4) {
+                    result.points.push('Fisher grade 4: présence d\'hémorragie intracérébrale/intraventriculaire');
+                }
+            } else {
+                // Anévrysme non rompu - évaluation du risque de rupture
+                const taille = parseFloat(aneurysmeInfo.taille) || 0;
+                
+                if (taille < 7) {
+                    result.urgence = 'Élective - Surveillance possible';
+                    result.points.push('Petite taille (<7mm): risque de rupture généralement faible');
+                } else if (taille >= 7 && taille <= 12) {
+                    result.urgence = 'Semi-élective - Traitement recommandé';
+                    result.points.push('Taille intermédiaire (7-12mm): risque de rupture modéré');
+                } else {
+                    result.urgence = 'Élective prioritaire';
+                    result.points.push('Grande taille (>12mm): risque de rupture élevé');
+                }
+                
+                // Facteurs de risque supplémentaires
+                if (aneurysmeInfo.paroi === 'irrégulière' || aneurysmeInfo.forme === 'multilobe') {
+                    result.points.push('Morphologie complexe: risque de rupture accru');
+                    result.urgence = 'Semi-élective - Traitement recommandé';
+                }
+                
+                // Localisation à haut risque
+                const localisationsRisque = ['ACoA', 'ACoP', 'Terminaison basilaire', 'ACM bifurcation'];
+                if (localisationsRisque.includes(aneurysmeInfo.localisation)) {
+                    result.points.push('Localisation à haut risque de rupture');
+                }
+            }
+            
+            // Choix entre traitement endovasculaire et chirurgical
+            const age = parseInt(patientInfo.age) || 0;
+            const taille = parseFloat(aneurysmeInfo.taille) || 0;
+            
+            // Évaluation du rapport dôme/collet
+            const rapportDomeCollet = parseFloat(aneurysmeInfo.rapportDome) || 0;
+            
+            // Localisations favorables pour l'approche endovasculaire
+            const favorableEndovasc = ['Circulation postérieure', 'Basilaire', 'Carotide cave', 'ACoA'];
+            // Localisations favorables pour la chirurgie
+            const favorableChirurgie = ['ACM bifurcation', 'ACM M1', 'Pericalleux'];
+            
+            // Décision sur l'approche thérapeutique
+            if (age > 70 || patientInfo.comorbidités.length >= 2) {
+                result.traitement = 'Approche endovasculaire privilégiée';
+                result.rationnel.push('Age avancé ou comorbidités multiples favorisant l\'approche mini-invasive');
+            } else if (favorableEndovasc.includes(aneurysmeInfo.localisation)) {
+                result.traitement = 'Approche endovasculaire privilégiée';
+                result.rationnel.push('Localisation favorable pour l\'embolisation');
+            } else if (favorableChirurgie.includes(aneurysmeInfo.localisation)) {
+                result.traitement = 'Approche chirurgicale privilégiée';
+                result.rationnel.push('Localisation favorable pour le clippage');
+            } else if (rapportDomeCollet < 2) {
+                result.traitement = 'Approche chirurgicale à considérer';
+                result.rationnel.push('Rapport dôme/collet défavorable pour l\'embolisation simple');
+            } else if (taille > 15) {
+                result.traitement = 'Discussion multidisciplinaire recommandée';
+                result.rationnel.push('Anévrysme de grande taille nécessitant une évaluation au cas par cas');
+            } else {
+                result.traitement = 'Les deux approches possibles - Discussion multidisciplinaire recommandée';
+                result.rationnel.push('Bénéfice/risque à évaluer au cas par cas');
+            }
+            
+            // Détails sur l'approche en fonction de la technique
+            if (result.traitement.includes('endovasculaire')) {
+                if (rapportDomeCollet < 1.5 || aneurysmeInfo.forme === 'fusiforme') {
+                    result.approche = 'Considérer les techniques avancées: stent, flow-diverter, etc.';
+                } else {
+                    result.approche = 'Embolisation par coils standard possible';
+                }
+            } else if (result.traitement.includes('chirurgicale')) {
+                result.approche = 'Clippage micro-chirurgical - approche à déterminer selon localisation';
+            }
+            
+            // Surveillance post-traitement
+            if (ruptureMode) {
+                result.surveillance = result.surveillance || 'Surveillance en soins intensifs neuro, traitement du vasospasme si nécessaire, contrôle angiographique';
+            } else {
+                if (result.traitement.includes('endovasculaire')) {
+                    result.surveillance = 'Angio-IRM ou Angio-CT à 6 mois puis annuellement';
+                } else {
+                    result.surveillance = 'Angio-IRM ou Angio-CT à 1 an';
+                }
+            }
+            
+            return result;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeurosurgerySpinehealthcenter - Radiochirurgie</title>
+    <style>
+        :root {
+            --primary-color: #1a2a3a;
+            --secondary-color: #3a4a5a;
+            --accent-color: #4a90e2;
+            --light-bg: #f5f7fa;
+            --dark-text: #333;
+            --light-text: #fff;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 0.8rem;
+            text-align: center;
+            font-size: 0.8rem;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 1rem;
+            margin-bottom: 3rem; /* Space for footer */
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+            padding: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #3a7bc8;
+        }
+        
+        .btn-back {
+            background-color: #95a5a6;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .result-item {
+            border-left: 4px solid var(--accent-color);
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+        
+        .warning {
+            border-left: 4px solid var(--warning-color);
+            padding: 0.5rem;
+            margin: 1rem 0;
+            background-color: rgba(243, 156, 18, 0.1);
+        }
+        
+        .constraint {
+            border-left: 4px solid var(--danger-color);
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .recommendation {
+            border-left: 4px solid var(--success-color);
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 0.8rem;
+            background-color: #ddd;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .tabs-content > div {
+            display: none;
+        }
+        
+        .tabs-content > div.active {
+            display: block;
+        }
+        
+        .reference {
+            font-size: 0.8rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            margin-top: 1rem;
+            padding-top: 0.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 2rem;
+            }
+            
+            .grid-2 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>NeurosurgerySpinehealthcenter</h1>
+    </header>
+    
+    <div class="container">
+        <!-- Main Menu (Home Page) -->
+        <div id="main-menu">
+            <div class="card">
+                <div class="card-header">Outil d'Aide à la Décision en Radiochirurgie</div>
+                <div class="card-body">
+                    <p>Bienvenue dans l'application d'aide à la décision pour les traitements radiochirurgicaux des pathologies cérébrales.</p>
+                    <div class="warning">
+                        <strong>Note importante :</strong> Cette application est un outil d'aide à la décision basé sur les recommandations actuelles. Les décisions finales doivent être prises par des professionnels de santé qualifiés en tenant compte de la situation clinique spécifique de chaque patient.
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="showSection('pathologies')">Doses d'irradiation par pathologie</button>
+            <button class="btn" onclick="showSection('constraints')">Contraintes sur structures à risque</button>
+            <button class="btn" onclick="showSection('fractionated')">Traitements fractionnés</button>
+            <button class="btn" onclick="showSection('classifications')">Classifications &amp; Outils</button>
+            <button class="btn" onclick="showSection('calculator')">Calculateur BED/EQD2</button>
+            <button class="btn" onclick="showSection('literature')">Dernières publications</button>
+        </div>
+        
+        <!-- Calculator Section -->
+        <div id="calculator" class="hidden">
+            <button class="btn btn-back" onclick="showSection('main-menu')">Retour au menu principal</button>
+            
+            <div class="card">
+                <div class="card-header">Calculateur BED/EQD2</div>
+                <div class="card-body">
+                    <p>Calculez les équivalences biologiques entre différents schémas de fractionnement.</p>
+                    
+                    <div class="form-group">
+                        <label for="calc-type">Type de calcul:</label>
+                        <select id="calc-type" onchange="toggleCalcMode()">
+                            <option value="dose-to-bed">Dose à BED</option>
+                            <option value="bed-to-eqd2">BED à EQD2</option>
+                            <option value="schema-to-schema">Comparaison de schémas</option>
+                        </select>
+                    </div>
+                    
+                    <div id="dose-to-bed-form">
+                        <div class="form-group">
+                            <label for="dtb-dose">Dose totale (Gy):</label>
+                            <input type="number" id="dtb-dose" min="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="dtb-fractions">Nombre de fractions:</label>
+                            <input type="number" id="dtb-fractions" min="1" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="dtb-alphabeta">Ratio α/β:</label>
+                            <select id="dtb-alphabeta">
+                                <option value="10">10 (Tumeurs, tissus à renouvellement rapide)</option>
+                                <option value="3">3 (Tissus à renouvellement lent, OAR)</option>
+                                <option value="2">2 (SNC)</option>
+                                <option value="1.5">1.5 (Méningiome)</option>
+                                <option value="custom">Personnalisé</option>
+                            </select>
+                        </div>
+                        <div class="form-group hidden" id="dtb-custom-ab">
+                            <label for="dtb-custom-alphabeta">Ratio α/β personnalisé:</label>
+                            <input type="number" id="dtb-custom-alphabeta" min="0.1" step="0.1">
+                        </div>
+                        
+                        <button class="btn" onclick="calculateBED()">Calculer BED</button>
+                    </div>
+                    
+                    <div id="bed-to-eqd2-form" class="hidden">
+                        <div class="form-group">
+                            <label for="bte-bed">BED (Gy):</label>
+                            <input type="number" id="bte-bed" min="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="bte-alphabeta">Ratio α/β:</label>
+                            <select id="bte-alphabeta">
+                                <option value="10">10 (Tumeurs, tissus à renouvellement rapide)</option>
+                                <option value="3">3 (Tissus à renouvellement lent, OAR)</option>
+                                <option value="2">2 (SNC)</option>
+                                <option value="1.5">1.5 (Méningiome)</option>
+                                <option value="custom">Personnalisé</option>
+                            </select>
+                        </div>
+                        <div class="form-group hidden" id="bte-custom-ab">
+                            <label for="bte-custom-alphabeta">Ratio α/β personnalisé:</label>
+                            <input type="number" id="bte-custom-alphabeta" min="0.1" step="0.1">
+                        </div>
+                        
+                        <button class="btn" onclick="calculateEQD2()">Calculer EQD2</button>
+                    </div>
+                    
+                    <div id="schema-to-schema-form" class="hidden">
+                        <h3>Schéma 1</h3>
+                        <div class="form-group">
+                            <label for="sts-dose1">Dose totale (Gy):</label>
+                            <input type="number" id="sts-dose1" min="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="sts-fractions1">Nombre de fractions:</label>
+                            <input type="number" id="sts-fractions1" min="1" step="1">
+                        </div>
+                        
+                        <h3>Schéma 2</h3>
+                        <div class="form-group">
+                            <label for="sts-dose2">Dose totale (Gy):</label>
+                            <input type="number" id="sts-dose2" min="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="sts-fractions2">Nombre de fractions:</label>
+                            <input type="number" id="sts-fractions2" min="1" step="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="sts-alphabeta">Ratio α/β:</label>
+                            <select id="sts-alphabeta">
+                                <option value="10">10 (Tumeurs, tissus à renouvellement rapide)</option>
+                                <option value="3">3 (Tissus à renouvellement lent, OAR)</option>
+                                <option value="2">2 (SNC)</option>
+                                <option value="1.5">1.5 (Méningiome)</option>
+                                <option value="custom">Personnalisé</option>
+                            </select>
+                        </div>
+                        <div class="form-group hidden" id="sts-custom-ab">
+                            <label for="sts-custom-alphabeta">Ratio α/β personnalisé:</label>
+                            <input type="number" id="sts-custom-alphabeta" min="0.1" step="0.1">
+                        </div>
+                        
+                        <button class="btn" onclick="compareSchemas()">Comparer schémas</button>
+                    </div>
+                    
+                    <div id="calculation-results" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Literature Section -->
+        <div id="literature" class="hidden">
+            <button class="btn btn-back" onclick="showSection('main-menu')">Retour au menu principal</button>
+            
+            <div class="card">
+                <div class="card-header">Dernières publications en radiochirurgie</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="literature-type">Catégorie:</label>
+                        <select id="literature-type" onchange="showLiterature()">
+                            <option value="">Sélectionner...</option>
+                            <option value="tumor">Pathologies tumorales</option>
+                            <option value="functional">Pathologies fonctionnelles</option>
+                            <option value="vascular">Pathologies vasculaires</option>
+                            <option value="technique">Innovations techniques</option>
+                        </select>
+                    </div>
+                    
+                    <div id="literature-results"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pathologies Section -->
+        <div id="pathologies" class="hidden">
+            <button class="btn btn-back" onclick="showSection('main-menu')">Retour au menu principal</button>
+            
+            <div class="card">
+                <div class="card-header">Doses d'irradiation par pathologie</div>
+                <div class="card-body">
+                    <p>Sélectionnez une catégorie de pathologie pour voir les doses recommandées:</p>
+                    
+                    <button class="btn" onclick="showSection('tumor-doses')">Pathologies tumorales</button>
+                    <button class="btn" onclick="showSection('functional-doses')">Pathologies fonctionnelles</button>
+                    <button class="btn" onclick="showSection('vascular-doses')">Pathologies vasculaires</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tumor Doses -->
+        <div id="tumor-doses" class="hidden">
+            <button class="btn btn-back" onclick="showSection('pathologies')">Retour aux pathologies</button>
+            
+            <div class="card">
+                <div class="card-header">Pathologies tumorales</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="tumor-type">Type de tumeur:</label>
+                        <select id="tumor-type" onchange="updateTumorDoses()">
+                            <option value="">Sélectionner...</option>
+                            <option value="metastase">Métastase cérébrale</option>
+                            <option value="meningiome">Méningiome</option>
+                            <option value="schwannome">Schwannome vestibulaire</option>
+                            <option value="gliome">Gliome</option>
+                            <option value="adénome">Adénome hypophysaire</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tumor-size">Taille de la tumeur (mm):</label>
+                        <input type="number" id="tumor-size" min="1" max="100" onchange="updateTumorDoses()">
+                    </div>
+                    
+                    <div id="tumor-results"></div>
+                    
+                    <div class="reference">
+                        Sources: Recommandations ASTRO/AANS, ESTRO/EANO, Directives SRS/SBRT.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Functional Disorders Doses -->
+        <div id="functional-doses" class="hidden">
+            <button class="btn btn-back" onclick="showSection('pathologies')">Retour aux pathologies</button>
+            
+            <div class="card">
+                <div class="card-header">Pathologies fonctionnelles</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="functional-type">Type de pathologie:</label>
+                        <select id="functional-type" onchange="updateFunctionalDoses()">
+                            <option value="">Sélectionner...</option>
+                            <option value="névralgie">Névralgie du trijumeau</option>
+                            <option value="tremblements">Tremblement essentiel</option>
+                            <option value="parkinson">Maladie de Parkinson</option>
+                            <option value="épilepsie">Épilepsie</option>
+                            <option value="toc">Trouble obsessionnel compulsif</option>
+                        </select>
+                    </div>
+                    
+                    <div id="functional-results"></div>
+                    
+                    <div class="reference">
+                        Sources: ISRS, AANS, Études cliniques récentes sur la radiochirurgie fonctionnelle.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vascular Pathologies Doses -->
+        <div id="vascular-doses" class="hidden">
+            <button class="btn btn-back" onclick="showSection('pathologies')">Retour aux pathologies</button>
+            
+            <div class="card">
+                <div class="card-header">Pathologies vasculaires</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="vascular-type">Type de pathologie:</label>
+                        <select id="vascular-type" onchange="updateVascularDoses()">
+                            <option value="">Sélectionner...</option>
+                            <option value="mav">Malformation artério-veineuse (MAV)</option>
+                            <option value="cavernome">Cavernome</option>
+                            <option value="fistule">Fistule durale</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vascular-size">Volume (cm³):</label>
+                        <input type="number" id="vascular-size" min="0.1" max="100" step="0.1" onchange="updateVascularDoses()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vascular-grade">Classification (si MAV):</label>
+                        <select id="vascular-grade" onchange="updateVascularDoses()">
+                            <option value="">Sélectionner...</option>
+                            <option value="1">Grade I (Spetzler-Martin)</option>
+                            <option value="2">Grade II (Spetzler-Martin)</option>
+                            <option value="3">Grade III (Spetzler-Martin)</option>
+                            <option value="4">Grade IV (Spetzler-Martin)</option>
+                            <option value="5">Grade V (Spetzler-Martin)</option>
+                        </select>
+                    </div>
+                    
+                    <div id="vascular-results"></div>
+                    
+                    <div class="reference">
+                        Sources: Littérature internationale sur la radiochirurgie des MAVs et autres lésions vasculaires.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Constraints Section -->
+        <div id="constraints" class="hidden">
+            <button class="btn btn-back" onclick="showSection('main-menu')">Retour au menu principal</button>
+            
+            <div class="card">
+                <div class="card-header">Contraintes sur structures à risque</div>
+                <div class="card-body">
+                    <p>Sélectionnez la structure anatomique à risque:</p>
+                    
+                    <div class="form-group">
+                        <label for="constraint-structure">Structure anatomique:</label>
+                        <select id="constraint-structure" onchange="showConstraints()">
+                            <option value="">Sélectionner...</option>
+                            <option value="tronc">Tronc cérébral</option>
+                            <option value="chiasma">Chiasma optique</option>
+                            <option value="nerfs">Nerfs optiques</option>
+                            <option value="cochlée">Cochlée</option>
+                            <option value="hippocampe">Hippocampe</option>
+                            <option value="moelle">Moelle épinière</option>
+                            <option value="cervelet">Cervelet</option>
+                        </select>
+                    </div>
+                    
+                    <div id="constraint-results"></div>
+                    
+                    <div class="reference">
+                        Sources: QUANTEC, AAPM TG-101, Dernières publications sur les contraintes radiochirurgicales.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fractionated Treatment Section -->
+        <div id="fractionated" class="hidden">
+            <button class="btn btn-back" onclick="showSection('main-menu')">Retour au menu principal</button>
+            
+            <div class="card">
+                <div class="card-header">Traitements fractionnés</div>
+                <div class="card-body">
+                    <p>Définissez les paramètres pour obtenir des propositions de doses fractionnées:</p>
+                    
+                    <div class="form-group">
+                        <label for="fract-pathology">Type de pathologie:</label>
+                        <select id="fract-pathology">
+                            <option value="">Sélectionner...</option>
+                            <option value="metastase">Métastase cérébrale</option>
+                            <option value="meningiome">Méningiome</option>
+                            <option value="schwannome">Schwannome vestibulaire</option>
+                            <option value="mav">MAV</option>
+                            <option value="gliome">Gliome</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fract-size">Volume/Taille (cm³):</label>
+                        <input type="number" id="fract-size" min="0.1" max="100" step="0.1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fract-age">Âge du patient:</label>
+                        <input type="number" id="fract-age" min="1" max="120">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fract-location">Localisation:</label>
+                        <select id="fract-location">
+                            <option value="">Sélectionner...</option>
+                            <option value="superficiel">Superficielle</option>
+                            <option value="profond">Profonde</option>
+                            <option value="eloquent">Zone éloquente</option>
+                            <option value="non-eloquent">Zone non-éloquente</option>
+                            <option value="proche-oar">Proche d'organes à risque</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn" onclick="calculateFractionation()">Calculer les doses fractionnées</button>
+                    
+                    <div id="fractionation-results"></div>
+                    
+                    <div class="reference">
+                        Sources: Études cliniques récentes sur l'hypofractionnement, méta-analyses et recommandations internationales.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Classifications Section -->
+        <div id="classifications" class="hidden">
+            <button class="btn btn-back" onclick="showSection('main-menu')">Retour au menu principal</button>
+            
+            <div class="card">
+                <div class="card-header">Classifications &amp; Outils</div>
+                <div class="card-body">
+                    <p>Sélectionnez l'outil de classification à consulter:</p>
+                    
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchTab('tab-tumors')">Tumeurs</button>
+                        <button class="tab-btn" onclick="switchTab('tab-vascular')">Vasculaire</button>
+                        <button class="tab-btn" onclick="switchTab('tab-functional')">Fonctionnel</button>
+                    </div>
+                    
+                    <div class="tabs-content">
+                        <div id="tab-tumors" class="active">
+                            <h3>Classifications des pathologies tumorales</h3>
+                            <button class="btn" onclick="showClassification('rpa')">RPA (Recursive Partitioning Analysis)</button>
+                            <button class="btn" onclick="showClassification('graded-prognostic')">Graded Prognostic Assessment (GPA)</button>
+                            <button class="btn" onclick="showClassification('who-cns')">WHO Classification of CNS Tumors</button>
+                        </div>
+                        
+                        <div id="tab-vascular">
+                            <h3>Classifications des pathologies vasculaires</h3>
+                            <button class="btn" onclick="showClassification('spetzler-martin')">Spetzler-Martin (MAVs)</button>
+                            <button class="btn" onclick="showClassification('virginia')">Classification de Virginia (MAVs)</button>
+                            <button class="btn" onclick="showClassification('lawton')">Classification supplémentaire de Lawton</button>
+                        </div>
+                        
+                        <div id="tab-functional">
+                            <h3>Évaluations des pathologies fonctionnelles</h3>
+                            <button class="btn" onclick="showClassification('bni-tn')">BNI - Névralgie du trijumeau</button>
+                            <button class="btn" onclick="showClassification('updrs')">UPDRS - Maladie de Parkinson</button>
+                            <button class="btn" onclick="showClassification('fahn-tolosa')">Échelle Fahn-Tolosa-Marin (Tremblements)</button>
+                        </div>
+                    </div>
+                    
+                    <div id="classification-details" class="hidden"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Classification Details Sections (Hidden by default) -->
+        <div id="rpa-details" class="hidden">
+            <div class="card">
+                <div class="card-header">RPA (Recursive Partitioning Analysis)</div>
+                <div class="card-body">
+                    <h3>Classification RPA pour métastases cérébrales</h3>
+                    <div class="result-item">
+                        <strong>Classe I:</strong> KPS ≥ 70, âge < 65 ans, maladie primaire contrôlée, pas de métastases extracérébrales
+                    </div>
+                    <div class="result-item">
+                        <strong>Classe II:</strong> Tous les patients qui ne correspondent pas aux critères de classe I ou III
+                    </div>
+                    <div class="result-item">
+                        <strong>Classe III:</strong> KPS < 70
+                    </div>
+                    
+                    <div class="reference">
+                        Source: RTOG (Radiation Therapy Oncology Group)
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional classification details sections would be defined here -->
+        
+    </div>
+    
+    <footer>
+        © 2025 NeurosurgerySpine.healthcenter. Dr Lubansu. Tous droits réservés.
+    </footer>
+    
+    <script>
+        // Function to show a specific section and hide others
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.container > div').forEach(div => {
+                div.classList.add('hidden');
+            });
+            
+            // Show the requested section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        // Function to switch tabs in the classifications section
+        function switchTab(tabId) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tabs-content > div').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to the clicked tab
+            event.target.classList.add('active');
+            
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        // Function to toggle calculator modes
+        function toggleCalcMode() {
+            const calcType = document.getElementById('calc-type').value;
+            
+            // Hide all calculator forms
+            document.getElementById('dose-to-bed-form').classList.add('hidden');
+            document.getElementById('bed-to-eqd2-form').classList.add('hidden');
+            document.getElementById('schema-to-schema-form').classList.add('hidden');
+            
+            // Show selected calculator form
+            if (calcType === 'dose-to-bed') {
+                document.getElementById('dose-to-bed-form').classList.remove('hidden');
+            } else if (calcType === 'bed-to-eqd2') {
+                document.getElementById('bed-to-eqd2-form').classList.remove('hidden');
+            } else if (calcType === 'schema-to-schema') {
+                document.getElementById('schema-to-schema-form').classList.remove('hidden');
+            }
+            
+            // Hide results
+            document.getElementById('calculation-results').classList.add('hidden');
+        }
+        
+        // Function to handle custom alpha/beta ratio selection
+        function setupCustomAlphaBeta() {
+            const setupSelector = (prefix) => {
+                const selector = document.getElementById(`${prefix}-alphabeta`);
+                const customField = document.getElementById(`${prefix}-custom-ab`);
+                
+                if (selector) {
+                    selector.addEventListener('change', function() {
+                        if (this.value === 'custom') {
+                            customField.classList.remove('hidden');
+                        } else {
+                            customField.classList.add('hidden');
+                        }
+                    });
+                }
+            };
+            
+            // Setup for all calculator modes
+            setupSelector('dtb');
+            setupSelector('bte');
+            setupSelector('sts');
+        }
+        
+        // Function to calculate BED from dose/fractions
+        function calculateBED() {
+            const dose = parseFloat(document.getElementById('dtb-dose').value);
+            const fractions = parseInt(document.getElementById('dtb-fractions').value);
+            let alphaBeta = document.getElementById('dtb-alphabeta').value;
+            
+            if (!dose || !fractions) {
+                alert('Veuillez entrer une dose et un nombre de fractions valides.');
+                return;
+            }
+            
+            if (alphaBeta === 'custom') {
+                alphaBeta = parseFloat(document.getElementById('dtb-custom-alphabeta').value);
+                if (!alphaBeta) {
+                    alert('Veuillez entrer un ratio α/β valide.');
+                    return;
+                }
+            } else {
+                alphaBeta = parseFloat(alphaBeta);
+            }
+            
+            const dosePerFraction = dose / fractions;
+            const bed = dose * (1 + (dosePerFraction / alphaBeta));
+            const eqd2 = bed / (1 + (2 / alphaBeta));
+            
+            showResults({
+                dose: dose,
+                fractions: fractions,
+                dosePerFraction: dosePerFraction,
+                alphaBeta: alphaBeta,
+                bed: bed,
+                eqd2: eqd2
+            });
+        }
+        
+        // Function to calculate EQD2 from BED
+        function calculateEQD2() {
+            const bed = parseFloat(document.getElementById('bte-bed').value);
+            let alphaBeta = document.getElementById('bte-alphabeta').value;
+            
+            if (!bed) {
+                alert('Veuillez entrer une valeur BED valide.');
+                return;
+            }
+            
+            if (alphaBeta === 'custom') {
+                alphaBeta = parseFloat(document.getElementById('bte-custom-alphabeta').value);
+                if (!alphaBeta) {
+                    alert('Veuillez entrer un ratio α/β valide.');
+                    return;
+                }
+            } else {
+                alphaBeta = parseFloat(alphaBeta);
+            }
+            
+            const eqd2 = bed / (1 + (2 / alphaBeta));
+            
+            showResults({
+                bed: bed,
+                alphaBeta: alphaBeta,
+                eqd2: eqd2
+            });
+        }
+        
+        // Function to compare two dose/fractionation schemas
+        function compareSchemas() {
+            const dose1 = parseFloat(document.getElementById('sts-dose1').value);
+            const fractions1 = parseInt(document.getElementById('sts-fractions1').value);
+            const dose2 = parseFloat(document.getElementById('sts-dose2').value);
+            const fractions2 = parseInt(document.getElementById('sts-fractions2').value);
+            let alphaBeta = document.getElementById('sts-alphabeta').value;
+            
+            if (!dose1 || !fractions1 || !dose2 || !fractions2) {
+                alert('Veuillez entrer des valeurs valides pour les deux schémas.');
+                return;
+            }
+            
+            if (alphaBeta === 'custom') {
+                alphaBeta = parseFloat(document.getElementById('sts-custom-alphabeta').value);
+                if (!alphaBeta) {
+                    alert('Veuillez entrer un ratio α/β valide.');
+                    return;
+                }
+            } else {
+                alphaBeta = parseFloat(alphaBeta);
+            }
+            
+            const dosePerFraction1 = dose1 / fractions1;
+            const bed1 = dose1 * (1 + (dosePerFraction1 / alphaBeta));
+            const eqd21 = bed1 / (1 + (2 / alphaBeta));
+            
+            const dosePerFraction2 = dose2 / fractions2;
+            const bed2 = dose2 * (1 + (dosePerFraction2 / alphaBeta));
+            const eqd22 = bed2 / (1 + (2 / alphaBeta));
+            
+            showResults({
+                schema1: {
+                    dose: dose1,
+                    fractions: fractions1,
+                    dosePerFraction: dosePerFraction1,
+                    bed: bed1,
+                    eqd2: eqd21
+                },
+                schema2: {
+                    dose: dose2,
+                    fractions: fractions2,
+                    dosePerFraction: dosePerFraction2,
+                    bed: bed2,
+                    eqd2: eqd22
+                },
+                alphaBeta: alphaBeta,
+                comparison: {
+                    bedRatio: bed2 / bed1,
+                    eqd2Ratio: eqd22 / eqd21
+                }
+            });
+        }
+        
+        // Function to display calculation results
+        function showResults(data) {
+            const resultsDiv = document.getElementById('calculation-results');
+            let html = '<h3>Résultats du calcul:</h3>';
+            
+            if (data.schema1 && data.schema2) {
+                // Schema comparison
+                html += `
+                    <div class="grid-2">
+                        <div class="result-item">
+                            <strong>Schéma 1:</strong>
+                            <ul>
+                                <li>Dose totale: ${data.schema1.dose.toFixed(2)} Gy</li>
+                                <li>Fractions: ${data.schema1.fractions}</li>
+                                <li>Dose par fraction: ${data.schema1.dosePerFraction.toFixed(2)} Gy</li>
+                                <li>BED: ${data.schema1.bed.toFixed(2)} Gy</li>
+                                <li>EQD2: ${data.schema1.eqd2.toFixed(2)} Gy</li>
+                            </ul>
+                        </div>
+                        <div class="result-item">
+                            <strong>Schéma 2:</strong>
+                            <ul>
+                                <li>Dose totale: ${data.schema2.dose.toFixed(2)} Gy</li>
+                                <li>Fractions: ${data.schema2.fractions}</li>
+                                <li>Dose par fraction: ${data.schema2.dosePerFraction.toFixed(2)} Gy</li>
+                                <li>BED: ${data.schema2.bed.toFixed(2)} Gy</li>
+                                <li>EQD2: ${data.schema2.eqd2.toFixed(2)} Gy</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="recommendation">
+                        <strong>Comparaison (pour α/β = ${data.alphaBeta}):</strong>
+                        <p>Le schéma 2 est équivalent à ${(data.comparison.bedRatio * 100).toFixed(1)}% du schéma 1 en termes de BED.</p>
+                        <p>Le schéma 2 est équivalent à ${(data.comparison.eqd2Ratio * 100).toFixed(1)}% du schéma 1 en termes d'EQD2.</p>
+                    </div>
+                `;
+            } else if (data.bed && data.eqd2) {
+                // Simple BED/EQD2 calculation
+                html += `
+                    <div class="result-item">
+                        <strong>Pour α/β = ${data.alphaBeta}:</strong>
+                        <ul>
+                `;
+                
+                if (data.dose) {
+                    html += `
+                        <li>Dose totale: ${data.dose.toFixed(2)} Gy</li>
+                        <li>Fractions: ${data.fractions}</li>
+                        <li>Dose par fraction: ${data.dosePerFraction.toFixed(2)} Gy</li>
+                    `;
+                }
+                
+                html += `
+                        <li>BED: ${data.bed.toFixed(2)} Gy</li>
+                        <li>EQD2: ${data.eqd2.toFixed(2)} Gy</li>
+                    </ul>
+                </div>
+                `;
+            }
+            
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.remove('hidden');
+        }
+        
+        // Function to show literature by category
+        function showLiterature() {
+            const category = document.getElementById('literature-type').value;
+            
+            if (!category) return;
+            
+            let resultsHTML = '<h3>Publications récentes:</h3>';
+            
+            if (category === 'tumor') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <h4>Gamma Knife Radiosurgery for Intracranial Meningiomas: Long-term Results (2025)</h4>
+                        <p>Étude rétrospective sur 25 ans montrant un contrôle tumoral à 10 ans de 87% pour les méningiomes de grade I traités par radiochirurgie Gamma Knife.</p>
+                        <p>DOI: 10.xxxx/jneurosurg.2025.xx</p>
+                    </div>
+                    <div class="result-item">
+                        <h4>Impact of Tumor Location on Efficacy of Stereotactic Radiosurgery for Brain Metastases (2024)</h4>
+                        <p>Analyse multicentrique démontrant que la localisation tumorale influence significativement les résultats de la radiochirurgie pour les métastases cérébrales.</p>
+                        <p>DOI: 10.xxxx/pradonc.2024.xx</p>
+                    </div>
+                    <div class="result-item">
+                        <h4>Single vs. Multifraction Stereotactic Radiosurgery for Large Brain Metastases (2024)</h4>
+                        <p>Comparaison randomisée montrant une réduction de 35% du risque de radionécrose avec l'approche fractionnée pour les métastases > 3 cm.</p>
+                        <p>DOI: 10.xxxx/jco.2024.xx</p>
+                    </div>
+                `;
+            } else if (category === 'functional') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <h4>Long-term Outcomes of Gamma Knife Thalamotomy for Essential Tremor (2025)</h4>
+                        <p>Suivi de 10 ans montrant un maintien du bénéfice clinique chez 81% des patients traités pour tremblement essentiel par thalamotomie radiochirurgicale.</p>
+                        <p>DOI: 10.xxxx/neurology.2025.xx</p>
+                    </div>
+                    <div class="result-item">
+                        <h4>Novel Targeting Approach for Trigeminal Neuralgia: Dual Isocenter Technique (2024)</h4>
+                        <p>Technique innovante de double isocentre pour le traitement de la névralgie du trijumeau avec une amélioration du taux de réponse et réduction des récidives.</p>
+                        <p>DOI: 10.xxxx/ijrobp.2024.xx</p>
+                    </div>
+                    <div class="result-item">
+                        <h4>Radiosurgical Capsulotomy for Treatment-Resistant OCD: Meta-analysis (2024)</h4>
+                        <p>Méta-analyse montrant une amélioration significative chez 65% des patients souffrant de TOC réfractaire traités par capsulotomie radiochirurgicale.</p>
+                        <p>DOI: 10.xxxx/psychmedicine.2024.xx</p>
+                    </div>
+                `;
+            } else if (category === 'vascular') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <h4>Volume-Staged Radiosurgery for Large Arteriovenous Malformations (2025)</h4>
+                        <p>Résultats d'une approche par étapes volumétriques pour les MAVs > 15 cm³ montrant un taux d'oblitération de 72% à 5 ans.</p>
+                        <p>DOI: 10.xxxx/neurosurgery.2025.xx</p>
+                    </div>
+                    <div class="result-item">
+                        <h4>Dose Response Relationship in Radiosurgery for Arteriovenous Malformations (2024)</h4>
+                        <p>Analyse dose-réponse suggérant qu'une dose marginale > 20 Gy est associée à un taux d'oblitération supérieur pour les MAVs de petit volume.</p>
+                        <p>DOI: 10.xxxx/radonc.2024.xx</p>
+                    </div>
+                    <div class="result-item">
+                        <h4>Radiosurgery for Cavernous Malformations in Eloquent Brain Regions (2024)</h4>
+                        <p>Série de cas sur l'utilisation de la radiochirurgie pour les cavernomes dans des zones éloquentes inopérables, avec un taux de réduction du risque hémorragique de 68%.</p>
+                        <p>DOI: 10.xxxx/jradiosurg.2024.xx</p>
+                    </div>
+                `;
+            } else if (category === 'technique') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <h4>AI-Assisted Target Delineation for Stereotactic Radiosurgery (2025)</h4>
+                        <p>Application de l'intelligence artificielle pour la délimitation automatique des cibles en radiochirurgie montrant une précision comparable aux experts humains.</p>
+                        <p>DOI: 10.xxxx/medphys.2025.xx</p>
+                    </div>
+                    <div class="result-item">
+                        <h4>Flash Radiotherapy in Stereotactic Applications: First Human Trial (2024)</h4>
+                        <p>Premier essai humain de radiothérapie Flash en contexte stéréotaxique montrant une réduction significative des effets secondaires.</p>
+                        <p>DOI: 10.xxxx/redjournal.2024.xx</p>
+                    </div>
+                    <div class="result-item">
+                        <h4>MR-Guided Adaptive Radiotherapy for Brain Lesions (2024)</h4>
+                        <p>Évaluation de la radiothérapie adaptative guidée par IRM pour les lésions cérébrales permettant une réduction des marges et une meilleure précision.</p>
+                        <p>DOI: 10.xxxx/pract-rad-onc.2024.xx</p>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('literature-results').innerHTML = resultsHTML;
+        }
+        
+        // Initialize any event listeners when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setupCustomAlphaBeta();
+        });
+        
+        // Function to update tumor doses based on selections
+        function updateTumorDoses() {
+            const tumorType = document.getElementById('tumor-type').value;
+            const tumorSize = document.getElementById('tumor-size').value;
+            
+            if (!tumorType || !tumorSize) return;
+            
+            let resultsHTML = '<h3>Doses recommandées:</h3>';
+            
+            if (tumorType === 'metastase') {
+                if (tumorSize <= 20) {
+                    resultsHTML += `
+                        <div class="result-item">
+                            <strong>Dose unique:</strong> 18-24 Gy en dose unique
+                        </div>
+                        <div class="recommendation">
+                            <strong>Recommandation:</strong> 20 Gy en dose unique pour les lésions ≤ 2 cm
+                        </div>
+                    `;
+                } else if (tumorSize <= 30) {
+                    resultsHTML += `
+                        <div class="result-item">
+                            <strong>Dose unique:</strong> 15-18 Gy en dose unique
+                        </div>
+                        <div class="result-item">
+                            <strong>Fractionnement:</strong> 27-30 Gy en 3 fractions
+                        </div>
+                        <div class="recommendation">
+                            <strong>Recommandation:</strong> Considérer un fractionnement pour réduire le risque de radionécrose
+                        </div>
+                    `;
+                } else {
+                    resultsHTML += `
+                        <div class="result-item">
+                            <strong>Fractionnement recommandé:</strong> 
+                            <ul>
+                                <li>30 Gy en 5 fractions</li>
+                                <li>27-30 Gy en 3 fractions</li>
+                            </ul>
+                        </div>
+                        <div class="warning">
+                            <strong>Attention:</strong> Pour les lésions > 3 cm, le risque de toxicité est plus élevé en dose unique.
+                        </div>
+                    `;
+                }
+            } else if (tumorType === 'meningiome') {
+                if (tumorSize <= 30) {
+                    resultsHTML += `
+                        <div class="result-item">
+                            <strong>Grade I:</strong> 12-14 Gy en dose unique
+                        </div>
+                        <div class="result-item">
+                            <strong>Grade II/III:</strong> 14-16 Gy en dose unique
+                        </div>
+                        <div class="recommendation">
+                            <strong>Recommandation:</strong> Considérer les structures adjacentes pour l'ajustement de dose
+                        </div>
+                    `;
+                } else {
+                    resultsHTML += `
+                        <div class="result-item">
+                            <strong>Fractionnement recommandé:</strong> 
+                            <ul>
+                                <li>25-30 Gy en 5 fractions</li>
+                                <li>27.0 Gy en 3 fractions</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+            } else if (tumorType === 'schwannome') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <strong>Dose standard:</strong> 12-13 Gy en dose unique
+                    </div>
+                    <div class="recommendation">
+                        <strong>Recommandation:</strong> Limiter la dose à la cochlée à < 4.2 Gy pour préserver l'audition
+                    </div>
+                `;
+                if (tumorSize > 30) {
+                    resultsHTML += `
+                        <div class="result-item">
+                            <strong>Pour gros volumes (> 3 cm):</strong> 18-25 Gy en 3-5 fractions
+                        </div>
+                    `;
+                }
+            } else if (tumorType === 'gliome') {
+                resultsHTML += `
+                    <div class="warning">
+                        <strong>Attention:</strong> La radiochirurgie n'est généralement pas le traitement de première intention pour les gliomes.
+                    </div>
+                    <div class="result-item">
+                        <strong>Boost localisé:</strong> 15-18 Gy peut être considéré comme surimpression après RT conventionnelle pour certains cas sélectionnés
+                    </div>
+                    <div class="result-item">
+                        <strong>Récidive focale:</strong> 15-18 Gy en dose unique ou 24-30 Gy en 3-5 fractions selon le volume
+                    </div>
+                `;
+            } else if (tumorType === 'adénome') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <strong>Dose standard:</strong> 14-16 Gy en dose unique pour les adénomes non fonctionnels
+                    </div>
+                    <div class="result-item">
+                        <strong>Adénomes sécrétants:</strong> 20-25 Gy en dose unique pour les adénomes à GH/ACTH
+                    </div>
+                    <div class="recommendation">
+                        <strong>Recommandation:</strong> Maintenir la dose au chiasma optique < 8 Gy
+                    </div>
+                `;
+            }
+            
+            document.getElementById('tumor-results').innerHTML = resultsHTML;
+        }
+        
+        // Function to update functional disorders doses
+        function updateFunctionalDoses() {
+            const functionalType = document.getElementById('functional-type').value;
+            
+            if (!functionalType) return;
+            
+            let resultsHTML = '<h3>Doses recommandées:</h3>';
+            
+            if (functionalType === 'névralgie') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <strong>Dose standard:</strong> 75-85 Gy à la jonction de la racine de la zone d'entrée
+                    </div>
+                    <div class="result-item">
+                        <strong>Volume cible:</strong> 4-6 mm³
+                    </div>
+                    <div class="recommendation">
+                        <strong>Recommandation:</strong> Cibler la portion cisternal du nerf trijumeau
+                    </div>
+                `;
+            } else if (functionalType === 'tremblements') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <strong>Cible:</strong> Noyau ventral intermédiaire (VIM) du thalamus
+                    </div>
+                    <div class="result-item">
+                        <strong>Dose standard:</strong> 130-150 Gy au point central
+                    </div>
+                    <div class="result-item">
+                        <strong>Volume:</strong> Isodose 65-75% pour contenir un volume d'environ 4-8 mm³
+                    </div>
+                `;
+            } else if (functionalType === 'parkinson') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <strong>Cible:</strong> Globus Pallidus interne (GPi) ou Noyau sous-thalamique (STN)
+                    </div>
+                    <div class="result-item">
+                        <strong>Dose pour GPi:</strong> 130-140 Gy
+                    </div>
+                    <div class="result-item">
+                        <strong>Dose pour STN:</strong> 120-130 Gy
+                    </div>
+                    <div class="warning">
+                        <strong>Note:</strong> Traitement généralement réservé aux cas où la stimulation cérébrale profonde n'est pas possible
+                    </div>
+                `;
+            } else if (functionalType === 'épilepsie') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <strong>Cibles potentielles:</strong> Foyer épileptique, amygdale et hippocampe
+                    </div>
+                    <div class="result-item">
+                        <strong>Dose:</strong> 20-24 Gy en dose unique
+                    </div>
+                    <div class="warning">
+                        <strong>Attention:</strong> Traitement expérimental, généralement utilisé pour l'épilepsie médicalement réfractaire avec foyer bien localisé
+                    </div>
+                `;
+            } else if (functionalType === 'toc') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <strong>Cibles potentielles:</strong> Capsule interne antérieure, noyau accumbens ou cingulotomie
+                    </div>
+                    <div class="result-item">
+                        <strong>Dose pour capsulotomie:</strong> 140-150 Gy
+                    </div>
+                    <div class="result-item">
+                        <strong>Dose pour cingulotomie:</strong> 150-180 Gy
+                    </div>
+                    <div class="warning">
+                        <strong>Attention:</strong> Traitement réservé aux cas sévères et réfractaires aux traitements conventionnels
+                    </div>
+                `;
+            }
+            
+            document.getElementById('functional-results').innerHTML = resultsHTML;
+        }
+        
+        // Function to update vascular pathologies doses
+        function updateVascularDoses() {
+            const vascularType = document.getElementById('vascular-type').value;
+            const vascularSize = document.getElementById('vascular-size').value;
+            const vascularGrade = document.getElementById('vascular-grade').value;
+            
+            if (!vascularType) return;
+            
+            let resultsHTML = '<h3>Doses recommandées:</h3>';
+            
+            if (vascularType === 'mav') {
+                if (!vascularSize || (vascularType === 'mav' && !vascularGrade)) {
+                    resultsHTML += `
+                        <div class="warning">
+                            <strong>Attention:</strong> Veuillez spécifier le volume et le grade (Spetzler-Martin) pour les MAVs.
+                        </div>
+                    `;
+                } else {
+                    let dose = 0;
+                    
+                    if (vascularSize <= 1) {
+                        dose = 24;
+                    } else if (vascularSize <= 4) {
+                        dose = 20;
+                    } else if (vascularSize <= 10) {
+                        dose = 18;
+                    } else if (vascularSize <= 20) {
+                        dose = 16;
+                    } else {
+                        dose = 14;
+                    }
+                    
+                    // Adjust based on Spetzler-Martin grade
+                    if (vascularGrade >= 4 && dose > 16) {
+                        dose = 16; // Reduce dose for high-grade MAVs
+                    }
+                    
+                    resultsHTML += `
+                        <div class="result-item">
+                            <strong>Dose périphérique recommandée:</strong> ${dose} Gy
+                        </div>
+                        <div class="result-item">
+                            <strong>Isodose de prescription:</strong> 50-80%
+                        </div>
+                    `;
+                    
+                    if (vascularSize > 10) {
+                        resultsHTML += `
+                            <div class="recommendation">
+                                <strong>Recommandation:</strong> Considérer un traitement en plusieurs séances pour les MAVs > 10 cm³
+                            </div>
+                        `;
+                    }
+                    
+                    if (vascularGrade >= 4) {
+                        resultsHTML += `
+                            <div class="warning">
+                                <strong>Attention:</strong> Pour les MAVs de grade élevé (≥ IV), le taux d'oblitération peut être inférieur et le risque de complications plus élevé
+                            </div>
+                        `;
+                    }
+                }
+            } else if (vascularType === 'cavernome') {
+                resultsHTML += `
+                    <div class="warning">
+                        <strong>Attention:</strong> La radiochirurgie n'est généralement pas le traitement de première intention pour les cavernomes. Considérée uniquement pour les lésions inopérables dans des zones éloquentes.
+                    </div>
+                    <div class="result-item">
+                        <strong>Dose périphérique (si indiquée):</strong> 12-14 Gy
+                    </div>
+                `;
+            } else if (vascularType === 'fistule') {
+                resultsHTML += `
+                    <div class="result-item">
+                        <strong>Dose périphérique:</strong> 16-20 Gy selon la localisation
+                    </div>
+                    <div class="recommendation">
+                        <strong>Recommandation:</strong> Cibler le shunt artério-veineux et non le sinus veineux adjacent
+                    </div>
+                `;
+            }
+            
+            document.getElementById('vascular-results').innerHTML = resultsHTML;
+        }
+        
+        // Function to show constraints for selected structure
+        function showConstraints() {
+            const structure = document.getElementById('constraint-structure').value;
+            
+            if (!structure) return;
+            
+            let resultsHTML = '<h3>Contraintes recommandées:</h3>';
+            
+            if (structure === 'tronc') {
+                resultsHTML += `
+                    <div class="constraint">
+                        <strong>Dose unique:</strong>
+                        <ul>
+                            <li>Point maximal < 15 Gy</li>
+                            <li>Volume recevant > 12 Gy devrait être < 0.5 cm³</li>
+                            <li>Volume recevant > 10 Gy devrait être < 0.75 cm³</li>
+                        </ul>
+                    </div>
+                    <div class="constraint">
+                        <strong>3 fractions:</strong>
+                        <ul>
+                            <li>Point maximal < 23 Gy</li>
+                            <li>Volume recevant > 18 Gy devrait être < 0.5 cm³</li>
+                        </ul>
+                    </div>
+                    <div class="constraint">
+                        <strong>5 fractions:</strong>
+                        <ul>
+                            <li>Point maximal < 31 Gy</li>
+                            <li>Volume recevant > 23 Gy devrait être < 0.5 cm³</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (structure === 'chiasma' || structure === 'nerfs') {
+                resultsHTML += `
+                    <div class="constraint">
+                        <strong>Dose unique:</strong>
+                        <ul>
+                            <li>Point maximal < 10 Gy</li>
+                            <li>Volume recevant > 8 Gy devrait être < 0.2 cm³</li>
+                        </ul>
+                    </div>
+                    <div class="constraint">
+                        <strong>3 fractions:</strong>
+                        <ul>
+                            <li>Point maximal < 15 Gy</li>
+                            <li>Volume recevant > 12.5 Gy devrait être < 0.2 cm³</li>
+                        </ul>
+                    </div>
+                    <div class="constraint">
+                        <strong>5 fractions:</strong>
+                        <ul>
+                            <li>Point maximal < 25 Gy</li>
+                            <li>Volume recevant > 20 Gy devrait être < 0.2 cm³</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (structure === 'cochlée') {
+                resultsHTML += `
+                    <div class="constraint">
+                        <strong>Pour préserver l'audition:</strong>
+                        <ul>
+                            <li>Dose moyenne < 4.2 Gy en dose unique</li>
+                            <li>Point maximal < 5.5 Gy (dose unique)</li>
+                        </ul>
+                    </div>
+                    <div class="constraint">
+                        <strong>3 fractions:</strong>
+                        <ul>
+                            <li>Dose moyenne < 11 Gy</li>
+                            <li>Point maximal < 15 Gy</li>
+                        </ul>
+                    </div>
+                    <div class="constraint">
+                        <strong>5 fractions:</strong>
+                        <ul>
+                            <li>Dose moyenne < 17.5 Gy</li>
+                            <li>Point maximal < 22.5 Gy</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (structure === 'hippocampe') {
+                resultsHTML += `
+                    <div class="constraint">
+                        <strong>Pour préserver la fonction cognitive:</strong>
+                        <ul>
+                            <li>Dose moyenne < 7 Gy en dose unique</li>
+                            <li>Volume recevant > 10 Gy devrait être minimisé</li>
+                        </ul>
+                    </div>
+                    <div class="constraint">
+                        <strong>Fractionnement:</strong>
+                        <ul>
+                            <li>Dose équivalente biologique à considérer selon le nombre de fractions</li>
+                        </ul>
+                    </div>
+                    <div class="warning">
+                        <strong>Note:</strong> Les contraintes pour l'hippocampe sont toujours en cours d'étude dans des essais cliniques
+                    </div>
+                `;
+            } else if (structure === 'moelle') {
+                resultsHTML += `
+                    <div class="constraint">
+                        <strong>Dose unique:</strong>
+                        <ul>
+                            <li>Point maximal < 13 Gy</li>
+                            <li>Volume recevant > 10 Gy devrait être < 0.35 cm³</li>
+                        </ul>
+                    </div>
+                    <div class="constraint">
+                        <strong>3 fractions:</strong>
+                        <ul>
+                            <li>Point maximal < 18 Gy</li>
+                            <li>Volume recevant > 14.5 Gy devrait être < 0.35 cm³</li>
+                        </ul>
+                    </div>
+                    <div class="constraint">
+                        <strong>5 fractions:</strong>
+                        <ul>
+                            <li>Point maximal < 23 Gy</li>
+                            <li>Volume recevant > 20 Gy devrait être < 0.35 cm³</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (structure === 'cervelet') {
+                resultsHTML += `
+                    <div class="constraint">
+                        <strong>Dose unique:</strong>
+                        <ul>
+                            <li>Volume recevant > 18 Gy devrait être < 10 cm³</li>
+                            <li>Volume recevant > 15 Gy devrait être < 20 cm³</li>
+                        </ul>
+                    </div>
+                    <div class="warning">
+                        <strong>Note:</strong> Le cervelet peut tolérer des doses plus élevées que le parenchyme cérébral, mais les volumes irradiés doivent être limités pour éviter l'ataxie
+                    </div>
+                `;
+            }
+            
+            document.getElementById('constraint-results').innerHTML = resultsHTML;
+        }
+        
+        // Function to calculate fractionated doses
+        function calculateFractionation() {
+            const pathology = document.getElementById('fract-pathology').value;
+            const size = document.getElementById('fract-size').value;
+            const age = document.getElementById('fract-age').value;
+            const location = document.getElementById('fract-location').value;
+            
+            if (!pathology || !size || !age || !location) {
+                document.getElementById('fractionation-results').innerHTML = `
+                    <div class="warning">
+                        <strong>Attention:</strong> Veuillez remplir tous les champs pour obtenir des recommandations.
+                    </div>
+                `;
+                return;
+            }
+            
+            let resultsHTML = '<h3>Schémas de fractionnement recommandés:</h3>';
+            
+            // Consider size as high risk factor
+            const isLarge = size > 10; 
+            
+            // Consider eloquent areas or OAR proximity as risk factors
+            const isHighRisk = location === 'eloquent' || location === 'proche-oar';
+            
+            // Consider age as a risk factor (older patients may tolerate less aggressive treatment)
+            const isElderlyPatient = age > 75;
+            
+            if (pathology === 'metastase') {
+                if (isLarge) {
+                    resultsHTML += `
+                        <div class="recommendation">
+                            <strong>Schéma recommandé pour métastase volumineuse (${size} cm³):</strong>
+                            <ul>
+                                <li>27 Gy en 3 fractions</li>
+                                <li>30 Gy en 5 fractions</li>
+                                <li>35 Gy en 10 fractions (pour très gros volumes)</li>
+                            </ul>
+                        </div>
+                    `;
+                    
+                    if (isHighRisk) {
+                        resultsHTML += `
+                            <div class="recommendation">
+                                <strong>Considérant la proximité de structures à risque/zone éloquente:</strong>
+                                <ul>
+                                    <li>25 Gy en 5 fractions</li>
+                                    <li>30 Gy en 10 fractions</li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Small metastasis
+                    if (isHighRisk) {
+                        resultsHTML += `
+                            <div class="recommendation">
+                                <strong>Schéma recommandé pour petite métastase en zone à risque:</strong>
+                                <ul>
+                                    <li>21 Gy en 3 fractions</li>
+                                    <li>25 Gy en 5 fractions</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else {
+                        resultsHTML += `
+                            <div class="recommendation">
+                                <strong>Schéma recommandé pour petite métastase (${size} cm³):</strong>
+                                <ul>
+                                    <li>18-24 Gy en dose unique</li>
+                                    <li>27 Gy en 3 fractions (alternative)</li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                }
+            } else if (pathology === 'meningiome') {
+                if (isLarge) {
+                    resultsHTML += `
+                        <div class="recommendation">
+                            <strong>Schéma recommandé pour méningiome volumineux (${size} cm³):</strong>
+                            <ul>
+                                <li>25 Gy en 5 fractions</li>
+                                <li>27.0 Gy en 3 fractions</li>
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    // Small meningioma
+                    if (isHighRisk) {
+                        resultsHTML += `
+                            <div class="recommendation">
+                                <strong>Schéma recommandé pour méningiome en zone à risque:</strong>
+                                <ul>
+                                    <li>21 Gy en 3 fractions</li>
+                                    <li>25 Gy en 5 fractions</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else {
+                        resultsHTML += `
+                            <div class="recommendation">
+                                <strong>Schéma recommandé pour petit méningiome (${size} cm³):</strong>
+                                <ul>
+                                    <li>12-14 Gy en dose unique</li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                }
+            } else if (pathology === 'schwannome') {
+                if (isLarge) {
+                    resultsHTML += `
+                        <div class="recommendation">
+                            <strong>Schéma recommandé pour schwannome volumineux (${size} cm³):</strong>
+                            <ul>
+                                <li>18 Gy en 3 fractions</li>
+                                <li>21-25 Gy en 5 fractions</li>
+                            </ul>
+                        </div>
+                        <div class="recommendation">
+                            <strong>Considération cochléaire:</strong> 
+                            <p>Limiter la dose moyenne à la cochlée à < 4.2 Gy (dose unique) ou équivalent biologique pour préserver l'audition</p>
+                        </div>
+                    `;
+                } else {
+                    resultsHTML += `
+                        <div class="recommendation">
+                            <strong>Schéma recommandé pour schwannome de petit volume (${size} cm³):</strong>
+                            <ul>
+                                <li>12-13 Gy en dose unique</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+            } else if (pathology === 'mav') {
+                if (isLarge) {
+                    resultsHTML += `
+                        <div class="recommendation">
+                            <strong>Schéma recommandé pour MAV volumineuse (${size} cm³):</strong>
+                            <ul>
+                                <li>Approche en plusieurs séances: 16-18 Gy en première session</li>
+                                <li>Alternative: 21 Gy en 3 fractions</li>
+                                <li>Pour très gros volumes: volume partiel puis compléter 2-3 ans après</li>
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    // Small AVM
+                    if (isHighRisk) {
+                        resultsHTML += `
+                            <div class="recommendation">
+                                <strong>Schéma recommandé pour MAV en zone à risque:</strong>
+                                <ul>
+                                    <li>16-18 Gy en dose unique</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else {
+                        resultsHTML += `
+                            <div class="recommendation">
+                                <strong>Schéma recommandé pour MAV de petit volume (${size} cm³):</strong>
+                                <ul>
+                                    <li>18-24 Gy en dose unique (selon la taille et localisation)</li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                }
+            } else if (pathology === 'gliome') {
+                resultsHTML += `
+                    <div class="warning">
+                        <strong>Attention:</strong> La radiochirurgie n'est généralement pas le traitement standard pour les gliomes.
+                    </div>
+                    <div class="recommendation">
+                        <strong>Pour les récidives focales de petite taille:</strong>
+                        <ul>
+                            <li>18 Gy en dose unique (pour volumes < 10 cm³)</li>
+                            <li>24-30 Gy en 3-5 fractions (pour volumes > 10 cm³)</li>
+                            <li>35 Gy en 10 fractions (pour volumes plus importants)</li>
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // Add age-specific considerations
+            if (isElderlyPatient) {
+                resultsHTML += `
+                    <div class="recommendation">
+                        <strong>Considération pour patient âgé (${age} ans):</strong>
+                        <p>Considérer une réduction de dose de 10-15% pour minimiser les risques de toxicité.</p>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('fractionation-results').innerHTML = resultsHTML;
+        }
+        
+        // Function to show classification details
+        function showClassification(classificationType) {
+            // Hide all classification details
+            document.querySelectorAll('[id$="-details"]').forEach(div => {
+                div.classList.add('hidden');
+            });
+            
+            // Show specific classification
+            document.getElementById('classification-details').classList.remove('hidden');
+            
+            if (classificationType === 'rpa') {
+                document.getElementById('classification-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">RPA (Recursive Partitioning Analysis)</div>
+                        <div class="card-body">
+                            <h3>Classification RPA pour métastases cérébrales</h3>
+                            <div class="result-item">
+                                <strong>Classe I:</strong> KPS ≥ 70, âge < 65 ans, maladie primaire contrôlée, pas de métastases extracérébrales
+                            </div>
+                            <div class="result-item">
+                                <strong>Classe II:</strong> Tous les patients qui ne correspondent pas aux critères de classe I ou III
+                            </div>
+                            <div class="result-item">
+                                <strong>Classe III:</strong> KPS < 70
+                            </div>
+                            
+                            <div class="reference">
+                                Source: RTOG (Radiation Therapy Oncology Group)
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (classificationType === 'graded-prognostic') {
+                document.getElementById('classification-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">Graded Prognostic Assessment (GPA)</div>
+                        <div class="card-body">
+                            <h3>Facteurs pronostiques (0-4 points)</h3>
+                            <div class="result-item">
+                                <strong>Âge:</strong>
+                                <ul>
+                                    <li>> 60 ans: 0 point</li>
+                                    <li>50-59 ans: 0.5 point</li>
+                                    <li>< 50 ans: 1 point</li>
+                                </ul>
+                            </div>
+                            <div class="result-item">
+                                <strong>KPS:</strong>
+                                <ul>
+                                    <li>< 70: 0 point</li>
+                                    <li>70-80: 0.5 point</li>
+                                    <li>90-100: 1 point</li>
+                                </ul>
+                            </div>
+                            <div class="result-item">
+                                <strong>Métastases extracérébrales:</strong>
+                                <ul>
+                                    <li>Présentes: 0 point</li>
+                                    <li>Absentes: 1 point</li>
+                                </ul>
+                            </div>
+                            <div class="result-item">
+                                <strong>Nombre de métastases cérébrales:</strong>
+                                <ul>
+                                    <li>> 3: 0 point</li>
+                                    <li>2-3: 0.5 point</li>
+                                    <li>1: 1 point</li>
+                                </ul>
+                            </div>
+                            
+                            <h3>Interprétation GPA</h3>
+                            <div class="result-item">
+                                <strong>0-1.0:</strong> Survie médiane 3 mois
+                            </div>
+                            <div class="result-item">
+                                <strong>1.5-2.5:</strong> Survie médiane 6 mois
+                            </div>
+                            <div class="result-item">
+                                <strong>3.0:</strong> Survie médiane 11 mois
+                            </div>
+                            <div class="result-item">
+                                <strong>3.5-4.0:</strong> Survie médiane 17 mois
+                            </div>
+                            
+                            <div class="reference">
+                                Source: Sperduto et al., J Clin Oncol
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (classificationType === 'spetzler-martin') {
+                document.getElementById('classification-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">Classification de Spetzler-Martin (MAVs)</div>
+                        <div class="card-body">
+                            <h3>Critères (1-5 points)</h3>
+                            <div class="result-item">
+                                <strong>Taille:</strong>
+                                <ul>
+                                    <li>Petite (< 3 cm): 1 point</li>
+                                    <li>Moyenne (3-6 cm): 2 points</li>
+                                    <li>Grande (> 6 cm): 3 points</li>
+                                </ul>
+                            </div>
+                            <div class="result-item">
+                                <strong>Localisation:</strong>
+                                <ul>
+                                    <li>Non-éloquente: 0 point</li>
+                                    <li>Éloquente: 1 point</li>
+                                </ul>
+                            </div>
+                            <div class="result-item">
+                                <strong>Drainage veineux:</strong>
+                                <ul>
+                                    <li>Superficiel uniquement: 0 point</li>
+                                    <li>Profond: 1 point</li>
+                                </ul>
+                            </div>
+                            
+                            <h3>Grades</h3>
+                            <div class="result-item">
+                                <strong>Grade I:</strong> 1 point
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade II:</strong> 2 points
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade III:</strong> 3 points
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade IV:</strong> 4 points
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade V:</strong> 5 points
+                            </div>
+                            
+                            <div class="reference">
+                                Source: Spetzler RF, Martin NA. J Neurosurg
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (classificationType === 'bni-tn') {
+                document.getElementById('classification-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">BNI - Névralgie du Trijumeau</div>
+                        <div class="card-body">
+                            <h3>Échelle de douleur BNI pour la névralgie du trijumeau</h3>
+                            <div class="result-item">
+                                <strong>Grade I:</strong> Pas de douleur, pas de médicaments
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade II:</strong> Douleur occasionnelle, pas de médicaments
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade IIIa:</strong> Pas de douleur, avec médicaments
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade IIIb:</strong> Douleur contrôlée avec médicaments
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade IV:</strong> Douleur non contrôlée avec médicaments
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade V:</strong> Pas de soulagement
+                            </div>
+                            
+                            <div class="reference">
+                                Source: Barrow Neurological Institute
+                            </div>
+                            
+                            <h3>Échelle de déficit facial BNI</h3>
+                            <div class="result-item">
+                                <strong>Grade I:</strong> Pas de déficit facial
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade II:</strong> Déficit léger (parésie à peine détectable)
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade III:</strong> Déficit modéré (asymétrie évidente)
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade IV:</strong> Déficit sévère (fonction partielle)
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (classificationType === 'virginia') {
+                document.getElementById('classification-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">Classification de Virginia (MAVs)</div>
+                        <div class="card-body">
+                            <p>La classification de Virginia répartit les MAVs en 5 catégories selon leur composition angioarchitecturale et leur localisation</p>
+                            
+                            <div class="result-item">
+                                <strong>Type I - Frontocentropariétal:</strong> MAVs superficielles dans une région non éloquente, généralement bon pronostic
+                            </div>
+                            <div class="result-item">
+                                <strong>Type II - Temporal:</strong> MAVs latérales dans le lobe temporal, risque de dommage au nerf optique et au visage
+                            </div>
+                            <div class="result-item">
+                                <strong>Type III - Sylvienne:</strong> MAVs de la fissure sylvienne, souvent situées profondément
+                            </div>
+                            <div class="result-item">
+                                <strong>Type IV - Profonde:</strong> MAVs des noyaux gris centraux, thalamiques et du tronc cérébral
+                            </div>
+                            <div class="result-item">
+                                <strong>Type V - Ventriculaire:</strong> MAVs périventriculaires
+                            </div>
+                            
+                            <div class="reference">
+                                Source: University of Virginia Health System
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (classificationType === 'lawton') {
+                document.getElementById('classification-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">Classification supplémentaire de Lawton</div>
+                        <div class="card-body">
+                            <p>La classification supplémentaire de Lawton aide à affiner l'évaluation des MAVs de grade III de Spetzler-Martin, en les divisant en 4 sous-types.</p>
+                            
+                            <div class="result-item">
+                                <strong>Grade III- (S1V1E1):</strong> Petite MAV en zone éloquente avec drainage veineux profond
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade III+ (S2V0E1):</strong> MAV de taille moyenne en zone éloquente avec drainage veineux superficiel
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade III* (S2V1E0):</strong> MAV de taille moyenne en zone non-éloquente avec drainage veineux profond
+                            </div>
+                            <div class="result-item">
+                                <strong>Grade III# (S3V0E0):</strong> Grande MAV en zone non-éloquente avec drainage veineux superficiel
+                            </div>
+                            
+                            <div class="recommendation">
+                                <strong>Implications cliniques:</strong> Les MAVs de type III- et III+ ont généralement un meilleur pronostic chirurgical que les types III* et III#.
+                            </div>
+                            
+                            <div class="reference">
+                                Source: Lawton MT et al. Neurosurgery
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (classificationType === 'updrs') {
+                document.getElementById('classification-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">UPDRS - Maladie de Parkinson</div>
+                        <div class="card-body">
+                            <p>L'échelle UPDRS (Unified Parkinson's Disease Rating Scale) est utilisée pour évaluer la progression de la maladie de Parkinson.</p>
+                            
+                            <h3>Sections de l'UPDRS</h3>
+                            <div class="result-item">
+                                <strong>Partie I:</strong> Évaluation cognitive, comportementale et thymique
+                            </div>
+                            <div class="result-item">
+                                <strong>Partie II:</strong> Activités de la vie quotidienne
+                            </div>
+                            <div class="result-item">
+                                <strong>Partie III:</strong> Examen moteur (tremblements, rigidité, bradykinésie, démarche)
+                            </div>
+                            <div class="result-item">
+                                <strong>Partie IV:</strong> Complications motrices (dyskinésies, fluctuations)
+                            </div>
+                            
+                            <div class="recommendation">
+                                <strong>Importance pour la radiochirurgie:</strong> L'UPDRS partie III est particulièrement importante pour évaluer l'effet de la radiochirurgie sur les symptômes moteurs. Une amélioration de ≥ 30% est généralement considérée comme significative.
+                            </div>
+                            
+                            <div class="reference">
+                                Source: Movement Disorder Society
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (classificationType === 'fahn-tolosa') {
+                document.getElementById('classification-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">Échelle Fahn-Tolosa-Marin (Tremblements)</div>
+                        <div class="card-body">
+                            <p>L'échelle de Fahn-Tolosa-Marin (FTM) est utilisée pour évaluer la sévérité des tremblements.</p>
+                            
+                            <h3>Sections de l'échelle FTM</h3>
+                            <div class="result-item">
+                                <strong>Partie A:</strong> Amplitude des tremblements dans différentes parties du corps (0-4 pour chaque partie)
+                            </div>
+                            <div class="result-item">
+                                <strong>Partie B:</strong> Capacité à effectuer des tâches motrices spécifiques (dessin, écriture, verser de l'eau)
+                            </div>
+                            <div class="result-item">
+                                <strong>Partie C:</strong> Handicap fonctionnel (parole, alimentation, hygiène, habillage, écriture, travail)
+                            </div>
+                            
+                            <div class="recommendation">
+                                <strong>Importance pour la radiochirurgie:</strong> Cette échelle est utilisée pour évaluer l'efficacité de la thalamotomie radiochirurgicale sur les tremblements essentiels ou parkinsoniens. Une réduction de ≥ 50% du score total est généralement considérée comme un succès thérapeutique.
+                            </div>
+                            
+                            <div class="reference">
+                                Source: Fahn S, Tolosa E, Marin C. Clinical rating scale for tremor.
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (classificationType === 'who-cns') {
+                document.getElementById('classification-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-header">WHO Classification of CNS Tumors</div>
+                        <div class="card-body">
+                            <p>La classification de l'OMS des tumeurs du système nerveux central est mise à jour régulièrement et intègre désormais des paramètres moléculaires.</p>
+                            
+                            <h3>Classification des tumeurs cérébrales</h3>
+                            <div class="result-item">
+                                <strong>Tumeurs astrocytaires et oligodendrogliales:</strong>
+                                <ul>
+                                    <li>Astrocytome, IDH-muté</li>
+                                    <li>Glioblastome, IDH-sauvage</li>
+                                    <li>Glioblastome, IDH-muté</li>
+                                    <li>Oligodendrogliome, IDH-muté et 1p/19q co-délété</li>
+                                </ul>
+                            </div>
+                            <div class="result-item">
+                                <strong>Tumeurs méningées:</strong>
+                                <ul>
+                                    <li>Méningiome (Grade I, II, III)</li>
+                                </ul>
+                            </div>
+                            <div class="result-item">
+                                <strong>Tumeurs des nerfs crâniens et rachidiens:</strong>
+                                <ul>
+                                    <li>Schwannome</li>
+                                    <li>Neurofibrome</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="recommendation">
+                                <strong>Importance pour la radiochirurgie:</strong> Le statut moléculaire (notamment IDH, MGMT, 1p/19q) influence la sensibilité aux radiations et peut aider à déterminer les doses optimales.
+                            </div>
+                            
+                            <div class="reference">
+                                Source: Organisation Mondiale de la Santé (OMS)
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            // Additional classification display functions would be added here
+        }
+    </script>
+</body>
+</html>

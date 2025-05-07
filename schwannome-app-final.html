@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aide à la décision pour la prise en charge des schwannomes vestibulaires</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7fa;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+        }
+        
+        .site-header {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin: 25px 0 15px;
+            color: var(--secondary-color);
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            margin: 20px 0 10px;
+            color: var(--secondary-color);
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            flex: 1;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        input[type="number"],
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .radio-group {
+            margin-bottom: 15px;
+        }
+        
+        .radio-group label {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 15px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        .radio-group input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        #resultSection {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4fc;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .recommendation {
+            padding: 20px;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .recommendation h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+        
+        .highlight {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        
+        .section-toggle {
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+        
+        .hidden-content {
+            display: none;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .tab-container {
+            margin: 20px 0;
+        }
+        
+        .tab-header {
+            display: flex;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            border: none;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+        
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: var(--border-radius);
+        }
+
+        /* Version Mobile */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .form-section {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .tab-header {
+                flex-direction: column;
+            }
+            
+            .tab-button {
+                margin-bottom: 5px;
+                border-radius: var(--border-radius);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="site-header">NeurosurgerySpinehealthcenter</div>
+    </header>
+    
+    <div class="container">
+        <div class="app-header">
+            <h1>Aide à la décision pour la prise en charge des schwannomes vestibulaires</h1>
+            <p>Outil clinique basé sur les recommandations actuelles</p>
+        </div>
+
+        <div class="form-section">
+            <h2>Paramètres cliniques et caractéristiques du patient</h2>
+
+            <div class="input-group">
+                <label for="patientAge">Âge du patient (années):</label>
+                <input type="number" id="patientAge" min="0" max="120">
+            </div>
+
+            <div class="radio-group">
+                <label>Sexe:</label>
+                <label><input type="radio" name="gender" value="male"> Homme</label>
+                <label><input type="radio" name="gender" value="female"> Femme</label>
+            </div>
+
+            <div class="input-group">
+                <label for="symptoms">Symptômes principaux:</label>
+                <div class="radio-group">
+                    <label><input type="checkbox" name="symptoms" value="hearing_loss"> Hypoacousie</label>
+                    <label><input type="checkbox" name="symptoms" value="tinnitus"> Acouphènes</label>
+                    <label><input type="checkbox" name="symptoms" value="vertigo"> Vertiges</label>
+                    <label><input type="checkbox" name="symptoms" value="facial"> Troubles de la motricité faciale</label>
+                    <label><input type="checkbox" name="symptoms" value="headache"> Céphalées</label>
+                    <label><input type="checkbox" name="symptoms" value="balance"> Troubles de l'équilibre</label>
+                    <label><input type="checkbox" name="symptoms" value="trigeminal"> Névralgie du trijumeau</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="symptomDuration">Durée des symptômes (mois):</label>
+                <input type="number" id="symptomDuration" min="0">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Caractéristiques tumorales</h2>
+
+            <div class="input-group">
+                <label for="tumorSize">Taille maximale de la tumeur (mm):</label>
+                <input type="number" id="tumorSize" min="0" max="100">
+            </div>
+
+            <div class="input-group">
+                <label for="koosGrade">Classification de Koos:</label>
+                <select id="koosGrade">
+                    <option value="">Sélectionner</option>
+                    <option value="1">Grade I - Tumeur intraméatique</option>
+                    <option value="2">Grade II - Tumeur s'étendant dans l'APC sans contact avec le tronc cérébral</option>
+                    <option value="3">Grade III - Tumeur atteignant le tronc cérébral sans effet de masse</option>
+                    <option value="4">Grade IV - Tumeur comprimant le tronc cérébral (déviation du 4e ventricule)</option>
+                </select>
+                <div class="section-toggle" onclick="toggleContent('koosInfo')">Afficher détails de la classification de Koos</div>
+                <div id="koosInfo" class="hidden-content">
+                    <h3>Classification de Koos des schwannomes vestibulaires</h3>
+                    <table>
+                        <tr>
+                            <th>Grade</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>Grade I</td>
+                            <td>Tumeur intracanalaire, limitée exclusivement au conduit auditif interne</td>
+                        </tr>
+                        <tr>
+                            <td>Grade II</td>
+                            <td>Tumeur s'étendant dans l'angle ponto-cérébelleux sans contact avec le tronc cérébral</td>
+                        </tr>
+                        <tr>
+                            <td>Grade III</td>
+                            <td>Tumeur atteignant le tronc cérébral sans effet de masse (pas de déviation du 4e ventricule)</td>
+                        </tr>
+                        <tr>
+                            <td>Grade IV</td>
+                            <td>Tumeur comprimant le tronc cérébral avec effet de masse (déviation du 4e ventricule)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="tumorLocation">Localisation détaillée:</label>
+                <select id="tumorLocation">
+                    <option value="">Sélectionner</option>
+                    <option value="intracanalaire">Intracanalaire pure</option>
+                    <option value="apc">Angle ponto-cérébelleux</option>
+                    <option value="tronc">Contact avec le tronc cérébral</option>
+                    <option value="compression">Compression du tronc cérébral</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="tumorCharacteristics">Caractéristiques IRM:</label>
+                <div class="radio-group">
+                    <label><input type="checkbox" name="tumor_char" value="homogene"> Homogène</label>
+                    <label><input type="checkbox" name="tumor_char" value="heterogene"> Hétérogène</label>
+                    <label><input type="checkbox" name="tumor_char" value="kystique"> Composante kystique</label>
+                    <label><input type="checkbox" name="tumor_char" value="calcification"> Calcifications</label>
+                    <label><input type="checkbox" name="tumor_char" value="hemorragie"> Hémorragie</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Bilan ORL et audiologique</h2>
+
+            <div class="input-group">
+                <label for="audiometryPTA">Seuil tonal moyen - PTA (dB):</label>
+                <input type="number" id="audiometryPTA" min="0" max="120">
+            </div>
+
+            <div class="input-group">
+                <label for="audiometrySDS">Score de discrimination - SDS (%):</label>
+                <input type="number" id="audiometrySDS" min="0" max="100">
+            </div>
+
+            <div class="input-group">
+                <label for="gardnerRobertson">Classification de Gardner-Robertson:</label>
+                <select id="gardnerRobertson">
+                    <option value="">Sélectionner</option>
+                    <option value="1">Grade I - Audition bonne à excellente (PTA ≤ 30 dB, SDS 70-100%)</option>
+                    <option value="2">Grade II - Audition utile (PTA 31-50 dB, SDS 50-69%)</option>
+                    <option value="3">Grade III - Audition non utile (PTA 51-90 dB, SDS 5-49%)</option>
+                    <option value="4">Grade IV - Audition mauvaise (PTA > 90 dB, SDS 1-4%)</option>
+                    <option value="5">Grade V - Surdité totale (PTA non mesurable, SDS 0%)</option>
+                </select>
+                <div class="section-toggle" onclick="toggleContent('gardnerInfo')">Afficher détails de la classification de Gardner-Robertson</div>
+                <div id="gardnerInfo" class="hidden-content">
+                    <h3>Classification de Gardner-Robertson de l'audition</h3>
+                    <table>
+                        <tr>
+                            <th>Grade</th>
+                            <th>Description</th>
+                            <th>Perte tonale moyenne (PTA)</th>
+                            <th>Score de discrimination (SDS)</th>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>Audition bonne à excellente</td>
+                            <td>≤ 30 dB</td>
+                            <td>70-100%</td>
+                        </tr>
+                        <tr>
+                            <td>II</td>
+                            <td>Audition utile</td>
+                            <td>31-50 dB</td>
+                            <td>50-69%</td>
+                        </tr>
+                        <tr>
+                            <td>III</td>
+                            <td>Audition non utile</td>
+                            <td>51-90 dB</td>
+                            <td>5-49%</td>
+                        </tr>
+                        <tr>
+                            <td>IV</td>
+                            <td>Audition mauvaise</td>
+                            <td>> 90 dB</td>
+                            <td>1-4%</td>
+                        </tr>
+                        <tr>
+                            <td>V</td>
+                            <td>Surdité totale</td>
+                            <td>Non mesurable</td>
+                            <td>0%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="houseBrackmann">Classification de House-Brackmann (nerf facial):</label>
+                <select id="houseBrackmann">
+                    <option value="">Sélectionner</option>
+                    <option value="1">Grade I - Fonction normale</option>
+                    <option value="2">Grade II - Dysfonction légère</option>
+                    <option value="3">Grade III - Dysfonction modérée</option>
+                    <option value="4">Grade IV - Dysfonction modérément sévère</option>
+                    <option value="5">Grade V - Dysfonction sévère</option>
+                    <option value="6">Grade VI - Paralysie totale</option>
+                </select>
+                <div class="section-toggle" onclick="toggleContent('hbInfo')">Afficher détails de la classification de House-Brackmann</div>
+                <div id="hbInfo" class="hidden-content">
+                    <h3>Classification de House-Brackmann pour la fonction du nerf facial</h3>
+                    <table>
+                        <tr>
+                            <th>Grade</th>
+                            <th>Description</th>
+                            <th>Caractéristiques</th>
+                        </tr>
+                        <tr>
+                            <td>I</td>
+                            <td>Fonction normale</td>
+                            <td>Mobilité faciale normale, symétrique dans tous les territoires</td>
+                        </tr>
+                        <tr>
+                            <td>II</td>
+                            <td>Dysfonction légère</td>
+                            <td>Légère faiblesse visible au repos, mouvement du front légèrement diminué, asymétrie mineure du sourire</td>
+                        </tr>
+                        <tr>
+                            <td>III</td>
+                            <td>Dysfonction modérée</td>
+                            <td>Asymétrie évidente mais non défigurante, syncinésies légères, occlusion oculaire et mobilité buccale conservées</td>
+                        </tr>
+                        <tr>
+                            <td>IV</td>
+                            <td>Dysfonction modérément sévère</td>
+                            <td>Faiblesse et/ou asymétrie sévère au repos, absence de mouvement frontal, fermeture palpébrale incomplète, asymétrie marquée de la bouche</td>
+                        </tr>
+                        <tr>
+                            <td>V</td>
+                            <td>Dysfonction sévère</td>
+                            <td>Mouvements à peine perceptibles, asymétrie très marquée au repos</td>
+                        </tr>
+                        <tr>
+                            <td>VI</td>
+                            <td>Paralysie totale</td>
+                            <td>Aucun mouvement, perte de tonus, aucune fonction</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="vestibularTests">Évaluation vestibulaire:</label>
+                <div class="radio-group">
+                    <label><input type="checkbox" name="vestibular" value="canal_paresis"> Hyporéflectivité vestibulaire (parésie canalaire)</label>
+                    <label><input type="checkbox" name="vestibular" value="areflexie"> Aréflexie vestibulaire</label>
+                    <label><input type="checkbox" name="vestibular" value="normal"> Tests vestibulaires normaux</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="otherFindings">Autres éléments du bilan:</label>
+                <textarea id="otherFindings" rows="3"></textarea>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Comorbidités et facteurs de risque</h2>
+
+            <div class="input-group">
+                <label for="comorbidities">Comorbidités significatives:</label>
+                <div class="radio-group">
+                    <label><input type="checkbox" name="comorbidity" value="hypertension"> Hypertension artérielle</label>
+                    <label><input type="checkbox" name="comorbidity" value="diabetes"> Diabète</label>
+                    <label><input type="checkbox" name="comorbidity" value="cardiac"> Pathologie cardiaque</label>
+                    <label><input type="checkbox" name="comorbidity" value="nf2"> Neurofibromatose type 2</label>
+                    <label><input type="checkbox" name="comorbidity" value="contralateral"> Hypoacousie controlatérale</label>
+                    <label><input type="checkbox" name="comorbidity" value="bilateral"> Atteinte bilatérale</label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="contraindications">Contre-indications spécifiques:</label>
+                <div class="radio-group">
+                    <label><input type="checkbox" name="contraindication" value="surgery"> Contre-indication à la chirurgie</label>
+                    <label><input type="checkbox" name="contraindication" value="radiosurgery"> Contre-indication à la radiochirurgie</label>
+                </div>
+            </div>
+        </div>
+
+        <button id="analyzeButton" onclick="analyzeCase()">Analyser le cas</button>
+
+        <div id="resultSection">
+            <h2>Recommandations</h2>
+            <div id="recommendationContent" class="recommendation"></div>
+            
+            <div class="tab-container">
+                <div class="tab-header">
+                    <button class="tab-button active" onclick="openTab(event, 'surgeryTab')">Approche chirurgicale</button>
+                    <button class="tab-button" onclick="openTab(event, 'radiosurgeryTab')">Radiochirurgie</button>
+                    <button class="tab-button" onclick="openTab(event, 'watchfulTab')">Surveillance active</button>
+                    <button class="tab-button" onclick="openTab(event, 'combinedTab')">Approche combinée</button>
+                </div>
+                
+                <div id="surgeryTab" class="tab-content active">
+                    <h3>Approche chirurgicale</h3>
+                    <p><strong>Types d'approches chirurgicales :</strong></p>
+                    <ul>
+                        <li><strong>Voie translabyrinthique</strong> : Utilisée quand l'audition est déjà compromise. Offre une bonne exposition de l'angle ponto-cérébelleux mais sacrifie l'audition.</li>
+                        <li><strong>Voie rétrosigmoïdienne</strong> : Peut préserver l'audition dans certains cas. Bonne exposition, mais accès plus limité au fond du conduit auditif interne.</li>
+                        <li><strong>Voie par la fosse moyenne</strong> : Pour petites tumeurs intracanalaires avec préservation possible de l'audition.</li>
+                    </ul>
+                    <p><strong>Indications :</strong></p>
+                    <ul>
+                        <li>Tumeurs volumineuses (Koos III et IV) avec effet de masse</li>
+                        <li>Symptômes neurologiques progressifs</li>
+                        <li>Jeunes patients</li>
+                        <li>Préférence du patient après information des risques et bénéfices</li>
+                    </ul>
+                    <div class="section-toggle" onclick="toggleContent('surgeryPrognosis')">Voir pronostic fonctionnel post-chirurgical</div>
+                    <div id="surgeryPrognosis" class="hidden-content">
+                        <p><strong>Pronostic fonctionnel :</strong></p>
+                        <ul>
+                            <li><strong>Nerf facial</strong> : Préservation anatomique dans 90-95% des cas pour tumeurs < 2cm. Récupération fonctionnelle généralement bonne pour grades I-III de House-Brackmann.</li>
+                            <li><strong>Audition</strong> : Préservation possible dans 30-50% des cas pour petites tumeurs avec audition préopératoire bonne (Gardner-Robertson I-II).</li>
+                            <li><strong>Fonction vestibulaire</strong> : Une compensation centrale se produit généralement en quelques semaines à quelques mois.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="radiosurgeryTab" class="tab-content">
+                    <h3>Radiochirurgie stéréotaxique (Gamma Knife)</h3>
+                    <p><strong>Principes :</strong></p>
+                    <p>La radiochirurgie délivre une dose unique et précise de radiation (généralement 12-13 Gy) sur la tumeur, visant à arrêter sa croissance plutôt qu'à la détruire.</p>
+                    <p><strong>Indications :</strong></p>
+                    <ul>
+                        <li>Tumeurs de petite à moyenne taille (< 3cm, idéalement < 2cm)</li>
+                        <li>Patients âgés ou avec comorbidités significatives</li>
+                        <li>Patients refusant la chirurgie</li>
+                        <li>Croissance documentée lors d'une surveillance</li>
+                    </ul>
+                    <div class="section-toggle" onclick="toggleContent('radiosurgeryResults')">Voir résultats et complications</div>
+                    <div id="radiosurgeryResults" class="hidden-content">
+                        <p><strong>Résultats attendus :</strong></p>
+                        <ul>
+                            <li><strong>Contrôle tumoral</strong> : 93-97% à 10 ans</li>
+                            <li><strong>Préservation du nerf facial</strong> : 95-98%</li>
+                            <li><strong>Préservation de l'audition</strong> : 50-70% à 5 ans chez les patients avec audition utile préalable</li>
+                        </ul>
+                        <p><strong>Complications possibles :</strong></p>
+                        <ul>
+                            <li>Œdème transitoire (généralement sans symptômes)</li>
+                            <li>Gonflement tumoral transitoire (pseudoprogression)</li>
+                            <li>Perte auditive progressive</li>
+                            <li>Rare : neuropathie trigéminale ou faciale</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="watchfulTab" class="tab-content">
+                    <h3>Surveillance active ("Wait and Scan")</h3>
+                    <p><strong>Principes :</strong></p>
+                    <p>La surveillance active implique un suivi régulier par IRM et examens audiologiques pour surveiller la croissance tumorale et les symptômes.</p>
+                    <p><strong>Indications :</strong></p>
+                    <ul>
+                        <li>Petites tumeurs intracanalaires asymptomatiques</li>
+                        <li>Patients âgés</li>
+                        <li>Tumeurs de découverte fortuite</li>
+                        <li>Patients avec comorbidités importantes</li>
+                    </ul>
+                    <div class="section-toggle" onclick="toggleContent('watchfulProtocol')">Voir protocole de surveillance</div>
+                    <div id="watchfulProtocol" class="hidden-content">
+                        <p><strong>Protocole de surveillance :</strong></p>
+                        <ul>
+                            <li>IRM initiale au diagnostic</li>
+                            <li>Suivi IRM à 6 mois</li>
+                            <li>Puis annuellement pendant 5 ans</li>
+                            <li>Si stabilité, tous les 2 ans ensuite</li>
+                            <li>Audiométrie annuelle</li>
+                            <li>Réévaluation en cas de croissance > 2mm/an ou apparition/aggravation des symptômes</li>
+                        </ul>
+                        <p><strong>Évolution naturelle :</strong></p>
+                        <ul>
+                            <li>30-40% des schwannomes vestibulaires ne montrent pas de croissance significative</li>
+                            <li>Taux de croissance moyen : 1-2 mm/an quand ils évoluent</li>
+                            <li>Risque de perte auditive progressive même sans croissance tumorale</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="combinedTab" class="tab-content">
+                    <h3>Approche combinée</h3>
+                    <p><strong>Principes :</strong></p>
+                    <p>L'approche combinée consiste en une résection chirurgicale partielle suivie d'une radiochirurgie sur le reliquat tumoral.</p>
+                    <p><strong>Indications :</strong></p>
+                    <ul>
+                        <li>Volumineuses tumeurs (Koos IV) où la préservation nerveuse totale est difficile</li>
+                        <li>Situations où on privilégie le maintien de la fonction faciale</li>
+                        <li>Cas spécifiques avec anatomie complexe</li>
+                        <li>Rechutes après traitement initial</li>
+                    </ul>
+                    <div class="section-toggle" onclick="toggleContent('combinedStrategy')">Voir stratégie combinée</div>
+                    <div id="combinedStrategy" class="hidden-content">
+                        <p><strong>Avantages de l'approche combinée :</strong></p>
+                        <ul>
+                            <li>Réduction de l'effet de masse en cas de tumeur volumineuse</li>
+                            <li>Meilleure préservation de la fonction du nerf facial</li>
+                            <li>Option pour les tumeurs à composante kystique</li>
+                            <li>Confirmation histologique</li>
+                        </ul>
+                        <p><strong>Protocole :</strong></p>
+                        <ul>
+                            <li>Chirurgie visant une exérèse maximale tout en préservant l'intégrité nerveuse</li>
+                            <li>IRM post-opératoire à 3-6 mois</li>
+                            <li>Radiochirurgie sur le reliquat en cas de stabilité</li>
+                            <li>Suivi combiné au long terme</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleContent(id) {
+            const content = document.getElementById(id);
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+        
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].className = tabContents[i].className.replace(" active", "");
+            }
+            
+            const tabButtons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].className = tabButtons[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(tabName).className += " active";
+            evt.currentTarget.className += " active";
+        }
+        
+        function getCheckedValues(name) {
+            const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+            const values = [];
+            checkboxes.forEach(checkbox => {
+                values.push(checkbox.value);
+            });
+            return values;
+        }
+        
+        function analyzeCase() {
+            // Récupération des données du formulaire
+            const age = parseInt(document.getElementById("patientAge").value) || 0;
+            const koosGrade = document.getElementById("koosGrade").value;
+            const tumorSize = parseInt(document.getElementById("tumorSize").value) || 0;
+            const gardnerRobertson = document.getElementById("gardnerRobertson").value;
+            const houseBrackmann = document.getElementById("houseBrackmann").value;
+            const symptoms = getCheckedValues("symptoms");
+            const comorbidities = getCheckedValues("comorbidity");
+            const contraindications = getCheckedValues("contraindication");
+            const vestibularTests = getCheckedValues("vestibular");
+            const tumorCharacteristics = getCheckedValues("tumor_char");
+            
+            // Logique de recommandation
+            let recommendation = "";
+            let approachType = "";
+            
+            // Évaluation de base sur la classification de Koos
+            if (koosGrade === "1") {
+                // Tumeur intracanalaire (Koos I)
+                if (age > 65 || comorbidities.includes("contralateral") || contraindications.includes("surgery")) {
+                    recommendation = "Surveillance active (Wait and Scan) recommandée";
+                    approachType = "watchful";
+                    
+                    if (symptoms.includes("hearing_loss") && (gardnerRobertson === "3" || gardnerRobertson === "4")) {
+                        recommendation += " ou radiochirurgie selon l'évolution des symptômes";
+                        approachType += "+radiosurgery";
+                    }
+                } else if (symptoms.length > 2 || symptoms.includes("vertigo") || symptoms.includes("facial")) {
+                    if (gardnerRobertson === "1" || gardnerRobertson === "2") {
+                        recommendation = "Chirurgie avec préservation de l'audition par voie rétrosigmoïdienne recommandée";
+                        approachType = "surgery";
+                    } else {
+                        recommendation = "Radiochirurgie (Gamma Knife) recommandée";
+                        approachType = "radiosurgery";
+                    }
+                } else {
+                    recommendation = "Surveillance active (Wait and Scan) recommandée initialement avec contrôle IRM à 6 mois";
+                    approachType = "watchful";
+                }
+            } else if (koosGrade === "2") {
+                // Tumeur Koos II
+                if (age > 70 || comorbidities.includes("contralateral") || contraindications.includes("surgery")) {
+                    recommendation = "Radiochirurgie (Gamma Knife) recommandée";
+                    approachType = "radiosurgery";
+                } else if (symptoms.includes("hearing_loss") && (gardnerRobertson === "1" || gardnerRobertson === "2")) {
+                    recommendation = "Chirurgie par voie rétrosigmoïdienne avec tentative de préservation de l'audition";
+                    approachType = "surgery";
+                } else if (gardnerRobertson === "3" || gardnerRobertson === "4" || gardnerRobertson === "5") {
+                    recommendation = "Chirurgie par voie translabyrinthique ou radiochirurgie";
+                    approachType = "surgery+radiosurgery";
+                } else {
+                    recommendation = "Radiochirurgie (Gamma Knife) ou surveillance active selon les préférences du patient";
+                    approachType = "radiosurgery+watchful";
+                }
+            } else if (koosGrade === "3") {
+                // Tumeur Koos III
+                if (age > 75 || contraindications.includes("surgery")) {
+                    if (tumorSize <= 30) {
+                        recommendation = "Radiochirurgie (Gamma Knife) recommandée";
+                        approachType = "radiosurgery";
+                    } else {
+                        recommendation = "Approche combinée: chirurgie de réduction puis radiochirurgie sur le reliquat";
+                        approachType = "combined";
+                    }
+                } else if (age < 60 && !contraindications.includes("surgery")) {
+                    recommendation = "Chirurgie d'exérèse recommandée";
+                    approachType = "surgery";
+                    
+                    if (gardnerRobertson === "1" || gardnerRobertson === "2") {
+                        recommendation += " par voie rétrosigmoïdienne avec monitoring du nerf cochléaire";
+                    } else {
+                        recommendation += " par voie translabyrinthique";
+                    }
+                } else {
+                    if (tumorSize <= 25) {
+                        recommendation = "Radiochirurgie (Gamma Knife) recommandée";
+                        approachType = "radiosurgery";
+                    } else {
+                        recommendation = "Chirurgie d'exérèse par voie translabyrinthique recommandée";
+                        approachType = "surgery";
+                    }
+                }
+            } else if (koosGrade === "4") {
+                // Tumeur Koos IV
+                if (age > 80 || contraindications.includes("surgery")) {
+                    recommendation = "Approche combinée: chirurgie de réduction puis radiochirurgie sur le reliquat";
+                    approachType = "combined";
+                } else {
+                    recommendation = "Chirurgie d'exérèse par voie translabyrinthique recommandée";
+                    approachType = "surgery";
+                    
+                    if (tumorSize > 35 || tumorCharacteristics.includes("kystique")) {
+                        recommendation += ". Envisager éventuellement une exérèse subtotale avec préservation du nerf facial puis radiochirurgie sur le reliquat";
+                        approachType += "+combined";
+                    }
+                }
+            } else {
+                recommendation = "Veuillez compléter les informations essentielles (classification de Koos) pour obtenir une recommandation précise.";
+            }
+            
+            // Ajustements basés sur d'autres facteurs
+            if (comorbidities.includes("nf2")) {
+                recommendation += "<br><br><strong>NB: Cas de neurofibromatose de type 2</strong>: Une prise en charge multidisciplinaire spécialisée est recommandée, avec considération particulière pour la préservation de l'audition. Un traitement médical par bevacizumab peut être envisagé.";
+            }
+            
+            if (comorbidities.includes("bilateral")) {
+                recommendation += "<br><br><strong>NB: Atteinte bilatérale</strong>: La préservation de l'audition devient prioritaire. Une approche séquentielle est recommandée, avec traitement initial du côté le plus symptomatique ou de la tumeur la plus volumineuse.";
+            }
+            
+            if (houseBrackmann !== "" && parseInt(houseBrackmann) >= 3) {
+                recommendation += "<br><br><strong>NB: Atteinte faciale préexistante</strong>: La préservation du nerf facial devient prioritaire dans la stratégie thérapeutique.";
+            }
+            
+            // Affichage des résultats
+            document.getElementById("resultSection").style.display = "block";
+            document.getElementById("recommendationContent").innerHTML = `
+                <h3>Recommandation principale</h3>
+                <p>${recommendation}</p>
+                
+                <h3>Paramètres principaux considérés</h3>
+                <ul>
+                    <li>Âge: ${age > 0 ? age + " ans" : "Non spécifié"}</li>
+                    <li>Classification de Koos: ${koosGrade ? "Grade " + koosGrade : "Non spécifiée"}</li>
+                    <li>Taille tumorale: ${tumorSize > 0 ? tumorSize + " mm" : "Non spécifiée"}</li>
+                    <li>Fonction auditive: ${gardnerRobertson ? "Gardner-Robertson grade " + gardnerRobertson : "Non spécifiée"}</li>
+                    <li>Fonction faciale: ${houseBrackmann ? "House-Brackmann grade " + houseBrackmann : "Non spécifiée"}</li>
+                </ul>
+                
+                <p><strong>Note:</strong> Cette recommandation est basée sur les dernières données scientifiques, mais doit être adaptée à chaque patient individuellement. Une décision multidisciplinaire et l'information éclairée du patient restent essentielles.</p>
+            `;
+            
+            // Activation de l'onglet correspondant à la recommandation
+            if (approachType.includes("surgery") && !approachType.includes("combined")) {
+                openTab({currentTarget: document.querySelector('.tab-button[onclick*="surgeryTab"]')}, 'surgeryTab');
+            } else if (approachType.includes("radiosurgery") && !approachType.includes("combined")) {
+                openTab({currentTarget: document.querySelector('.tab-button[onclick*="radiosurgeryTab"]')}, 'radiosurgeryTab');
+            } else if (approachType.includes("watchful")) {
+                openTab({currentTarget: document.querySelector('.tab-button[onclick*="watchfulTab"]')}, 'watchfulTab');
+            } else if (approachType.includes("combined")) {
+                openTab({currentTarget: document.querySelector('.tab-button[onclick*="combinedTab"]')}, 'combinedTab');
+            }
+        }
+    </script>
+    
+    <footer>
+        © 2025 NeurosurgerySpine.healthcenter. Développé par Dr Lubansu. Tous droits réservés.
+    </footer>
+</body>
+</html>
