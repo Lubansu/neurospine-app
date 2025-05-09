@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Classification OMS 2021 des Tumeurs Cérébrales</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+        
+        .main-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 0.8rem;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .header-title {
+            margin-top: 5px;
+            font-size: 1.1em;
+            padding: 0.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .age-selector {
+            background-color: white;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        h1, h2, h3 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: white;
+            font-size: 16px;
+            width: 60%;
+        }
+
+        .tab {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #bdc3c7;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .tab-btn {
+            background-color: #f5f5f5;
+            color: var(--secondary-color);
+            border: none;
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-bottom: -1px;
+            transition: all 0.3s;
+            flex-grow: 1;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background-color: #e9e9e9;
+        }
+
+        .tab-btn.active {
+            background-color: white;
+            border-color: #bdc3c7;
+            border-bottom: 2px solid white;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            min-width: 600px; /* Pour permettre le défilement horizontal */
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: var(--light-color);
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .tumor-type {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .molecular-feature {
+            color: var(--danger-color);
+        }
+
+        .treatment {
+            color: var(--success-color);
+        }
+
+        .treatment-card {
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+
+        .warning {
+            background-color: #fff3e0;
+            border-left: 4px solid var(--warning-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        /* Améliorations spécifiques pour mobile */
+        @media (max-width: 768px) {
+            .main-header {
+                font-size: 1.5rem;
+                padding: 0.6rem;
+            }
+            
+            .header-title h1 {
+                font-size: 1.2rem;
+            }
+            
+            .container {
+                padding: 8px;
+            }
+            
+            .tab {
+                padding: 10px;
+            }
+            
+            .tab-btn {
+                padding: 0.5rem 0.4rem;
+                font-size: 0.8rem;
+            }
+            
+            p, li {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 6px;
+                font-size: 0.8rem;
+            }
+            
+            .treatment-card, .warning {
+                padding: 0.8rem;
+            }
+            
+            /* Indicateur de défilement pour les tableaux */
+            .tab::after {
+                content: "← Faites défiler →";
+                display: block;
+                text-align: center;
+                color: #777;
+                padding: 5px;
+                font-size: 0.7rem;
+                font-style: italic;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="main-header">
+            NeurosurgerySpinehealthcenter
+        </div>
+        <div class="header-title">
+            <h1 id="main-title">Classification OMS 2021 des Tumeurs Cérébrales</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <div class="age-selector">
+                <label for="age-group" id="age-group-label">Groupe d'âge :</label>
+                <select id="age-group" onchange="changeAgeGroup()">
+                    <option value="adult" selected>Adulte</option>
+                    <option value="pediatric">Pédiatrique</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="showSection('classification')">Classification</button>
+            <button class="tab-btn" onclick="showSection('meningiomes')">Méningiomes</button>
+            <button class="tab-btn" onclick="showSection('molecular')">Marqueurs Moléculaires</button>
+            <button class="tab-btn" onclick="showSection('treatment')">Stratégies Thérapeutiques</button>
+        </div>
+
+        <!-- Section Classification -->
+        <div id="classification-section" class="tab active">
+            <!-- Adulte -->
+            <div id="adult" class="tab active">
+                <h2>Classification des Tumeurs Cérébrales chez l'Adulte</h2>
+                <p>La nouvelle classification de l'OMS 2021 des tumeurs du système nerveux central utilise une approche intégrée qui combine des caractéristiques histologiques et moléculaires.</p>
+                
+                <h3>Gliomes Diffus de Type Adulte</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type de Tumeur</th>
+                            <th>Caractéristiques Moléculaires</th>
+                            <th>Grade</th>
+                            <th>Traitement et Pronostic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tumor-type">Glioblastome, IDH-sauvage</td>
+                            <td>Chromosomes +7/-10, amplification d'EGFR, mutations du promoteur TERT, souvent méthylation du promoteur MGMT</td>
+                            <td>4</td>
+                            <td>Résection chirurgicale et radiothérapie ± thérapie adjuvante alkylante. La méthylation du promoteur MGMT prédit une meilleure réponse au traitement</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Astrocytome diffus, IDH-muté</td>
+                            <td>IDH1/2, ATRX, TP53, CDKN2A</td>
+                            <td>2-4 (selon nécrose, mitoses, prolifération microvasculaire et délétion de CDKN2A)</td>
+                            <td>Résection chirurgicale et radiothérapie ± thérapie alkylante. Évolution plus indolente que le glioblastome IDH-sauvage, mais la délétion de CDKN2A prédit un mauvais pronostic</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Oligodendrogliome, IDH-muté et 1p/19q co-délété</td>
+                            <td>IDH1/2, co-délétion 1p/19q, promoteur TERT, CIC, NOTCH1, FUBP1</td>
+                            <td>2-3 (selon présence d'anaplasie, nécrose, prolifération microvasculaire et mitoses)</td>
+                            <td>Résection et radiothérapie ± thérapie PCV. Évolution indolente, similaire aux gliomes IDH-mutés</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Gliomes Astrocytiques Circonscrits</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type de Tumeur</th>
+                            <th>Caractéristiques Moléculaires</th>
+                            <th>Grade</th>
+                            <th>Traitement et Pronostic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tumor-type">Astrocytome pilocytique</td>
+                            <td>Fusion KIAA1549-BRAF, NF1, BRAF V600E</td>
+                            <td>1</td>
+                            <td>Bon pronostic après résection complète</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Astrocytome subépendymaire à cellules géantes</td>
+                            <td>TSC1, TSC2</td>
+                            <td>1</td>
+                            <td>Inhibiteurs de mTOR, résection</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Xanthoastrocytome pléomorphe</td>
+                            <td>BRAF V600E, CDKN2A/B</td>
+                            <td>2-3</td>
+                            <td>Résection chirurgicale maximale. Récurrence et progression non inhabituelle</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Gliome chordoïde</td>
+                            <td>PRKCA D463H</td>
+                            <td>2-3</td>
+                            <td>Résection chirurgicale maximale ± radiothérapie</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Astroblastome, MN1-altéré</td>
+                            <td>MN1</td>
+                            <td>Non établi</td>
+                            <td>Résection ± chimiothérapie/radiothérapie. Récurrence locale fréquente, mais bon pronostic global</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Astrocytome de haut grade avec caractéristiques piloïdes</td>
+                            <td>CDKN2A/B, NF1, BRAF, ATRX</td>
+                            <td>Non définitivement établi, mais généralement compatible avec le grade 3 de l'OMS</td>
+                            <td>Résection ± chimiothérapie/radiothérapie. Pronostic intermédiaire entre l'astrocytome de grade 3 et 4 IDH-muté</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Tumeurs Épendymaires</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type de Tumeur</th>
+                            <th>Caractéristiques Moléculaires</th>
+                            <th>Grade</th>
+                            <th>Traitement et Pronostic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tumor-type">Épendymome supratentoriel, ZFTA fusion-positif</td>
+                            <td>Fusions ZFTA, le plus souvent avec RELA. Altérations CDKN2A/B fréquemment présentes</td>
+                            <td>2-3</td>
+                            <td>Agressif, surtout en présence de délétion CDKN2A/B</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Épendymome supratentoriel, YAP1 fusion-positif</td>
+                            <td>Fusions YAP1, le plus souvent avec MAMLD1</td>
+                            <td>2-3</td>
+                            <td>Plus indolent que les épendymomes à fusion ZFTA. Bon pronostic après résection</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Épendymome de la fosse postérieure groupe A (PFA)</td>
+                            <td>Surexpression EZHIP, perte de H3K27Me3</td>
+                            <td>2-3</td>
+                            <td>Bon pronostic après résection complète. Un gain 1q et une résection incomplète indiquent un mauvais pronostic</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Épendymome de la fosse postérieure groupe B (PFB)</td>
+                            <td>Monosomie 6, trisomie 18, perte du chromosome 22q</td>
+                            <td>2-3</td>
+                            <td>La résection incomplète et la perte de 13q indiquent un mauvais pronostic</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Épendymome spinal</td>
+                            <td>NF2, amplification MYCN</td>
+                            <td>2-3</td>
+                            <td>Pronostic bon après résection mais mauvais si amplification MYCN présente</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pédiatrique -->
+            <div id="pediatric" class="tab">
+                <h2>Classification des Tumeurs Cérébrales Pédiatriques</h2>
+                <p>La classification OMS 2021 reconnaît désormais des entités tumorales spécifiques à l'enfant, distinctes de celles de l'adulte.</p>
+                
+                <h3>Gliomes Diffus de Type Pédiatrique de Bas Grade</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type de Tumeur</th>
+                            <th>Caractéristiques Moléculaires</th>
+                            <th>Grade</th>
+                            <th>Traitement et Pronostic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tumor-type">Astrocytome diffus, MYB- ou MYBL1-altéré</td>
+                            <td>Fusions MYB ou MYBL1 impliquant PCDHGA1, MMP16, ou MAML2</td>
+                            <td>1</td>
+                            <td>Pronostic généralement bon après résection</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Gliome angiocentrique</td>
+                            <td>Fusions MYB (généralement avec QKI)</td>
+                            <td>1</td>
+                            <td>Pronostic généralement bon après résection</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Tumeur neuroépithéliale polymorphe de bas grade du jeune (PLNTY)</td>
+                            <td>BRAF V600E, FGFR2/3, NTRK</td>
+                            <td>1</td>
+                            <td>Généralement bon pronostic après résection, mais certaines données soutiennent la thérapie ciblée</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Gliome diffus de bas grade, MAPK pathway-altéré</td>
+                            <td>BRAF V600E, FGFR1</td>
+                            <td>1</td>
+                            <td>Généralement bon pronostic après résection, mais certaines données soutiennent la thérapie ciblée</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Gliomes Diffus de Type Pédiatrique de Haut Grade</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type de Tumeur</th>
+                            <th>Caractéristiques Moléculaires</th>
+                            <th>Grade</th>
+                            <th>Traitement et Pronostic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tumor-type">Gliome diffus de la ligne médiane, H3 K27-altéré</td>
+                            <td>H3K27, TP53, EZHIP, EGFR, PDGFRA</td>
+                            <td>4</td>
+                            <td>Généralement mauvais pronostic. Radiothérapie et chimiothérapie alkylante sont standard</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Gliome hémisphérique diffus, H3 G34-muté</td>
+                            <td>H3G34, TP53, ATRX</td>
+                            <td>4</td>
+                            <td>Résection, radiothérapie et chimiothérapie alkylante standard</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Gliome de haut grade de type pédiatrique, H3-sauvage et IDH-sauvage</td>
+                            <td>PDGFRA (RTK1), EGFR/TERT promoteur (RTK2), amplification MYCN (pHGG MYCN)</td>
+                            <td>4</td>
+                            <td>Thérapie standard similaire à celle ci-dessus. Mauvais pronostic même lorsque le promoteur MGMT est méthylé</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Gliome hémisphérique de type infantile</td>
+                            <td>Famille NTRK, ROS, ALK, MET</td>
+                            <td>4</td>
+                            <td>Meilleur pronostic que les autres pHGG en raison de l'efficacité des thérapies ciblées</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Tumeurs Embryonnaires</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type de Tumeur</th>
+                            <th>Caractéristiques Moléculaires</th>
+                            <th>Grade</th>
+                            <th>Traitement et Pronostic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="tumor-type">Médulloblastome, WNT-activé</td>
+                            <td>CTNNB1 et monosomie 6, APC</td>
+                            <td>4</td>
+                            <td>Excellent avec thérapie. Des protocoles de radiation réduite peuvent être envisagés</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Médulloblastome, SHH-activé et TP53-sauvage</td>
+                            <td>PTCH1, SUFU, SMO, MYCN</td>
+                            <td>4</td>
+                            <td>Intermédiaire, mauvais si amplification MYCN présente</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Médulloblastome, SHH-activé et TP53-muté</td>
+                            <td>PTCH1, SUFU, SMO, TP53, MYCN</td>
+                            <td>4</td>
+                            <td>Mauvais pronostic</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Médulloblastome, non-WNT/non-SHH</td>
+                            <td>Séparé en 8 sous-groupes par profilage de méthylation</td>
+                            <td>4</td>
+                            <td>Les groupes 6 et 7 ont le meilleur pronostic. Les groupes 2, 3 et 8 ont le pire</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Tumeur Teratoïde/Rhabdoïde Atypique</td>
+                            <td>SMARCB1/INI1, SMARCA4</td>
+                            <td>4</td>
+                            <td>Mauvais pronostic</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Tumeur Neuroépithéliale Cribriforme</td>
+                            <td>SMARCB1/INI1</td>
+                            <td>4</td>
+                            <td>Meilleure réponse à la thérapie que AT/RT et bonne survie globale</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Tumeur embryonnaire avec rosettes multicouches</td>
+                            <td>C19MC, DICER1</td>
+                            <td>4</td>
+                            <td>Évolution agressive avec des temps de survie d'environ 1 an même avec une thérapie intensive</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Neuroblastome du SNC, FOXR2-activé</td>
+                            <td>FOXR2</td>
+                            <td>4</td>
+                            <td>Nouvelle entité avec des données de survie limitées</td>
+                        </tr>
+                        <tr>
+                            <td class="tumor-type">Tumeur du SNC avec duplications en tandem internes BCOR</td>
+                            <td>BCOR</td>
+                            <td>4</td>
+                            <td>Nouvelle entité avec des données de survie limitées</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section Méningiomes (Nouvelle Section) -->
+        <div id="meningiomes-section" class="tab">
+            <h2>Classification des Méningiomes - OMS 2021</h2>
+            <p>Les méningiomes représentent environ 30% de toutes les tumeurs cérébrales primaires. La classification OMS 2021 intègre des caractéristiques histologiques et moléculaires pour définir les sous-types de méningiomes.</p>
+            
+            <h3>Classification des Méningiomes par Grade</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Grade</th>
+                        <th>Sous-types histologiques</th>
+                        <th>Caractéristiques moléculaires</th>
+                        <th>Risque de récidive et comportement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="tumor-type">Grade 1 (Bénin)</td>
+                        <td>
+                            <ul>
+                                <li>Méningiome méningothélial</li>
+                                <li>Méningiome fibroblastique</li>
+                                <li>Méningiome transitionnel</li>
+                                <li>Méningiome psammomateux</li>
+                                <li>Méningiome angiomateux</li>
+                                <li>Méningiome microkystique</li>
+                                <li>Méningiome sécrétoire</li>
+                                <li>Méningiome lymphoplasmocytaire</li>
+                                <li>Méningiome métaplasique</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>Mutations NF2 (40-60%)</li>
+                                <li>Mutations KLF4/TRAF7 (méningiome sécrétoire)</li>
+                                <li>Mutations AKT1 (méningothélial)</li>
+                                <li>Mutations SMO (base du crâne)</li>
+                                <li>Inactivation du CDKN2A/B rare</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>Faible risque de récidive (7-25% à 10 ans)</li>
+                                <li>Croissance lente</li>
+                                <li>Bon pronostic après résection complète</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tumor-type">Grade 2 (Atypique)</td>
+                        <td>
+                            <ul>
+                                <li>Méningiome atypique</li>
+                                <li>Méningiome à cellules claires</li>
+                                <li>Méningiome chordoïde</li>
+                            </ul>
+                            <p><strong>Critères histologiques:</strong></p>
+                            <ul>
+                                <li>Activité mitotique accrue (4-19 mitoses/10 HPF)</li>
+                                <li>Invasion du cerveau</li>
+                                <li>≥ 3 des critères suivants: hypercellularité, architecture en nappes, nécrose, nucléole proéminent, cellules petites</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>Mutations NF2 plus fréquentes (60-80%)</li>
+                                <li>Gain chromosomique 1q, 9q, 12q, 14q, 15q, 17q, 20q</li>
+                                <li>Perte chromosomique 1p, 6q, 10q, 14q, 18q</li>
+                                <li>Inactivation CDKN2A/B (15%)</li>
+                                <li>Signature méthylation de classe A ou B</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>Risque de récidive intermédiaire (30-55% à 10 ans)</li>
+                                <li>Potentiel de croissance accéléré</li>
+                                <li>Bénéfice potentiel de la radiothérapie adjuvante après résection incomplète</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="tumor-type">Grade 3 (Anaplasique)</td>
+                        <td>
+                            <ul>
+                                <li>Méningiome anaplasique/malin</li>
+                                <li>Méningiome rhabdoïde</li>
+                                <li>Méningiome papillaire</li>
+                            </ul>
+                            <p><strong>Critères histologiques:</strong></p>
+                            <ul>
+                                <li>Activité mitotique élevée (≥20 mitoses/10 HPF)</li>
+                                <li>Caractéristiques histologiques de malignité franche</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>Monosomie 22/altérations NF2 (75-90%)</li>
+                                <li>Inactivation CDKN2A/B (40-60%)</li>
+                                <li>Altérations TERT (20-30%)</li>
+                                <li>Altérations TP53 et RB1</li>
+                                <li>Instabilité chromosomique marquée</li>
+                                <li>Gain/amplification chromosomes 1q, 17q23</li>
+                                <li>Signature méthylation classe C</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                <li>Haut risque de récidive (60-100% à 10 ans)</li>
+                                <li>Croissance rapide et comportement agressif</li>
+                                <li>Capacité d'invasion locale et infiltration cérébrale</li>
+                                <li>Radiothérapie adjuvante souvent indiquée</li>
+                                <li>Survie à 5 ans: 30-60%</li>
+                                <li>Potentiel métastatique rare</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Stratification du Risque Moléculaire</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Classe de méthylation</th>
+                        <th>Caractéristiques moléculaires</th>
+                        <th>Pronostic</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Classe bénigne A</td>
+                        <td>Profil de méthylation favorable</td>
+                        <td>Excellent pronostic quel que soit le grade histologique</td>
+                    </tr>
+                    <tr>
+                        <td>Classe intermédiaire B</td>
+                        <td>Profil de méthylation intermédiaire</td>
+                        <td>Risque intermédiaire de progression et de récidive</td>
+                    </tr>
+                    <tr>
+                        <td>Classe maligne C</td>
+                        <td>Profil de méthylation défavorable, souvent associé à l'inactivation de CDKN2A/B</td>
+                        <td>Haut risque de progression et de récidive, même pour les méningiomes histologiquement bénins ou atypiques</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Facteurs de Risque pour les Méningiomes</h3>
+            <div class="treatment-card">
+                <h4>Facteurs de Risque Cliniques</h4>
+                <ul>
+                    <li>Age avancé (incidence augmente avec l'âge)</li>
+                    <li>Sexe féminin (ratio F:M = 2:1 pour les méningiomes de grade 1)</li>
+                    <li>Exposition aux radiations ionisantes (risque relatif x8-x10)</li>
+                    <li>Prédisposition génétique (NF2, syndrome de Li-Fraumeni)</li>
+                    <li>Hormones (augmentation pendant la grossesse, récepteurs hormonaux)</li>
+                    <li>Traumatisme crânien (association controversée)</li>
+                </ul>
+            </div>
+
+            <h3>Stratégies Thérapeutiques pour les Méningiomes</h3>
+            <div class="treatment-card">
+                <h4>Méningiome Grade 1</h4>
+                <p><strong>Traitement de première ligne:</strong></p>
+                <ul>
+                    <li>Chirurgie: résection complète (Simpson I-III) si possible</li>
+                    <li>Observation pour les méningiomes asymptomatiques, petits ou de localisation difficile</li>
+                    <li>Radiothérapie: généralement réservée aux récidives ou résections incomplètes symptomatiques</li>
+                </ul>
+                <p><strong>Surveillance:</strong> IRM tous les 6-12 mois pendant 5 ans, puis annuellement</p>
+            </div>
+            
+            <div class="treatment-card">
+                <h4>Méningiome Grade 2</h4>
+                <p><strong>Traitement de première ligne:</strong></p>
+                <ul>
+                    <li>Chirurgie: résection maximale</li>
+                    <li>Radiothérapie adjuvante recommandée en cas de résection incomplète (Simpson IV-V)</li>
+                    <li>Radiothérapie adjuvante à considérer même après résection complète (controverse)</li>
+                    <li>Radiochirurgie stéréotaxique pour les petites lésions résiduelles ou récidivantes</li>
+                </ul>
+                <p><strong>Surveillance:</strong> IRM tous les 3-6 mois pendant 2-3 ans, puis tous les 6-12 mois</p>
+            </div>
+            
+            <div class="treatment-card">
+                <h4>Méningiome Grade 3</h4>
+                <p><strong>Traitement de première ligne:</strong></p>
+                <ul>
+                    <li>Chirurgie: résection maximale</li>
+                    <li>Radiothérapie adjuvante recommandée quel que soit le degré de résection</li>
+                    <li>Dose recommandée: 54-60 Gy</li>
+                </ul>
+                <p><strong>Options pour les récidives:</strong></p>
+                <ul>
+                    <li>Réintervention chirurgicale si possible</li>
+                    <li>Radiothérapie/radiochirurgie si non irradié précédemment</li>
+                    <li>Traitement systémique à considérer: inhibiteurs de la somatostatine, inhibiteurs du VEGF (bevacizumab), inhibiteurs mTOR (everolimus)</li>
+                    <li>Inclure le patient dans un essai clinique si possible</li>
+                </ul>
+                <p><strong>Surveillance:</strong> IRM tous les 3 mois pendant 2 ans, puis tous les 4-6 mois</p>
+            </div>
+
+            <div class="warning">
+                <p><strong>Points clés:</strong> Les facteurs prédictifs de récidive pour les méningiomes incluent le grade histologique, l'étendue de la résection (échelle de Simpson), la localisation, l'index Ki-67/MIB-1 élevé, et le profil moléculaire défavorable (Classe C, inactivation CDKN2A/B, altérations TERT).</p>
+            </div>
+        </div>
+
+        <!-- Section Marqueurs Moléculaires -->
+        <div id="molecular-section" class="tab">
+            <h3>Principaux Marqueurs Moléculaires</h3>
+            <p>Les marqueurs moléculaires sont désormais essentiels pour le diagnostic et la prise en charge thérapeutique des tumeurs cérébrales.</p>
+            
+            <table class="tumor-table">
+                <tr>
+                    <th>Marqueur</th>
+                    <th>Signification</th>
+                    <th>Implications pronostiques</th>
+                </tr>
+                <tr>
+                    <td>Mutation IDH1/2</td>
+                    <td>Mutation des gènes de l'isocitrate déshydrogénase</td>
+                    <td>Meilleur pronostic pour les gliomes IDH-mutés</td>
+                </tr>
+                <tr>
+                    <td>Codélétion 1p/19q</td>
+                    <td>Perte du bras court du chromosome 1 et du bras long du chromosome 19</td>
+                    <td>Signature moléculaire des oligodendrogliomes, meilleure sensibilité à la chimiothérapie</td>
+                </tr>
+                <tr>
+                    <td>MGMT méthylé</td>
+                    <td>Méthylation du promoteur du gène MGMT</td>
+                    <td>Meilleure réponse au témozolomide</td>
+                </tr>
+                <tr>
+                    <td>Mutation H3 K27M</td>
+                    <td>Mutation de l'histone H3 en position K27</td>
+                    <td>Pronostic défavorable, résistance aux traitements conventionnels</td>
+                </tr>
+                <tr>
+                    <td>TERT promoteur</td>
+                    <td>Mutations du promoteur de la télomérase</td>
+                    <td>Fréquent dans les glioblastomes et oligodendrogliomes</td>
+                </tr>
+                <tr>
+                    <td>NF2</td>
+                    <td>Gène suppresseur de tumeur sur le chromosome 22q</td>
+                    <td>Fréquemment muté dans les méningiomes, surtout ceux de grade élevé</td>
+                </tr>
+                <tr>
+                    <td>CDKN2A/B</td>
+                    <td>Gènes suppresseurs de tumeur impliqués dans la régulation du cycle cellulaire</td>
+                    <td>L'inactivation prévoit un comportement agressif dans de nombreuses tumeurs cérébrales</td>
+                </tr>
+                <tr>
+                    <td>H3 G34</td>
+                    <td>Mutation de l'histone H3 en position G34</td>
+                    <td>Associée aux gliomes pédiatriques de haut grade, pronostic défavorable</td>
+                </tr>
+            </table>
+            
+            <div class="warning">
+                <p><strong>Note importante:</strong> L'analyse moléculaire complète est désormais indispensable pour établir un diagnostic précis et orienter la prise en charge thérapeutique.</p>
+            </div>
+        </div>
+
+        <!-- Section Stratégies Thérapeutiques -->
+        <div id="treatment-section" class="tab">
+            <h3>Stratégies Thérapeutiques selon la Classification Moléculaire</h3>
+            
+            <div class="treatment-card">
+                <h4>Astrocytome IDH-muté, Grade 2-3</h4>
+                <p><strong>Traitement de première ligne:</strong></p>
+                <ul>
+                    <li>Résection chirurgicale maximale</li>
+                    <li>Radiothérapie (50-54 Gy) pour les grades 3 ou les résections incomplètes</li>
+                    <li>Chimiothérapie par PCV ou témozolomide pour les grades 3</li>
+                </ul>
+                <p><strong>Surveillance:</strong> IRM tous les 3-4 mois pendant 2 ans, puis tous les 6 mois</p>
+            </div>
+            
+            <div class="treatment-card">
+                <h4>Oligodendrogliome IDH-muté et 1p/19q codélété, Grade 2-3</h4>
+                <p><strong>Traitement de première ligne:</strong></p>
+                <ul>
+                    <li>Résection chirurgicale maximale</li>
+                    <li>Radiothérapie suivie de chimiothérapie PCV (grade 3)</li>
+                    <li>Témozolomide si contre-indication au PCV</li>
+                </ul>
+                <p><strong>Facteurs favorables:</strong> MGMT méthylé, âge < 50 ans</p>
+            </div>
+            
+            <div class="treatment-card">
+                <h4>Glioblastome IDH-sauvage, Grade 4</h4>
+                <p><strong>Traitement de première ligne:</strong></p>
+                <ul>
+                    <li>Résection chirurgicale maximale</li>
+                    <li>Protocole Stupp: radiothérapie (60 Gy) + témozolomide concomitant</li>
+                    <li>Témozolomide adjuvant 6-12 cycles</li>
+                </ul>
+                <p><strong>Options pour les récidives:</strong> Bevacizumab, réintervention, essais cliniques</p>
+            </div>
+            
+            <div class="treatment-card">
+                <h4>Médulloblastome</h4>
+                <p><strong>Traitement selon le sous-groupe moléculaire:</strong></p>
+                <ul>
+                    <li><strong>WNT-activé:</strong> Désescalade possible (meilleur pronostic)</li>
+                    <li><strong>SHH-activé:</strong> Inhibiteurs de la voie SHH + traitement standard</li>
+                    <li><strong>Groupe 3/4:</strong> Protocoles intensifiés pour les haut-risques</li>
+                </ul>
+                <p><strong>Traitement standard:</strong> Chirurgie + radiothérapie cranio-spinale + chimiothérapie</p>
+            </div>
+
+            <div class="treatment-card">
+                <h4>Méningiome Grade 1</h4>
+                <p><strong>Traitement:</strong></p>
+                <ul>
+                    <li>Résection chirurgicale complète Simpson I-III si possible</li>
+                    <li>Observation si asymptomatique ou localisation difficile</li>
+                    <li>Radiothérapie pour récidives symptomatiques ou résection incomplète</li>
+                </ul>
+                <p><strong>Surveillance:</strong> IRM tous les 6-12 mois pendant 5 ans</p>
+            </div>
+            
+            <div class="treatment-card">
+                <h4>Méningiome Grade 2-3</h4>
+                <p><strong>Traitement:</strong></p>
+                <ul>
+                    <li>Résection chirurgicale maximale</li>
+                    <li>Radiothérapie adjuvante (54-60 Gy), particulièrement pour les méningiomes de grade 3</li>
+                    <li>Considérer les thérapies systémiques pour les récidives multiples</li>
+                </ul>
+                <p><strong>Surveillance:</strong> IRM tous les 3-6 mois pendant 2-3 ans</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 NeurosurgerySpine.healthcenter. Développé par Dr Lubansu. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+        // Fonction pour changer de groupe d'âge
+        function changeAgeGroup() {
+            const ageGroup = document.getElementById('age-group').value;
+            showTab(ageGroup);
+        }
+
+        // Fonction pour afficher l'onglet sélectionné
+        function showTab(ageGroup) {
+            // Cacher tous les onglets
+            const tabs = document.querySelectorAll('#classification-section .tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Afficher l'onglet sélectionné dans la section de classification
+            const selectedTab = document.getElementById(ageGroup);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+        }
+
+        // Fonction pour montrer une section spécifique (classification, méningiomes, moléculaire, traitement)
+        function showSection(section) {
+            // Cacher toutes les sections
+            document.querySelectorAll('.container > .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Afficher la section sélectionnée
+            document.getElementById(`${section}-section`).classList.add('active');
+            
+            // Mettre à jour les boutons d'onglet
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Trouver et activer le bouton correspondant
+            const buttons = document.querySelectorAll('.tab-btn');
+            for (let i = 0; i < buttons.length; i++) {
+                if (buttons[i].getAttribute('onclick').includes(section)) {
+                    buttons[i].classList.add('active');
+                    break;
+                }
+            }
+            
+            // Faire défiler vers le haut pour une meilleure expérience mobile
+            window.scrollTo(0, 0);
+        }
+
+        // Ajouter des gestionnaires d'événements tactiles pour faciliter le défilement des tableaux sur mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const tables = document.querySelectorAll('table');
+            tables.forEach(table => {
+                // Ajouter un indicateur visuel pour indiquer la possibilité de défilement
+                const tableWrapper = document.createElement('div');
+                tableWrapper.style.overflowX = 'auto';
+                tableWrapper.style.width = '100%';
+                tableWrapper.style.position = 'relative';
+                
+                // Remplacer la table par le wrapper
+                table.parentNode.insertBefore(tableWrapper, table);
+                tableWrapper.appendChild(table);
+            });
+        });
+
+        // Désactiver le zoom sur double-tap pour les appareils mobiles
+        document.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
