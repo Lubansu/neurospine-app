@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Classification OMS 2021 des Tumeurs Cérébrales</title>
     <style>
         :root {
@@ -26,6 +28,7 @@
             background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
         }
 
         header {
@@ -33,33 +36,35 @@
             color: white;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
         
         .main-header {
             background-color: #2c3e50;
             color: white;
-            padding: 2rem;
+            padding: 0.8rem;
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
         }
 
         .header-title {
-            margin-top: 10px;
-            font-size: 1.2em;
+            margin-top: 5px;
+            font-size: 1.1em;
             padding: 0.5rem;
         }
 
         .container {
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
         }
 
         .controls {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
             gap: 10px;
         }
@@ -67,13 +72,26 @@
         .age-selector {
             background-color: white;
             border-radius: 8px;
-            padding: 15px;
+            padding: 12px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
 
         h1, h2, h3 {
             color: var(--secondary-color);
             margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+        }
+
+        h3 {
+            font-size: 1.1rem;
         }
 
         label {
@@ -87,15 +105,17 @@
             border: 1px solid #ddd;
             background-color: white;
             font-size: 16px;
+            width: 60%;
         }
 
         .tab {
             display: none;
             background-color: white;
             border-radius: 8px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            overflow-x: auto;
         }
 
         .active {
@@ -106,14 +126,15 @@
             display: flex;
             flex-wrap: wrap;
             border-bottom: 2px solid #bdc3c7;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            width: 100%;
         }
 
         .tab-btn {
             background-color: #f5f5f5;
-            color: var(--text-color);
+            color: var(--secondary-color);
             border: none;
-            padding: 0.8rem 1.5rem;
+            padding: 0.6rem 0.8rem;
             cursor: pointer;
             border-top-left-radius: 4px;
             border-top-right-radius: 4px;
@@ -121,6 +142,9 @@
             border-bottom: none;
             margin-bottom: -1px;
             transition: all 0.3s;
+            flex-grow: 1;
+            font-size: 0.9rem;
+            text-align: center;
         }
 
         .tab-btn:hover {
@@ -137,18 +161,33 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            position: relative;
+            margin-bottom: 20px;
+            -webkit-overflow-scrolling: touch; /* Pour une meilleure expérience de défilement sur iOS */
         }
 
         th, td {
-            padding: 12px;
+            padding: 8px;
             border: 1px solid #ddd;
             text-align: left;
+            font-size: 0.9rem;
+            white-space: normal;
+            vertical-align: top;
         }
-
+        
         th {
             background-color: var(--light-color);
             font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         tr:nth-child(even) {
@@ -189,22 +228,79 @@
             color: white;
             text-align: center;
             padding: 1rem;
-            margin-top: 2rem;
+            margin-top: 1rem;
+            font-size: 0.8rem;
         }
 
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        /* Améliorations spécifiques pour mobile */
         @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
+            .main-header {
+                font-size: 1.4rem;
+                padding: 0.6rem;
             }
             
-            .age-selector {
-                width: 100%;
+            .header-title h1 {
+                font-size: 1.1rem;
             }
-
+            
+            .container {
+                padding: 8px;
+            }
+            
+            .tab {
+                padding: 10px;
+            }
+            
             .tab-btn {
-                flex-grow: 1;
+                padding: 0.5rem 0.4rem;
+                font-size: 0.75rem;
+            }
+            
+            p, li {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 6px;
+                font-size: 0.8rem;
+            }
+            
+            .treatment-card, .warning {
+                padding: 0.8rem;
+            }
+            
+            /* Ajustements pour les tableaux sur mobile */
+            .table-container {
+                border-left: 3px solid #e0e0e0;
+                border-right: 3px solid #e0e0e0;
+            }
+            
+            /* Indicateur de défilement */
+            .scroll-indicator {
+                display: block;
                 text-align: center;
-                padding: 0.6rem;
+                color: #777;
+                font-size: 0.7rem;
+                padding: 5px 0;
+                font-style: italic;
+            }
+            
+            /* Améliorer la visibilité des colonnes */
+            td, th {
+                min-width: 120px;
+            }
+            
+            td.tumor-type {
+                min-width: 150px;
             }
         }
     </style>
@@ -908,7 +1004,48 @@
                     break;
                 }
             }
+            
+            // Faire défiler vers le haut pour une meilleure expérience mobile
+            window.scrollTo(0, 0);
         }
+
+        // Envelopper tous les tableaux dans des conteneurs à défilement
+        document.addEventListener('DOMContentLoaded', function() {
+            // Envelopper tous les tableaux dans des div avec défilement
+            const tables = document.querySelectorAll('table');
+            tables.forEach(table => {
+                // Créer le conteneur de table
+                const tableContainer = document.createElement('div');
+                tableContainer.className = 'table-container';
+                
+                // Ajouter un indicateur de défilement
+                const scrollIndicator = document.createElement('div');
+                scrollIndicator.className = 'scroll-indicator';
+                scrollIndicator.innerHTML = "← Faites défiler →";
+                scrollIndicator.style.textAlign = 'center';
+                scrollIndicator.style.color = '#777';
+                scrollIndicator.style.fontSize = '0.7rem';
+                scrollIndicator.style.padding = '5px 0';
+                scrollIndicator.style.fontStyle = 'italic';
+                
+                // Remplacer la table par le wrapper
+                table.parentNode.insertBefore(tableContainer, table);
+                tableContainer.appendChild(table);
+                tableContainer.after(scrollIndicator);
+                
+                // Vérifier si la table est plus large que son conteneur
+                if (table.offsetWidth > tableContainer.offsetWidth) {
+                    scrollIndicator.style.display = 'block';
+                } else {
+                    scrollIndicator.style.display = 'none';
+                }
+            });
+        });
+
+        // Désactiver le zoom sur double-tap pour les appareils mobiles
+        document.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 </html>
