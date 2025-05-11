@@ -1,0 +1,1820 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyseur d'Alignement Cervical</title>
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --secondary-color: #f50057;
+            --light-bg: #f5f7fa;
+            --dark-text: #333333;
+            --light-text: #ffffff;
+            --border-color: #dddddd;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+            --active-tool: #303f9f;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-style: italic;
+            opacity: 0.8;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        
+        .panel {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .panel-header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        
+        .panel-body {
+            padding: 20px;
+        }
+        
+        .upload-area {
+            width: 100%;
+            max-width: 600px;
+            height: 180px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin: 0 auto 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .upload-area:hover {
+            background-color: rgba(63, 81, 181, 0.1);
+        }
+        
+        .upload-area svg {
+            width: 48px;
+            height: 48px;
+            fill: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            text-align: center;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+        }
+        
+        .upload-btn, 
+        .camera-btn,
+        .action-btn {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 5px 10px 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .upload-btn:hover,
+        .camera-btn:hover,
+        .action-btn:hover {
+            background-color: #303f9f;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .canvas-container {
+            position: relative;
+            margin: 20px auto;
+            max-width: 100%;
+            border: 1px solid var(--border-color);
+            display: none;
+            overflow: hidden;
+        }
+        
+        #canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .tools-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .point-indicator {
+            background-color: white;
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .result-panel {
+            display: none;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-label {
+            font-weight: bold;
+        }
+        
+        .result-value {
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .camera-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .camera-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+        }
+        
+        .camera-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .camera-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-text);
+        }
+        
+        #camera-stream {
+            width: 100%;
+            max-height: 70vh;
+            background-color: #f1f1f1;
+            margin-bottom: 15px;
+        }
+        
+        .camera-footer {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step:not(:last-child):after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 3px;
+            background-color: #ddd;
+            z-index: 1;
+        }
+        
+        .step.active:not(:last-child):after {
+            background-color: var(--primary-color);
+        }
+        
+        .step-icon {
+            display: inline-flex;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ddd;
+            color: white;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step.active .step-icon {
+            background-color: var(--primary-color);
+        }
+        
+        .step.completed .step-icon {
+            background-color: var(--success-color);
+        }
+        
+        .step-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .step.active .step-label {
+            color: var(--dark-text);
+            font-weight: bold;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container {
+                padding: 5px;
+            }
+            
+            .upload-area {
+                height: 100px;
+            }
+            
+            .upload-area svg {
+                width: 28px;
+                height: 28px;
+                margin-bottom: 8px;
+            }
+            
+            .tools-container {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+            }
+            
+            .action-btn {
+                padding: 6px 8px;
+                font-size: 0.8rem;
+                height: 36px;
+            }
+            
+            .step-label {
+                font-size: 0.7rem;
+            }
+            
+            .point-indicator {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+                margin: 8px 0;
+            }
+            
+            .panel-body {
+                padding: 10px;
+            }
+            
+            .panel-header {
+                padding: 10px 15px;
+            }
+            
+            .result-item {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+            
+            .result-label {
+                max-width: 65%;
+            }
+            
+            .result-value {
+                font-size: 0.95rem;
+            }
+            
+            .progress-steps {
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Analyseur d'Alignement Cervical</h1>
+        <div class="tagline">Mesurez les paramètres cervicaux avec précision</div>
+    </header>
+    
+    <div class="container">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step active" id="step1">
+                <div class="step-icon">1</div>
+                <div class="step-label">Charger l'image</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-icon">2</div>
+                <div class="step-label">Marquer les points</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-icon">3</div>
+                <div class="step-label">Résultats</div>
+            </div>
+        </div>
+        
+        <!-- Step 1: Upload Panel -->
+        <div class="panel" id="upload-panel">
+            <div class="panel-header">Chargement de la radiographie</div>
+            <div class="panel-body">
+                <div class="upload-area" id="drop-area">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                    </svg>
+                    <p class="upload-text">Glissez-déposez votre radiographie cervicale ici</p>
+                    <p class="upload-text">ou</p>
+                    <button class="upload-btn" id="select-file-btn">Sélectionner un fichier</button>
+                    <input type="file" id="file-input" accept="image/*">
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="camera-btn" id="open-camera-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        Prendre une photo
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 2: Canvas Panel -->
+        <div class="panel" id="canvas-panel" style="display: none;">
+            <div class="panel-header">Marquage des points anatomiques</div>
+            <div class="panel-body">
+                <!-- Outils en grille -->
+                <div class="tools-container" id="tools">
+                    <button class="action-btn" id="zoom-in">Zoom +</button>
+                    <button class="action-btn" id="zoom-out">Zoom -</button>
+                    <button class="action-btn" id="pan-mode">Mode Déplacement</button>
+                    <button class="action-btn" id="rotate-image">Rotation 90°</button>
+                    <button class="action-btn" id="flip-image">Retourner</button>
+                    <button class="action-btn" id="reset-view">Réinitialiser</button>
+                    <button class="action-btn" id="undo-point">Annuler point</button>
+                </div>
+                
+                <!-- Indicateur de point déplacé ici -->
+                <div class="point-indicator" id="point-indicator">
+                    Marquez le point antérieur du plateau inférieur de C2
+                    <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.8; font-weight: normal;">
+                        <a href="#" id="show-calculation-help" style="color: var(--primary-color);">Comment les angles sont-ils calculés ?</a>
+                    </div>
+                </div>
+                
+                <div class="canvas-container" id="canvas-container">
+                    <canvas id="canvas"></canvas>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn" id="prev-step">Retour</button>
+                    <button class="action-btn" id="next-step" style="flex-grow: 2;">Calculer les paramètres</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 3: Results Panel -->
+        <div class="panel" id="results-panel" style="display: none;">
+            <div class="panel-header">Paramètres d'alignement cervical</div>
+            <div class="panel-body">
+                <div class="result-panel" id="cervical-results">
+                    <div class="result-item">
+                        <span class="result-label">Angle de Cobb C2-C7 (CL):</span>
+                        <span class="result-value" id="result-cl">--</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Inclinaison de T1 (T1S):</span>
+                        <span class="result-value" id="result-t1s">--</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">C2-C7 SVA:</span>
+                        <span class="result-value" id="result-c2c7-sva">--</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">T1S-CL:</span>
+                        <span class="result-value" id="result-t1s-cl">--</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Inclinaison de C2 (C2S):</span>
+                        <span class="result-value" id="result-c2s">--</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Inclinaison K-line:</span>
+                        <span class="result-value" id="result-kline">--</span>
+                    </div>
+		    <div class="result-item">
+        		<span class="result-label">Thoracic Inlet Angle (TIA):</span>
+        		<span class="result-value" id="result-tia">--</span>
+    		    </div>
+    		    <div class="result-item">
+        		<span class="result-label">Neck Tilt (NT):</span>
+        		<span class="result-value" id="result-nt">--</span>
+    		   </div>
+	       </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn" id="recalculate" style="background-color: var(--warning-color);">Remesurer</button>
+                    <button class="action-btn" id="new-analysis" style="background-color: var(--success-color);">Nouvelle analyse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Camera Modal -->
+    <div class="camera-modal" id="camera-modal">
+        <div class="camera-container">
+            <div class="camera-header">
+                <div class="camera-title">Prendre une photo de la radiographie</div>
+                <button class="close-btn" id="close-camera">&times;</button>
+            </div>
+            <video id="camera-stream" autoplay></video>
+            <div class="camera-footer">
+                <button class="action-btn" id="switch-camera">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                        <path d="M21 12 A 9 9 0 0 0 3 12 M 3 12 A 9 9 0 0 0 21 12 M 12 3 L 8 7 M 12 3 L 16 7 M 12 21 L 8 17 M 12 21 L 16 17"></path>
+                    </svg>
+                    Changer de caméra
+                </button>
+                <button class="action-btn" id="take-photo">Prendre la photo</button>
+            </div>
+        </div>
+    </div>
+    
+                <div id="calculation-help-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 1000;">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 8px; max-width: 90%; max-height: 80%; overflow-y: auto;">
+                        <h3 style="margin-top: 0; color: var(--primary-color);">Calcul des Angles Cervicaux</h3>
+                        <p style="margin-bottom: 10px;"><strong>Lordose Cervicale (CL):</strong> Angle entre les plateaux inférieurs de C2 et C7</p>
+                        <p style="margin-bottom: 10px;"><strong>T1 Slope (T1S):</strong> Angle entre le plateau supérieur de T1 et l'horizontale</p>
+                        <p style="margin-bottom: 10px;"><strong>C2-C7 SVA:</strong> Distance horizontale entre la ligne verticale passant par C2 et C7</p>
+                        <p style="margin-bottom: 10px;"><strong>T1S-CL:</strong> Différence entre T1S et CL (mesure du déséquilibre cervical)</p>
+                        <p style="margin-bottom: 10px;"><strong>C2 Slope:</strong> Angle entre le plateau inférieur de C2 et l'horizontale</p>
+                        <p style="margin-bottom: 10px;"><strong>Thoracic Inlet Angle (TIA):</strong> Angle entre la perpendiculaire au plateau de T1 et la ligne T1-sternum</p>
+                        <p style="margin-bottom: 10px;"><strong>Neck Tilt (NT):</strong> Angle entre la ligne T1-sternum et la verticale</p>
+                        <p style="margin-bottom: 15px;"><strong>Formule clé:</strong> TIA = T1S + NT</p>
+                        <button id="close-help-modal" style="background-color: var(--primary-color); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Fermer</button>
+                    </div>
+		</div>
+    <script>
+        // Variables globales
+        let currentStep = 1;
+        let canvas, ctx;
+        let image = null;
+        let scale = 1;
+        let offsetX = 0, offsetY = 0;
+        let isDragging = false;
+        let lastX, lastY;
+        let rotationAngle = 0;
+        let isFlippedHorizontally = false;
+        let originalCanvasWidth = 0;
+        let originalCanvasHeight = 0;
+        let isPanMode = false; // Mode déplacement actif ou non
+        
+        // Points pour les mesures cervicales
+        let currentPointIndex = 0;
+        const pointLabels = [
+            "Point antérieur du plateau inférieur de C2",
+            "Point postérieur du plateau inférieur de C2",
+            "Point antérieur du plateau inférieur de C7",
+            "Point postérieur du plateau inférieur de C7",
+            "Point antérieur du plateau supérieur de T1",
+            "Point postérieur du plateau supérieur de T1",
+            "Point central du corps vertébral de C2",
+            "Point central du corps vertébral de C7",
+            "Extrémité supérieure du sternum (Manubrium)" // Point ajouté pour le TIA
+        ];
+        
+        let points = [];
+        
+        // Résultats
+        let results = {
+            cl: null,       // Angle de Cobb C2-C7 (Lordose Cervicale)
+            t1s: null,      // Inclinaison de T1
+            c2c7Sva: null,  // C2-C7 SVA
+            t1sCl: null,    // T1S-CL
+            c2s: null,      // Inclinaison de C2
+            kline: null,    // Inclinaison de la K-line
+            tia: null,      // Thoracic Inlet Angle
+            nt: null        // Neck Tilt
+        };
+        
+        // Initialiser l'application quand le DOM est chargé
+        document.addEventListener('DOMContentLoaded', init);
+        
+        function init() {
+            // Configuration du canvas
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            
+            // Gestionnaires pour le chargement de fichiers
+            const fileInput = document.getElementById('file-input');
+            const selectFileBtn = document.getElementById('select-file-btn');
+            const dropArea = document.getElementById('drop-area');
+            
+            fileInput.addEventListener('change', handleFileSelect);
+            selectFileBtn.addEventListener('click', () => fileInput.click());
+            
+            // Fonctionnalité glisser-déposer
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.style.backgroundColor = 'rgba(63, 81, 181, 0.2)';
+            });
+            
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.style.backgroundColor = '';
+            });
+            
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.style.backgroundColor = '';
+                
+                if (e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // Fonctionnalité de caméra
+            const openCameraBtn = document.getElementById('open-camera-btn');
+            const closeCameraBtn = document.getElementById('close-camera');
+            const takePhotoBtn = document.getElementById('take-photo');
+            const switchCameraBtn = document.getElementById('switch-camera');
+            const cameraModal = document.getElementById('camera-modal');
+            
+            openCameraBtn.addEventListener('click', openCamera);
+            closeCameraBtn.addEventListener('click', closeCamera);
+            takePhotoBtn.addEventListener('click', takePhoto);
+            switchCameraBtn.addEventListener('click', switchCamera);
+            
+            // Outils
+            const zoomInBtn = document.getElementById('zoom-in');
+            const zoomOutBtn = document.getElementById('zoom-out');
+            const panModeBtn = document.getElementById('pan-mode');
+            const rotateBtn = document.getElementById('rotate-image');
+            const flipBtn = document.getElementById('flip-image');
+            const resetViewBtn = document.getElementById('reset-view');
+            const undoPointBtn = document.getElementById('undo-point');
+            
+            zoomInBtn.addEventListener('click', zoomIn);
+            zoomOutBtn.addEventListener('click', zoomOut);
+            panModeBtn.addEventListener('click', togglePanMode);
+            rotateBtn.addEventListener('click', rotateImage);
+            flipBtn.addEventListener('click', flipImage);
+            resetViewBtn.addEventListener('click', resetView);
+            undoPointBtn.addEventListener('click', undoPoint);
+            
+            // Navigation
+            const prevStepBtn = document.getElementById('prev-step');
+            const nextStepBtn = document.getElementById('next-step');
+            const recalculateBtn = document.getElementById('recalculate');
+            const newAnalysisBtn = document.getElementById('new-analysis');
+            
+            prevStepBtn.addEventListener('click', goToPrevStep);
+            nextStepBtn.addEventListener('click', goToNextStep);
+            recalculateBtn.addEventListener('click', restartMeasurement);
+            newAnalysisBtn.addEventListener('click', startNewAnalysis);
+            
+            // Ajouter l'aide de calcul
+            document.getElementById('show-calculation-help').addEventListener('click', function(e) {
+                e.preventDefault();
+                showCalculationHelp();
+            });
+            
+            // Interactions du canvas
+            setupCanvasInteractions();
+        }
+// Fonction explicative des calculs d'angles
+        function showCalculationHelp() {
+            // Afficher la modale au lieu d'une alerte
+            const helpModal = document.getElementById('calculation-help-modal');
+            helpModal.style.display = 'block';
+            
+            // Configurer le bouton de fermeture
+            document.getElementById('close-help-modal').onclick = function() {
+                helpModal.style.display = 'none';
+            };
+            
+            // Fermer la modale en cliquant à l'extérieur
+            helpModal.onclick = function(event) {
+                if (event.target === helpModal) {
+                    helpModal.style.display = 'none';
+                }
+            };
+        } 
+
+        
+        function setupCanvasInteractions() {
+            canvas.addEventListener('mousedown', function(event) {
+                const rect = canvas.getBoundingClientRect();
+                
+                // Capturer la position initiale de la souris
+                lastX = event.clientX;
+                lastY = event.clientY;
+                
+                if (isPanMode || currentStep !== 2 || currentPointIndex >= pointLabels.length) {
+                    // Mode déplacement activé ou étape autre que marquage des points
+                    isDragging = true;
+                } else {
+                    // Mode marquage de points
+                    const mouseX = event.clientX - rect.left;
+                    const mouseY = event.clientY - rect.top;
+                    
+                    // Calculer le centre du canvas
+                    const centerX = canvas.width / 2;
+                    const centerY = canvas.height / 2;
+                    
+                    // 1. Coordonnées relatives au centre
+                    const x1 = mouseX - centerX;
+                    const y1 = mouseY - centerY;
+                    
+                    // 2. Appliquer le flip si nécessaire
+                    let x2 = isFlippedHorizontally ? -x1 : x1;
+                    
+                    // 3. Annuler la rotation
+                    const angleRad = -rotationAngle * Math.PI / 180;
+                    const cosA = Math.cos(angleRad);
+                    const sinA = Math.sin(angleRad);
+                    const x3 = x2 * cosA - y1 * sinA;
+                    const y3 = x2 * sinA + y1 * cosA;
+                    
+                    // 4. Appliquer l'échelle et le déplacement
+                    const x = x3 / scale - offsetX + image.width / 2;
+                    const y = y3 / scale - offsetY + image.height / 2;
+                    
+                    // Ajouter le point
+                    addPoint(x, y);
+                }
+            });
+            
+            canvas.addEventListener('mousemove', function(event) {
+                if (isDragging) {
+                    // Calculer le déplacement
+                    const dx = event.clientX - lastX;
+                    const dy = event.clientY - lastY;
+                    
+                    // Ajuster le déplacement en fonction de la rotation
+                    if (rotationAngle === 0) {
+                        offsetX += dx / scale;
+                        offsetY += dy / scale;
+                    } else if (rotationAngle === 90) {
+                        offsetX += dy / scale;
+                        offsetY -= dx / scale;
+                    } else if (rotationAngle === 180) {
+                        offsetX -= dx / scale;
+                        offsetY -= dy / scale;
+                    } else if (rotationAngle === 270) {
+                        offsetX -= dy / scale;
+                        offsetY += dx / scale;
+                    }
+                    
+                    // Mettre à jour la dernière position
+                    lastX = event.clientX;
+                    lastY = event.clientY;
+                    
+                    // Redessiner l'image
+                    drawImage();
+                }
+            });
+            
+            canvas.addEventListener('mouseup', () => isDragging = false);
+            canvas.addEventListener('mouseout', () => isDragging = false);
+            
+            // Support tactile pour les appareils mobiles
+            canvas.addEventListener('touchstart', function(event) {
+                if (event.touches.length === 1) {
+                    event.preventDefault();
+                    
+                    const touch = event.touches[0];
+                    lastX = touch.clientX;
+                    lastY = touch.clientY;
+                    
+                    if (isPanMode || currentStep !== 2 || currentPointIndex >= pointLabels.length) {
+                        // Mode déplacement activé ou étape autre que marquage des points
+                        isDragging = true;
+                    } else {
+                        // Mode marquage de points
+                        const rect = canvas.getBoundingClientRect();
+                        const touchX = touch.clientX - rect.left;
+                        const touchY = touch.clientY - rect.top;
+                        
+                        // Calculer le centre du canvas
+                        const centerX = canvas.width / 2;
+                        const centerY = canvas.height / 2;
+                        
+                        // 1. Coordonnées relatives au centre
+                        const x1 = touchX - centerX;
+                        const y1 = touchY - centerY;
+                        
+                        // 2. Appliquer le flip si nécessaire
+                        let x2 = isFlippedHorizontally ? -x1 : x1;
+                        
+                        // 3. Annuler la rotation
+                        const angleRad = -rotationAngle * Math.PI / 180;
+                        const cosA = Math.cos(angleRad);
+                        const sinA = Math.sin(angleRad);
+                        const x3 = x2 * cosA - y1 * sinA;
+                        const y3 = x2 * sinA + y1 * cosA;
+                        
+                        // 4. Appliquer l'échelle et le déplacement
+                        const x = x3 / scale - offsetX + image.width / 2;
+                        const y = y3 / scale - offsetY + image.height / 2;
+                        
+                        // Ajouter le point
+                        addPoint(x, y);
+                    }
+                }
+            });
+            
+            canvas.addEventListener('touchmove', function(event) {
+                if (isDragging && event.touches.length === 1) {
+                    event.preventDefault();
+                    
+                    const touch = event.touches[0];
+                    
+                    // Calculer le déplacement
+                    const dx = touch.clientX - lastX;
+                    const dy = touch.clientY - lastY;
+                    
+                    // Ajuster le déplacement en fonction de la rotation
+                    if (rotationAngle === 0) {
+                        offsetX += dx / scale;
+                        offsetY += dy / scale;
+                    } else if (rotationAngle === 90) {
+                        offsetX += dy / scale;
+                        offsetY -= dx / scale;
+                    } else if (rotationAngle === 180) {
+                        offsetX -= dx / scale;
+                        offsetY -= dy / scale;
+                    } else if (rotationAngle === 270) {
+                        offsetX -= dy / scale;
+                        offsetY += dx / scale;
+                    }
+                    
+                    lastX = touch.clientX;
+                    lastY = touch.clientY;
+                    
+                    drawImage();
+                }
+            });
+            
+            canvas.addEventListener('touchend', () => isDragging = false);
+            
+            // Zoom à la molette
+            canvas.addEventListener('wheel', function(event) {
+                event.preventDefault();
+                
+                // Obtenir la position du curseur par rapport au canvas
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = event.clientX - rect.left;
+                const mouseY = event.clientY - rect.top;
+                
+                // Position dans les coordonnées de l'image (avant zoom)
+                const canvasCenterX = canvas.width / 2;
+                const canvasCenterY = canvas.height / 2;
+                
+                // Coordonnées relatives au centre du canvas
+                const x1 = mouseX - canvasCenterX;
+                const y1 = mouseY - canvasCenterY;
+                
+                // Appliquer la rotation inverse
+                const angleRad = -rotationAngle * Math.PI / 180;
+                const cosA = Math.cos(angleRad);
+                const sinA = Math.sin(angleRad);
+                const x2 = x1 * cosA - y1 * sinA;
+                const y2 = x1 * sinA + y1 * cosA;
+                
+                // Position dans les coordonnées de l'image
+                const imageX = x2 / scale + offsetX;
+                const imageY = y2 / scale + offsetY;
+                
+                // Modifier l'échelle en fonction de la direction de la molette
+                const delta = -Math.sign(event.deltaY) * 0.1;
+                const newScale = Math.max(0.1, scale * (1 + delta));
+                
+                // Ajuster l'offset pour maintenir la position du curseur
+                offsetX = imageX - (x2 / newScale);
+                offsetY = imageY - (y2 / newScale);
+                
+                // Appliquer la nouvelle échelle
+                scale = newScale;
+                
+                // Redessiner l'image
+                drawImage();
+            });
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+        
+        function handleFile(file) {
+            if (!file.type.match('image.*')) {
+                alert('Veuillez sélectionner un fichier image.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const img = new Image();
+                
+                img.onload = function() {
+                    // Stocker l'image
+                    image = img;
+                    
+                    // Réinitialiser les points
+                    points = [];
+                    currentPointIndex = 0;
+                    
+                    // Passer à l'étape 2
+                    goToStep(2);
+                    
+                    // Configurer le canvas
+                    setupCanvas();
+                    
+                    // Mettre à jour l'indicateur de point
+                    updatePointIndicator();
+                };
+                
+                img.src = e.target.result;
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        function setupCanvas() {
+            const canvasContainer = document.getElementById('canvas-container');
+            const containerWidth = canvasContainer.clientWidth || 600;
+            // Ajuster la hauteur du conteneur pour maximiser l'espace disponible
+            const containerHeight = Math.max(window.innerHeight * 0.6, 450);
+            
+            const imageRatio = image.width / image.height;
+            const containerRatio = containerWidth / containerHeight;
+            
+            let canvasWidth, canvasHeight;
+            
+            if (imageRatio > containerRatio) {
+                canvasWidth = containerWidth;
+                canvasHeight = containerWidth / imageRatio;
+            } else {
+                canvasHeight = containerHeight;
+                canvasWidth = containerHeight * imageRatio;
+            }
+            
+            // Définir les dimensions minimales
+            canvasWidth = Math.max(canvasWidth, 300);
+            canvasHeight = Math.max(canvasHeight, 300);
+            
+            // Appliquer les dimensions
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            // Sauvegarder les dimensions originales pour la rotation
+            originalCanvasWidth = canvasWidth;
+            originalCanvasHeight = canvasHeight;
+            
+            // Réinitialiser les transformations avec un facteur de zoom approprié
+            const scaleX = canvas.width / image.width;
+            const scaleY = canvas.height / image.height;
+            scale = Math.min(scaleX, scaleY) * 0.9; // 90% pour une petite marge
+            
+            offsetX = 0;
+            offsetY = 0;
+            rotationAngle = 0;
+            isFlippedHorizontally = false;
+            
+            // Afficher les outils et le canvas
+            document.getElementById('tools').style.display = 'grid';
+            canvasContainer.style.display = 'block';
+            
+            // Dessiner l'image
+            drawImage();
+        }
+        
+        function drawImage() {
+            if (!image) return;
+            
+            // Effacer le canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            try {
+                // Sauvegarder l'état du contexte
+                ctx.save();
+                
+                // Calculer le centre du canvas
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                
+                // Appliquer les transformations
+                ctx.translate(centerX, centerY);
+                ctx.rotate(rotationAngle * Math.PI / 180);
+                ctx.scale(scale, scale);
+                if (isFlippedHorizontally) {
+                    ctx.scale(-1, 1);
+                }
+                ctx.translate(offsetX, offsetY);
+                
+                // Dessiner l'image centrée
+                ctx.drawImage(image, -image.width/2, -image.height/2);
+                
+                // Restaurer l'état du contexte
+                ctx.restore();
+                
+                // Dessiner les points et les lignes
+                drawPointsAndLines();
+            } catch (error) {
+                console.error("Erreur lors du dessin de l'image:", error);
+            }
+        }
+        
+        function drawPointsAndLines() {
+            for (let i = 0; i < points.length; i++) {
+                // Dessiner le point
+                let color;
+                let label;
+                
+                // Assigner différentes couleurs à différents types de points
+                if (i < 2) {
+                    // Points du plateau de C2
+                    color = '#f44336'; // Rouge
+                    label = i === 0 ? 'C2a' : 'C2p';
+                } else if (i < 4) {
+                    // Points du plateau de C7
+                    color = '#2196f3'; // Bleu
+                    label = i === 2 ? 'C7a' : 'C7p';
+                } else if (i < 6) {
+                    // Points du plateau de T1
+                    color = '#4caf50'; // Vert
+                    label = i === 4 ? 'T1a' : 'T1p';
+                } else if (i < 8) {
+                    // Points centraux de C2 et C7
+                    color = '#9c27b0'; // Violet
+                    label = i === 6 ? 'C2m' : 'C7m';
+                } else {
+                    // Point du sternum
+                    color = '#ff9800'; // Orange
+                    label = 'ST';
+                }
+                
+                drawPoint(points[i], color, label);
+                
+                // Dessiner les lignes pour les plateaux
+                if (i === 1 && points[0]) {
+                    // Ligne du plateau de C2
+                    drawLine(points[0], points[1], '#f44336');
+                } else if (i === 3 && points[2]) {
+                    // Ligne du plateau de C7
+                    drawLine(points[2], points[3], '#2196f3');
+                } else if (i === 5 && points[4]) {
+                    // Ligne du plateau de T1
+                    drawLine(points[4], points[5], '#4caf50');
+                } else if (i === 7 && points[6]) {
+                    // K-line (C2 au point central de C7)
+                    drawLine(points[6], points[7], '#9c27b0');
+                } else if (i === 8 && points[4] && points[5]) {
+                    // Ligne du milieu de T1 au sternum (pour TIA)
+                    const t1MidPoint = {
+                        x: (points[4].x + points[5].x) / 2,
+                        y: (points[4].y + points[5].y) / 2
+                    };
+                    drawLine(t1MidPoint, points[8], '#ff9800');
+                    
+                    // Ligne perpendiculaire au plateau T1 (pour TIA)
+                    if (points[4] && points[5]) {
+                        const t1Vector = {
+                            x: points[5].x - points[4].x,
+                            y: points[5].y - points[4].y
+                        };
+                        
+                        // Vecteur perpendiculaire normalisé
+                        const perpLength = 100;
+                        const perpVector = {
+                            x: -t1Vector.y,
+                            y: t1Vector.x
+                        };
+                        
+                        // Normaliser le vecteur perpendiculaire
+                        const perpMag = Math.sqrt(perpVector.x * perpVector.x + perpVector.y * perpVector.y);
+                        perpVector.x = perpVector.x / perpMag * perpLength;
+                        perpVector.y = perpVector.y / perpMag * perpLength;
+                        
+                        // Orienter correctement (vers le haut anatomiquement)
+                        if (perpVector.y > 0) {
+                            perpVector.x = -perpVector.x;
+                            perpVector.y = -perpVector.y;
+                        }
+                        
+                        const perpEnd = {
+                            x: t1MidPoint.x + perpVector.x,
+                            y: t1MidPoint.y + perpVector.y
+                        };
+                        
+                        drawLine(t1MidPoint, perpEnd, 'rgba(255, 152, 0, 0.5)');
+                    }
+                }
+            }
+        }
+        
+        function drawPoint(point, color, label) {
+            if (!point) return;
+            
+            ctx.save();
+            
+            // Calculer le centre du canvas
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Appliquer les transformations
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotationAngle * Math.PI / 180);
+            ctx.scale(scale, scale);
+            if (isFlippedHorizontally) {
+                ctx.scale(-1, 1);
+            }
+            ctx.translate(offsetX, offsetY);
+            
+            // Dessiner un cercle plus petit
+            const pointRadius = 3 / scale; // Réduire la taille du point
+            ctx.beginPath();
+            ctx.arc(point.x - image.width / 2, point.y - image.height / 2, pointRadius, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 0.5 / scale; // Réduire l'épaisseur de la bordure
+            ctx.stroke();
+            
+            // Dessiner l'étiquette plus petite
+            ctx.font = `${9 / scale}px Arial`; // Réduire la taille de la police
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1.5 / scale;
+            ctx.strokeText(label, point.x - image.width / 2 + 6 / scale, point.y - image.height / 2 - 6 / scale);
+            ctx.fillText(label, point.x - image.width / 2 + 6 / scale, point.y - image.height / 2 - 6 / scale);
+            
+            ctx.restore();
+        }
+        
+        function drawLine(start, end, color) {
+            if (!start || !end) return;
+            
+            ctx.save();
+            
+            // Calculer le centre du canvas
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Appliquer les transformations
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotationAngle * Math.PI / 180);
+            ctx.scale(scale, scale);
+            if (isFlippedHorizontally) {
+                ctx.scale(-1, 1);
+            }
+            ctx.translate(offsetX, offsetY);
+            
+            // Dessiner la ligne
+            ctx.beginPath();
+            ctx.moveTo(start.x - image.width / 2, start.y - image.height / 2);
+            ctx.lineTo(end.x - image.width / 2, end.y - image.height / 2);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5 / scale; // Ligne plus fine
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+        
+        function addPoint(x, y) {
+            if (currentPointIndex < pointLabels.length) {
+                points[currentPointIndex] = { x, y };
+                currentPointIndex++;
+                
+                updatePointIndicator();
+                drawImage();
+                
+                // Vérifier si tous les points ont été marqués
+                if (currentPointIndex === pointLabels.length) {
+                    // Mettre à jour le bouton suivant pour indiquer l'achèvement
+                    document.getElementById('next-step').innerText = 'Calculer les paramètres';
+                }
+            }
+        }
+        
+        function updatePointIndicator() {
+            const indicator = document.getElementById('point-indicator');
+            
+            if (currentPointIndex < pointLabels.length) {
+                indicator.innerHTML = `
+                    ${pointLabels[currentPointIndex]}
+                    <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.8; font-weight: normal;">
+                        <a href="#" id="show-calculation-help" style="color: var(--primary-color);">Comment les angles sont-ils calculés ?</a>
+                    </div>
+                `;
+                
+                // Rattacher l'événement car le HTML a été remplacé
+                document.getElementById('show-calculation-help').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showCalculationHelp();
+                });
+            } else {
+                indicator.innerHTML = `
+                    Tous les points sont marqués. Cliquez sur "Calculer les paramètres" pour continuer.
+                    <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.8; font-weight: normal;">
+                        <a href="#" id="show-calculation-help" style="color: var(--primary-color);">Comment les angles sont-ils calculés ?</a>
+                    </div>
+                `;
+                
+                // Rattacher l'événement car le HTML a été remplacé
+                document.getElementById('show-calculation-help').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showCalculationHelp();
+                });
+                
+                indicator.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                indicator.style.color = '#2e7d32';
+            }
+        }
+        
+        function undoPoint() {
+            if (currentPointIndex > 0) {
+                currentPointIndex--;
+                points.pop();
+                
+                // Réinitialiser le texte du bouton si nous ne sommes plus à la fin
+                if (currentPointIndex < pointLabels.length - 1) {
+                    document.getElementById('next-step').innerText = 'Continuer';
+                }
+                
+                // Réinitialiser le style de l'indicateur
+                const indicator = document.getElementById('point-indicator');
+                indicator.style.backgroundColor = '';
+                indicator.style.color = '';
+                
+                updatePointIndicator();
+                drawImage();
+            }
+        }
+        
+    function calculateParameters() {
+    console.log("Début du calcul des paramètres");
+    if (points.length < pointLabels.length) {
+        alert('Veuillez marquer tous les points requis d\'abord.');
+        return;
+    }
+    
+    // Vecteurs utiles
+    const horizontalVector = { x: 1, y: 0 };
+    const verticalVector = { x: 0, y: 1 };
+    
+    // 1. Angle de Cobb C2-C7 (Lordose Cervicale)
+    const c2Vector = { 
+        x: points[1].x - points[0].x, 
+        y: points[1].y - points[0].y 
+    };
+    
+    const c7Vector = { 
+        x: points[3].x - points[2].x, 
+        y: points[3].y - points[2].y 
+    };
+    
+    // Calcul de base de l'angle
+    results.cl = angleBetweenVectors(c2Vector, c7Vector);
+    
+    // On calcule comme avant pour déterminer si c'est une lordose ou une cyphose
+    const c2Slope = getSlope(points[0], points[1]);
+    const c7Slope = getSlope(points[2], points[3]);
+    
+    // Déterminer si c'est une lordose (les plateaux forment un 'C')
+    let isLordosis = ((c2Slope > 0 && c7Slope < 0) || (c2Slope < 0 && c7Slope > 0));
+    
+    // Ajuster le signe en fonction de la logique anatomique
+    if (isLordosis) {
+        if (results.cl > 0) {
+            results.cl = -results.cl;
+        }
+    } else {
+        if (results.cl < 0) {
+            results.cl = -results.cl;
+        }
+    }
+    
+    // INVERSION DÉLIBÉRÉE : inverser le signe de CL
+    results.cl = -results.cl;
+    
+    // 2. Inclinaison de T1 (T1 Slope)
+    const t1Vector = { 
+        x: points[5].x - points[4].x, 
+        y: points[5].y - points[4].y 
+    };
+    
+    results.t1s = angleBetweenVectors(t1Vector, horizontalVector);
+    
+    // Ajuster le signe selon la position des points
+    if (points[5].y < points[4].y) {
+        results.t1s = -results.t1s;
+    }
+    
+    // INVERSION DÉLIBÉRÉE : inverser le signe de T1S
+    results.t1s = -results.t1s;
+    
+    // 3. C2-C7 SVA (mm)
+    const c7SupPost = { x: points[3].x, y: points[3].y };
+    const c2Plumb = {
+        x: points[6].x,
+        y: c7SupPost.y
+    };
+    
+    // Distance horizontale en pixels
+    const pixelDistance = c2Plumb.x - c7SupPost.x;
+    
+    // Approximation pixel-à-mm (supposant 72 dpi)
+    const pixelToMmRatio = 0.35;
+    
+    // C2-C7 SVA est positif quand la ligne d'aplomb C2 est en avant de C7
+    results.c2c7Sva = pixelDistance * pixelToMmRatio;
+    
+    // 4. Calcul de T1S-CL (inchangé car les deux valeurs sont inversées)
+    results.t1sCl = results.t1s - results.cl;
+    
+    // 5. Inclinaison de C2 (C2 Slope)
+    results.c2s = angleBetweenVectors(c2Vector, horizontalVector);
+    
+    // Ajuster le signe selon la position des points
+    if (points[1].y < points[0].y) {
+        results.c2s = -results.c2s;
+    }
+    
+    // INVERSION DÉLIBÉRÉE : inverser le signe de C2S
+    results.c2s = -results.c2s;
+    
+    // 6. K-line tilt
+    const kLineVector = {
+        x: points[7].x - points[6].x,
+        y: points[7].y - points[6].y
+    };
+    
+    results.kline = angleBetweenVectors(kLineVector, verticalVector);
+    
+    // 7. Thoracic Inlet Angle (TIA) et Neck Tilt (NT)
+    if (points[8]) {
+        // Calculer le point central du plateau supérieur de T1
+        const t1MidPoint = {
+            x: (points[4].x + points[5].x) / 2,
+            y: (points[4].y + points[5].y) / 2
+        };
+        
+        // Vecteur de T1 au sternum
+        const t1ToSternumVector = {
+            x: points[8].x - t1MidPoint.x,
+            y: points[8].y - t1MidPoint.y
+        };
+        
+        // Vecteur perpendiculaire au plateau T1
+        const t1PerpVector = {
+            x: -t1Vector.y,
+            y: t1Vector.x
+        };
+        
+        // Orienter correctement (vers le haut anatomiquement)
+        if (t1PerpVector.y > 0) {
+            t1PerpVector.x = -t1PerpVector.x;
+            t1PerpVector.y = -t1PerpVector.y;
+        }
+        
+        // Calculer l'angle TIA
+        results.tia = angleBetweenVectors(t1ToSternumVector, t1PerpVector);
+        
+        // NT d'après la formule TIA-T1S (en utilisant la valeur inversée de T1S)
+        results.nt = results.tia - results.t1s;
+    }
+    
+    // Afficher les résultats
+    console.log("Résultats calculés:", results);
+    displayResults();
+}
+
+// Fonction utilitaire pour calculer la pente (slope) d'une ligne
+function getSlope(point1, point2) {
+    if (point2.x - point1.x === 0) return Infinity; // Pente verticale
+    return (point2.y - point1.y) / (point2.x - point1.x);
+}
+        
+        function angleBetweenVectors(v1, v2) {
+            // Produit scalaire: v1·v2 = |v1|·|v2|·cos(θ)
+            const dotProduct = v1.x * v2.x + v1.y * v2.y;
+            
+            // Magnitudes
+            const magV1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
+            const magV2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+            
+            // Angle en radians
+            const cosTheta = dotProduct / (magV1 * magV2);
+            
+            // Gérer les erreurs numériques
+            const clampedCosTheta = Math.min(Math.max(cosTheta, -1), 1);
+            
+            // Convertir en degrés
+            return Math.acos(clampedCosTheta) * 180 / Math.PI;
+        }
+        
+        function displayResults() {
+            document.getElementById('result-cl').textContent = `${results.cl.toFixed(1)}°`;
+            document.getElementById('result-t1s').textContent = `${results.t1s.toFixed(1)}°`;
+            document.getElementById('result-c2c7-sva').textContent = `${results.c2c7Sva.toFixed(1)} mm`;
+            document.getElementById('result-t1s-cl').textContent = `${results.t1sCl.toFixed(1)}°`;
+            document.getElementById('result-c2s').textContent = `${results.c2s.toFixed(1)}°`;
+            document.getElementById('result-kline').textContent = `${results.kline.toFixed(1)}°`;
+            document.getElementById('result-tia').textContent = results.tia ? `${results.tia.toFixed(1)}°` : '--';
+            document.getElementById('result-nt').textContent = results.nt ? `${results.nt.toFixed(1)}°` : '--';
+        }
+        
+        function zoomIn() {
+            scale *= 1.2;
+            drawImage();
+        }
+        
+        function zoomOut() {
+            scale /= 1.2;
+            if (scale < 0.1) scale = 0.1;
+            drawImage();
+        }
+        
+        function rotateImage() {
+            // Sauvegarder les dimensions originales si pas déjà fait
+            if (originalCanvasWidth === 0) {
+                originalCanvasWidth = canvas.width;
+                originalCanvasHeight = canvas.height;
+            }
+            
+            // Incrémenter l'angle de rotation
+            rotationAngle = (rotationAngle + 90) % 360;
+            
+            // Redimensionner le canvas en fonction de l'orientation
+            if (rotationAngle === 90 || rotationAngle === 270) {
+                // Portrait → Paysage ou Paysage → Portrait
+                canvas.width = originalCanvasHeight;
+                canvas.height = originalCanvasWidth;
+            } else {
+                // Retour à l'orientation d'origine
+                canvas.width = originalCanvasWidth;
+                canvas.height = originalCanvasHeight;
+            }
+            
+            drawImage();
+        }
+        
+        function flipImage() {
+            // Basculer l'état de retournement
+            isFlippedHorizontally = !isFlippedHorizontally;
+            
+            // Mettre à jour l'apparence du bouton
+            const flipBtn = document.getElementById('flip-image');
+            flipBtn.style.backgroundColor = isFlippedHorizontally ? 'var(--active-tool)' : '';
+            
+            // Redessiner l'image
+            drawImage();
+        }
+        
+        function togglePanMode() {
+            isPanMode = !isPanMode;
+            
+            // Mettre à jour l'apparence du bouton
+            const panModeBtn = document.getElementById('pan-mode');
+            if (isPanMode) {
+                panModeBtn.style.backgroundColor = 'var(--active-tool)';
+                panModeBtn.textContent = 'Mode Point';
+                
+                // Changer l'apparence du curseur
+                canvas.style.cursor = 'move';
+            } else {
+                panModeBtn.style.backgroundColor = '';
+                panModeBtn.textContent = 'Mode Déplacement';
+                
+                // Réinitialiser l'apparence du curseur
+                canvas.style.cursor = 'default';
+            }
+        }
+        
+        function resetView() {
+            if (!image) return;
+            
+            // Réinitialiser les paramètres de transformation
+            scale = 1;
+            offsetX = 0;
+            offsetY = 0;
+            rotationAngle = 0;
+            isFlippedHorizontally = false;
+            isPanMode = false;
+            
+            // Réinitialiser l'apparence des boutons
+            const flipBtn = document.getElementById('flip-image');
+            flipBtn.style.backgroundColor = '';
+            
+            const panModeBtn = document.getElementById('pan-mode');
+            panModeBtn.style.backgroundColor = '';
+            panModeBtn.textContent = 'Mode Déplacement';
+            
+            // Réinitialiser l'apparence du curseur
+            canvas.style.cursor = 'default';
+            
+            // Setup canvas again to reset dimensions
+            setupCanvas();
+            
+            // Ensure tools container is visible
+            document.getElementById('tools').style.display = 'grid';
+        }
+        
+        function openCamera() {
+            const cameraModal = document.getElementById('camera-modal');
+            const cameraStream = document.getElementById('camera-stream');
+            
+            cameraModal.style.display = 'flex';
+            
+            // Utiliser la caméra arrière par défaut
+            const constraints = {
+                video: {
+                    facingMode: "environment",
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                }
+            };
+            
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function(stream) {
+                    cameraStream.srcObject = stream;
+                })
+                .catch(function(error) {
+                    console.error("Erreur d'accès à la caméra:", error);
+                    
+                    // Essayer la caméra avant comme solution de secours
+                    navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: "user",
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
+                    }).then(function(stream) {
+                        cameraStream.srcObject = stream;
+                    }).catch(function(err) {
+                        alert("Impossible d'accéder à la caméra. Veuillez vérifier les permissions.");
+                        closeCamera();
+                    });
+                });
+        }
+        
+        function closeCamera() {
+            const cameraModal = document.getElementById('camera-modal');
+            const cameraStream = document.getElementById('camera-stream');
+            
+            // Arrêter le flux de la caméra
+            if (cameraStream.srcObject) {
+                const tracks = cameraStream.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+            
+            cameraModal.style.display = 'none';
+        }
+        
+        function switchCamera() {
+            const cameraStream = document.getElementById('camera-stream');
+            
+            // Déterminer le mode actuel de la caméra
+            let currentFacingMode = "environment"; // Supposer la caméra arrière par défaut
+            
+            try {
+                const videoTrack = cameraStream.srcObject.getVideoTracks()[0];
+                if (videoTrack) {
+                    const settings = videoTrack.getSettings();
+                    if (settings && settings.facingMode) {
+                        currentFacingMode = settings.facingMode;
+                    }
+                }
+            } catch (e) {
+                console.log("Impossible de déterminer le mode de la caméra:", e);
+            }
+            
+            // Arrêter le flux vidéo actuel
+            if (cameraStream.srcObject) {
+                const tracks = cameraStream.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+            
+            // Basculer entre "user" (avant) et "environment" (arrière)
+            const newFacingMode = currentFacingMode === "user" ? "environment" : "user";
+            
+            // Configurer les nouvelles contraintes
+            const constraints = {
+                video: {
+                    facingMode: newFacingMode,
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                }
+            };
+            
+            // Accéder à la nouvelle caméra
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function(stream) {
+                    cameraStream.srcObject = stream;
+                })
+                .catch(function(error) {
+                    console.error("Erreur lors du changement de caméra:", error);
+                    alert("Impossible de changer de caméra.");
+                    
+                    // Essayer de revenir à la caméra précédente
+                    navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: currentFacingMode,
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        }
+                    }).then(function(stream) {
+                        cameraStream.srcObject = stream;
+                    });
+                });
+        }
+        
+        function takePhoto() {
+            const cameraStream = document.getElementById('camera-stream');
+            
+            // Créer un canvas temporaire pour capturer l'image
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = cameraStream.videoWidth;
+            tempCanvas.height = cameraStream.videoHeight;
+            
+            // Dessiner l'image de la caméra sur le canvas
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(cameraStream, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // Convertir en image
+            const dataURL = tempCanvas.toDataURL('image/png');
+            const img = new Image();
+            
+            img.onload = function() {
+                // Stocker l'image
+                image = img;
+                
+                // Fermer la caméra avant le traitement
+                closeCamera();
+                
+                // Réinitialiser les points
+                points = [];
+                currentPointIndex = 0;
+                
+                // Passer à l'étape 2
+                goToStep(2);
+                
+                // Configurer le canvas avec la nouvelle image
+                setupCanvas();
+                
+                // Mettre à jour l'indicateur de point
+                updatePointIndicator();
+            };
+            
+            img.src = dataURL;
+        }
+        
+        function goToStep(step) {
+            currentStep = step;
+            
+            // Mettre à jour l'interface en fonction de l'étape
+            if (step === 1) {
+                document.getElementById('upload-panel').style.display = 'block';
+                document.getElementById('canvas-panel').style.display = 'none';
+                document.getElementById('results-panel').style.display = 'none';
+            } else if (step === 2) {
+                document.getElementById('upload-panel').style.display = 'none';
+                document.getElementById('canvas-panel').style.display = 'block';
+                document.getElementById('results-panel').style.display = 'none';
+            } else if (step === 3) {
+                document.getElementById('upload-panel').style.display = 'none';
+                document.getElementById('canvas-panel').style.display = 'none';
+                document.getElementById('results-panel').style.display = 'block';
+                document.getElementById('cervical-results').style.display = 'block';
+            }
+            
+            // Mettre à jour les indicateurs d'étape
+            updateStepIndicators();
+        }
+        
+        function updateStepIndicators() {
+            const steps = [
+                document.getElementById('step1'),
+                document.getElementById('step2'),
+                document.getElementById('step3')
+            ];
+            
+            for (let i = 0; i < steps.length; i++) {
+                steps[i].classList.remove('active', 'completed');
+                if (i + 1 === currentStep) {
+                    steps[i].classList.add('active');
+                } else if (i + 1 < currentStep) {
+                    steps[i].classList.add('completed');
+                }
+            }
+        }
+        
+        function goToNextStep() {
+            if (currentStep === 1) {
+                // Étape 1 à 2 - devrait être géré par les fonctions de fichier/caméra
+            } else if (currentStep === 2) {
+                // Étape 2 à 3 - Calculer et afficher les résultats
+		console.log("Points marqués:", currentPointIndex, "sur", pointLabels.length);
+                if (currentPointIndex === pointLabels.length) {
+		console.log("Tous les points sont marqués, calcul des paramètres...");
+                    calculateParameters();
+                    goToStep(3);
+                } else {
+                    alert(`Veuillez marquer tous les points requis (${currentPointIndex}/${pointLabels.length} marqués).`);
+                }
+            }
+        }
+        
+        function goToPrevStep() {
+            if (currentStep > 1) {
+                goToStep(currentStep - 1);
+            }
+        }
+        
+        function restartMeasurement() {
+            // Garder la même image mais réinitialiser les points
+            points = [];
+            currentPointIndex = 0;
+            
+            // Réinitialiser l'indicateur de point
+            const indicator = document.getElementById('point-indicator');
+            indicator.style.backgroundColor = '';
+            indicator.style.color = '';
+            
+            // Revenir à l'étape 2
+            goToStep(2);
+            
+            // Mettre à jour l'indicateur de point
+            updatePointIndicator();
+            
+            // Redessiner l'image
+            drawImage();
+        }
+        
+        function startNewAnalysis() {
+            // Réinitialiser tout
+            points = [];
+            currentPointIndex = 0;
+            image = null;
+            
+            // Revenir à l'étape 1
+            goToStep(1);
+        }
+// Fonction pour exporter les données vers le calculateur cervical
+function exportToCervicalCalculator() {
+    // Vérifier que les résultats sont disponibles
+    if (!results.cl || !results.t1s || !results.c2c7Sva) {
+        alert("Veuillez d'abord calculer les paramètres avant d'exporter.");
+        return;
+    }
+    
+    // Créer un objet avec les données à exporter
+    const data = {
+        cl: results.cl.toFixed(1),
+        t1s: results.t1s.toFixed(1),
+        c2c7Sva: results.c2c7Sva.toFixed(1),
+        c2s: results.c2s ? results.c2s.toFixed(1) : '',
+        tia: results.tia ? results.tia.toFixed(1) : '',
+        nt: results.nt ? results.nt.toFixed(1) : ''
+    };
+    
+    // Créer l'URL avec les paramètres
+    const queryParams = new URLSearchParams();
+    Object.keys(data).forEach(key => {
+        if (data[key]) {
+            queryParams.append(key, data[key]);
+        }
+    });
+    
+    // Construire l'URL complète vers le calculateur
+    const calculatorUrl = 'cervical-spine-calculator.html?' + queryParams.toString();
+    
+    // Ouvrir le calculateur dans un nouvel onglet avec les données
+    window.open(calculatorUrl, '_blank');
+}
+
+// Fonction pour ajouter le bouton d'exportation à l'interface
+function addExportButton() {
+    // Vérifier si le bouton n'existe pas déjà pour éviter les doublons
+    if (!document.getElementById('export-to-calculator')) {
+        // Trouver le conteneur des boutons d'action dans le panneau de résultats
+        const actionButtonsContainer = document.querySelector('#results-panel .action-buttons');
+        
+        if (actionButtonsContainer) {
+            // Créer le bouton d'exportation
+            const exportButton = document.createElement('button');
+            exportButton.id = 'export-to-calculator';
+            exportButton.className = 'action-btn';
+            exportButton.style.backgroundColor = '#3f51b5';
+            exportButton.textContent = 'Exporter vers Calculateur';
+            exportButton.addEventListener('click', exportToCervicalCalculator);
+            
+            // Ajouter le bouton au conteneur
+            actionButtonsContainer.appendChild(exportButton);
+        }
+    }
+}
+
+// Modifier la fonction goToStep pour ajouter le bouton d'exportation lorsqu'on atteint l'étape des résultats
+const originalGoToStep = goToStep;
+goToStep = function(step) {
+    // Appeler la fonction originale
+    originalGoToStep(step);
+    
+    // Si on est à l'étape des résultats, ajouter le bouton d'exportation
+    if (step === 3) {
+        // Attendre un peu que le DOM soit mis à jour
+        setTimeout(addExportButton, 100);
+    }
+};
+
+// Modifier la fonction calculateParameters pour ajouter le bouton d'exportation après l'affichage des résultats
+const originalCalculateParameters = calculateParameters;
+calculateParameters = function() {
+    // Appeler la fonction originale
+    originalCalculateParameters();
+    
+    // Ajouter le bouton d'exportation
+    addExportButton();
+};
+    </script>
+</body>
+</html>

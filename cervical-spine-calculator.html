@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur des Paramètres de la Colonne Cervicale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #3f51b5;
+        }
+        .panel {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .panel-header {
+            background-color: #3f51b5;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        .panel-body {
+            padding: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        #calculate {
+            background-color: #4285f4;
+            color: white;
+        }
+        #reset {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        #import {
+            background-color: #4caf50;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        .warning {
+            color: #e53935;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .info-box {
+            background-color: #f1f8e9;
+            border-left: 4px solid #8bc34a;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .alert-box {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .danger-box {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        .reference {
+            font-size: 0.8em;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            color: #666;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        #export-code-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 100;
+        }
+        #export-code-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+            overflow: auto;
+        }
+        .code-block {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-x: auto;
+            font-family: monospace;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculateur des Paramètres de la Colonne Cervicale</h1>
+    
+    <div class="panel">
+        <div class="panel-header">Paramètres d'alignement cervical</div>
+        <div class="panel-body">
+            <div class="input-group">
+                <label for="cl">
+                    <span class="tooltip">Angle de Cobb C2-C7 (CL) en degrés
+                        <span class="tooltiptext">Angle entre les plateaux inférieurs de C2 et C7</span>
+                    </span>
+                </label>
+                <input type="number" id="cl" step="0.1" placeholder="Entrez la valeur de la lordose cervicale (CL)">
+            </div>
+            
+            <div class="input-group">
+                <label for="t1s">
+                    <span class="tooltip">Inclinaison de T1 (T1S) en degrés
+                        <span class="tooltiptext">Angle entre le plateau supérieur de T1 et l'horizontale</span>
+                    </span>
+                </label>
+                <input type="number" id="t1s" step="0.1" placeholder="Entrez la valeur de T1 Slope (T1S)">
+            </div>
+            
+            <div class="input-group">
+                <label for="c2c7-sva">
+                    <span class="tooltip">C2-C7 SVA en mm
+                        <span class="tooltiptext">Distance horizontale entre la ligne verticale passant par C2 et C7</span>
+                    </span>
+                </label>
+                <input type="number" id="c2c7-sva" step="0.1" placeholder="Entrez la valeur de C2-C7 SVA">
+            </div>
+            
+            <div class="input-group">
+                <label for="c2s">
+                    <span class="tooltip">Inclinaison de C2 (C2S) en degrés
+                        <span class="tooltiptext">Angle entre le plateau inférieur de C2 et l'horizontale</span>
+                    </span>
+                </label>
+                <input type="number" id="c2s" step="0.1" placeholder="Entrez la valeur de C2 Slope (C2S)">
+            </div>
+            
+            <div class="input-group">
+                <label for="tia">
+                    <span class="tooltip">Thoracic Inlet Angle (TIA) en degrés
+                        <span class="tooltiptext">Angle entre la perpendiculaire au plateau de T1 et la ligne T1-sternum</span>
+                    </span>
+                </label>
+                <input type="number" id="tia" step="0.1" placeholder="Entrez la valeur de TIA (optionnel)">
+            </div>
+            
+            <div class="input-group">
+                <label for="nt">
+                    <span class="tooltip">Neck Tilt (NT) en degrés
+                        <span class="tooltiptext">Angle entre la ligne T1-sternum et la verticale</span>
+                    </span>
+                </label>
+                <input type="number" id="nt" step="0.1" placeholder="Entrez la valeur de NT (optionnel)">
+            </div>
+            
+            <div class="button-group">
+                <button id="import">Importer depuis l'analyseur</button>
+                <button id="calculate">Calculer</button>
+                <button id="reset">Réinitialiser</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="results" class="results">
+        <div id="warning" class="warning"></div>
+        
+        <div class="section-title">Paramètres d'entrée</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Paramètre</th>
+                    <th>Valeur</th>
+                    <th>Plage normale</th>
+                </tr>
+            </thead>
+            <tbody id="input-params">
+                <!-- Données dynamiques -->
+            </tbody>
+        </table>
+        
+        <div class="section-title">Paramètres calculés</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Paramètre</th>
+                    <th>Valeur</th>
+                    <th>Interprétation</th>
+                </tr>
+            </thead>
+            <tbody id="calculated-params">
+                <!-- Données dynamiques -->
+            </tbody>
+        </table>
+        
+        <div class="section-title">Analyse de l'équilibre cervical</div>
+        <div id="balance-analysis" class="info-box">
+            <!-- Données dynamiques -->
+        </div>
+        
+        <div class="section-title">Recommandations cliniques</div>
+        <div id="clinical-recommendations" class="info-box">
+            <!-- Données dynamiques -->
+        </div>
+        
+        <div id="surgical-recommendations-section" style="display: none;">
+            <div class="section-title">Recommandations chirurgicales</div>
+            <div id="surgical-recommendations" class="info-box">
+                <!-- Données dynamiques -->
+            </div>
+        </div>
+        
+        <div class="reference">
+            <p><strong>Références:</strong></p>
+            <p>1. Ames CP, et al. Cervical radiographical alignment: comprehensive assessment techniques and potential importance in cervical myelopathy. Spine. 2013;38(22):S149-60.</p>
+            <p>2. Scheer JK, et al. Cervical spine alignment, sagittal deformity, and clinical implications: a review. J Neurosurg Spine. 2013;19(2):141-59.</p>
+            <p>3. Lee SH, et al. Importance of both lordosis angle and distribution of cervical lordosis for reduction of spondylotic symptoms. Spine J. 2017;17(12):1953-1959.</p>
+            <p>4. Iyer S, et al. A formula for prediction of cervical facet joint angles derived from a validated cervical kinetic model. Spine. 2019;44(23):E1373-E1380.</p>
+        </div>
+    </div>
+    
+    <!-- Panneau de code d'exportation -->
+    <div id="export-code-panel">
+        <div id="export-code-content">
+            <span class="close-button" id="close-export-code">&times;</span>
+            <h2>Code d'exportation pour l'Analyseur d'Alignement Cervical</h2>
+            <p>Copiez ce code JavaScript et ajoutez-le à la fin du script de votre fichier cervical-alignment-analyzer.html, juste avant la balise de fermeture &lt;/script&gt;:</p>
+            <div class="code-block" id="export-js-code">
+// Fonction pour exporter les données vers le calculateur
+function exportToCervicalCalculator() {
+    // Récupérer les résultats
+    const clValue = document.getElementById('result-cl').textContent.replace('°', '').trim();
+    const t1sValue = document.getElementById('result-t1s').textContent.replace('°', '').trim();
+    const c2c7SvaValue = document.getElementById('result-c2c7-sva').textContent.replace(' mm', '').trim();
+    const c2sValue = document.getElementById('result-c2s').textContent.replace('°', '').trim();
+    const tiaValue = document.getElementById('result-tia').textContent.replace('°', '').trim();
+    const ntValue = document.getElementById('result-nt').textContent.replace('°', '').trim();
+    
+    // Créer un objet avec les données
+    const data = {
+        cl: clValue !== '--' ? clValue : '',
+        t1s: t1sValue !== '--' ? t1sValue : '',
+        c2c7Sva: c2c7SvaValue !== '--' ? c2c7SvaValue : '',
+        c2s: c2sValue !== '--' ? c2sValue : '',
+        tia: tiaValue !== '--' ? tiaValue : '',
+        nt: ntValue !== '--' ? ntValue : ''
+    };
+    
+    // Créer l'URL avec les paramètres
+    const queryParams = new URLSearchParams();
+    Object.keys(data).forEach(key => {
+        if (data[key]) {
+            queryParams.append(key, data[key]);
+        }
+    });
+    
+    // Construire l'URL complète vers le calculateur (ajuster le chemin selon votre configuration)
+    const calculatorUrl = 'cervical-spine-calculator.html?' + queryParams.toString();
+    
+    // Ouvrir le calculateur dans un nouvel onglet avec les données
+    window.open(calculatorUrl, '_blank');
+}
+
+// Ajouter un bouton d'exportation à la page des résultats
+function addExportButton() {
+    // Vérifier si le bouton n'existe pas déjà
+    if (!document.getElementById('export-to-calculator')) {
+        const resultsPanel = document.getElementById('results-panel');
+        const actionButtons = resultsPanel.querySelector('.action-buttons');
+        
+        // Créer le bouton d'exportation
+        const exportButton = document.createElement('button');
+        exportButton.id = 'export-to-calculator';
+        exportButton.className = 'action-btn';
+        exportButton.style.backgroundColor = '#3f51b5';
+        exportButton.textContent = 'Exporter vers Calculateur';
+        exportButton.addEventListener('click', exportToCervicalCalculator);
+        
+        // Ajouter le bouton aux boutons d'action
+        actionButtons.appendChild(exportButton);
+    }
+}
+
+// Ajouter le bouton lorsque les résultats sont affichés
+document.getElementById('next-step').addEventListener('click', function() {
+    if (currentStep === 2 && currentPointIndex === pointLabels.length) {
+        // Ajouter le bouton après un court délai pour s'assurer que la page des résultats est chargée
+        setTimeout(addExportButton, 500);
+    }
+});
+
+// Vous pouvez également ajouter cette ligne pour les résultats déjà affichés
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('results-panel') && 
+        document.getElementById('results-panel').style.display !== 'none') {
+        setTimeout(addExportButton, 500);
+    }
+});
+</div>
+            <p>Assurez-vous d'ajuster le chemin du fichier <code>cervical-spine-calculator.html</code> dans le code si nécessaire.</p>
+            <button id="copy-code" style="background-color: #4caf50; color: white; margin-top: 10px;">Copier le code</button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const clInput = document.getElementById('cl');
+            const t1sInput = document.getElementById('t1s');
+            const c2c7SvaInput = document.getElementById('c2c7-sva');
+            const c2sInput = document.getElementById('c2s');
+            const tiaInput = document.getElementById('tia');
+            const ntInput = document.getElementById('nt');
+            
+            const calculateBtn = document.getElementById('calculate');
+            const resetBtn = document.getElementById('reset');
+            const importBtn = document.getElementById('import');
+            
+            const resultsDiv = document.getElementById('results');
+            const warningDiv = document.getElementById('warning');
+            const surgicalRecommendationsSection = document.getElementById('surgical-recommendations-section');
+            
+            // Panneau de code d'exportation
+            const exportCodePanel = document.getElementById('export-code-panel');
+            const closeExportCode = document.getElementById('close-export-code');
+            const copyCodeBtn = document.getElementById('copy-code');
+            
+            // Fermer le panneau de code d'exportation
+            closeExportCode.addEventListener('click', function() {
+                exportCodePanel.style.display = 'none';
+            });
+            
+            // Copier le code
+            copyCodeBtn.addEventListener('click', function() {
+                const codeElement = document.getElementById('export-js-code');
+                const range = document.createRange();
+                range.selectNode(codeElement);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                
+                // Changer temporairement le texte du bouton
+                copyCodeBtn.textContent = 'Code copié!';
+                setTimeout(function() {
+                    copyCodeBtn.textContent = 'Copier le code';
+                }, 2000);
+            });
+            
+            // Calcul automatique des paramètres interdépendants
+            function calculateDependentParameters() {
+                // Calculer T1S-CL
+                if (t1sInput.value && clInput.value) {
+                    const t1s = parseFloat(t1sInput.value);
+                    const cl = parseFloat(clInput.value);
+                    // Il n'y a pas de champ d'entrée pour T1S-CL, c'est un paramètre calculé
+                }
+                
+                // Calculer TIA basé sur T1S et NT si les deux sont disponibles
+                if (t1sInput.value && ntInput.value && !tiaInput.value) {
+                    const t1s = parseFloat(t1sInput.value);
+                    const nt = parseFloat(ntInput.value);
+                    tiaInput.value = (t1s + nt).toFixed(1);
+                }
+                
+                // Calculer NT basé sur TIA et T1S si les deux sont disponibles
+                if (tiaInput.value && t1sInput.value && !ntInput.value) {
+                    const tia = parseFloat(tiaInput.value);
+                    const t1s = parseFloat(t1sInput.value);
+                    ntInput.value = (tia - t1s).toFixed(1);
+                }
+                
+                // Calculer T1S basé sur TIA et NT si les deux sont disponibles
+                if (tiaInput.value && ntInput.value && !t1sInput.value) {
+                    const tia = parseFloat(tiaInput.value);
+                    const nt = parseFloat(ntInput.value);
+                    t1sInput.value = (tia - nt).toFixed(1);
+                }
+            }
+            
+            t1sInput.addEventListener('input', calculateDependentParameters);
+            ntInput.addEventListener('input', calculateDependentParameters);
+            tiaInput.addEventListener('input', calculateDependentParameters);
+            
+            // Bouton Calculer
+            calculateBtn.addEventListener('click', function() {
+                // Validation des entrées
+                if (!clInput.value || !t1sInput.value || !c2c7SvaInput.value) {
+                    warningDiv.textContent = "Veuillez fournir au moins les valeurs CL, T1S et C2-C7 SVA pour l'analyse.";
+                    resultsDiv.style.display = 'block';
+                    return;
+                }
+                
+                // Effacer les avertissements précédents
+                warningDiv.textContent = '';
+                
+                // Récupérer les valeurs
+                const cl = parseFloat(clInput.value);
+                const t1s = parseFloat(t1sInput.value);
+                const c2c7Sva = parseFloat(c2c7SvaInput.value);
+                const c2s = c2sInput.value ? parseFloat(c2sInput.value) : null;
+                const tia = tiaInput.value ? parseFloat(tiaInput.value) : null;
+                const nt = ntInput.value ? parseFloat(ntInput.value) : null;
+                
+                // Calculer T1S-CL
+                const t1sCl = t1s - cl;
+                
+                // Vérifier la relation TIA = T1S + NT si tous les paramètres sont fournis
+                if (tia !== null && t1s !== null && nt !== null) {
+                    const calculatedTia = t1s + nt;
+                    if (Math.abs(tia - calculatedTia) > 2) {
+                        warningDiv.textContent = `Avertissement: TIA (${tia.toFixed(1)}) n'est pas approximativement égal à T1S (${t1s.toFixed(1)}) + NT (${nt.toFixed(1)}) = ${calculatedTia.toFixed(1)}. Vérifiez vos mesures.`;
+                    }
+                }
+                
+                // Remplir le tableau des paramètres d'entrée
+                document.getElementById('input-params').innerHTML = `
+                    <tr>
+                        <td>Angle de Cobb C2-C7 (CL)</td>
+                        <td>${cl.toFixed(1)}°</td>
+                        <td>10° à 30°</td>
+                    </tr>
+                    <tr>
+                        <td>Inclinaison de T1 (T1S)</td>
+                        <td>${t1s.toFixed(1)}°</td>
+                        <td>20° à 35°</td>
+                    </tr>
+                    <tr>
+                        <td>C2-C7 SVA</td>
+                        <td>${c2c7Sva.toFixed(1)} mm</td>
+                        <td>0 à 20 mm</td>
+                    </tr>
+                    ${c2s !== null ? `
+                    <tr>
+                        <td>Inclinaison de C2 (C2S)</td>
+                        <td>${c2s.toFixed(1)}°</td>
+                        <td>-5° à 15°</td>
+                    </tr>` : ''}
+                    ${tia !== null ? `
+                    <tr>
+                        <td>Thoracic Inlet Angle (TIA)</td>
+                        <td>${tia.toFixed(1)}°</td>
+                        <td>65° à 85°</td>
+                    </tr>` : ''}
+                    ${nt !== null ? `
+                    <tr>
+                        <td>Neck Tilt (NT)</td>
+                        <td>${nt.toFixed(1)}°</td>
+                        <td>40° à 50°</td>
+                    </tr>` : ''}
+                `;
+                
+                // Remplir le tableau des paramètres calculés
+                document.getElementById('calculated-params').innerHTML = `
+                    <tr>
+                        <td>T1S-CL</td>
+                        <td>${t1sCl.toFixed(1)}°</td>
+                        <td>${getT1SClInterpretation(t1sCl)}</td>
+                    </tr>
+                    ${tia === null && t1s !== null && nt !== null ? `
+                    <tr>
+                        <td>TIA (calculé)</td>
+                        <td>${(t1s + nt).toFixed(1)}°</td>
+                        <td>Formule: TIA = T1S + NT</td>
+                    </tr>` : ''}
+                `;
+                
+                // Analyse de l'équilibre cervical
+                document.getElementById('balance-analysis').innerHTML = getBalanceAnalysis(cl, t1s, t1sCl, c2c7Sva);
+                
+                // Recommandations cliniques
+                document.getElementById('clinical-recommendations').innerHTML = getClinicalRecommendations(cl, t1s, t1sCl, c2c7Sva);
+                
+                // Recommandations chirurgicales
+                const surgicalIndication = getSurgicalIndication(cl, t1s, t1sCl, c2c7Sva);
+                if (surgicalIndication) {
+                    document.getElementById('surgical-recommendations').innerHTML = getSurgicalRecommendations(cl, t1s, t1sCl, c2c7Sva);
+                    surgicalRecommendationsSection.style.display = 'block';
+                } else {
+                    surgicalRecommendationsSection.style.display = 'none';
+                }
+                
+                // Afficher les résultats
+                resultsDiv.style.display = 'block';
+            });
+            
+            // Fonction pour interpréter T1S-CL
+            function getT1SClInterpretation(t1sCl) {
+                if (t1sCl < 0) {
+                    return "Hyperlordose cervicale (T1S-CL < 0°)";
+                } else if (t1sCl >= 0 && t1sCl <= 15) {
+                    return "Équilibre harmonieux (T1S-CL entre 0° et 15°)";
+                } else if (t1sCl > 15 && t1sCl <= 25) {
+                    return "Déséquilibre modéré (T1S-CL entre 15° et 25°)";
+                } else {
+                    return "Déséquilibre sévère (T1S-CL > 25°)";
+                }
+            }
+            
+            // Fonction pour l'analyse de l'équilibre cervical
+            function getBalanceAnalysis(cl, t1s, t1sCl, c2c7Sva) {
+                let analysis = "";
+                
+                // Analyse basée sur T1S-CL
+                if (t1sCl < 0) {
+                    analysis += "<p><strong>Hyperlordose cervicale:</strong> La lordose cervicale est excessive par rapport à T1S. Cela peut indiquer une compensation pour un déséquilibre thoracolombaire ou être idiopathique.</p>";
+                } else if (t1sCl >= 0 && t1sCl <= 15) {
+                    analysis += "<p><strong>Équilibre harmonieux:</strong> Bonne relation entre la lordose cervicale et l'inclinaison de T1. Les études montrent que ce ratio est associé à de meilleurs résultats cliniques et une moindre dégénérescence cervicale.</p>";
+                } else if (t1sCl > 15 && t1sCl <= 25) {
+                    analysis += "<p><strong>Déséquilibre modéré:</strong> La lordose cervicale est insuffisante par rapport à T1S. Cela peut être associé à des douleurs cervicales et une perte de fonction.</p>";
+                } else {
+                    analysis += "<p><strong>Déséquilibre sévère:</strong> Hypolordose cervicale importante par rapport à T1S. Fortement associé à des symptômes cliniques, des cervicalgies, et potentiellement à une myélopathie cervicale.</p>";
+                }
+                
+                // Analyse basée sur C2-C7 SVA
+                if (c2c7Sva < 0) {
+                    analysis += "<p><strong>C2-C7 SVA négatif:</strong> Posture cervicale en extension excessive, souvent associée à des contraintes sur les articulations facettaires postérieures.</p>";
+                } else if (c2c7Sva >= 0 && c2c7Sva <= 20) {
+                    analysis += "<p><strong>C2-C7 SVA normal:</strong> Bon alignement global dans le plan sagittal, associé à une meilleure fonction et moins de symptômes.</p>";
+                } else if (c2c7Sva > 20 && c2c7Sva <= 40) {
+                    analysis += "<p><strong>C2-C7 SVA modérément augmenté:</strong> Début de posture de la tête vers l'avant, ce qui peut augmenter les contraintes sur les muscles cervicaux postérieurs.</p>";
+                } else {
+                    analysis += "<p><strong>C2-C7 SVA sévèrement augmenté:</strong> Posture significative de la tête vers l'avant, associée à une augmentation de la fatigue musculaire, des cervicalgies chroniques et une diminution de la qualité de vie.</p>";
+                }
+                
+                // Analyse basée sur la relation entre T1S et CL
+                if (cl < 0.5 * t1s) {
+                    analysis += "<p><strong>Lordose insuffisante pour T1S:</strong> La règle de Ames suggère que CL devrait être environ 80% de T1S. Votre CL est significativement inférieure à cette cible.</p>";
+                } else if (cl >= 0.5 * t1s && cl <= 0.9 * t1s) {
+                    analysis += "<p><strong>Relation CL/T1S sous-optimale:</strong> La lordose cervicale est légèrement inférieure à la cible optimale par rapport à T1S.</p>";
+                } else if (cl > 0.9 * t1s && cl < 1.1 * t1s) {
+                    analysis += "<p><strong>Relation CL/T1S harmonieuse:</strong> La lordose cervicale est bien proportionnée à l'inclinaison de T1, suggérant un bon équilibre biomécanique.</p>";
+                } else {
+                    analysis += "<p><strong>Lordose excessive pour T1S:</strong> La lordose cervicale est plus importante que nécessaire par rapport à T1S, ce qui peut indiquer une compensation.</p>";
+                }
+                
+                return analysis;
+            }
+            
+            // Fonction pour les recommandations cliniques
+            function getClinicalRecommendations(cl, t1s, t1sCl, c2c7Sva) {
+                let recommendations = "";
+                
+                // Recommandations basées sur T1S-CL
+                if (t1sCl < 0) {
+                    recommendations += "<p><strong>Pour l'hyperlordose cervicale:</strong></p><ul>";
+                    recommendations += "<li>Étirements des muscles extenseurs cervicaux (trapèze supérieur, élévateur de la scapula)</li>";
+                    recommendations += "<li>Renforcement des muscles fléchisseurs profonds du cou</li>";
+                    recommendations += "<li>Techniques de mobilisation articulaire pour améliorer la mobilité segmentaire</li>";
+                    recommendations += "<li>Correction posturale avec focus sur la position de la tête</li>";
+                    recommendations += "</ul>";
+                } else if (t1sCl >= 0 && t1sCl <= 15) {
+                    recommendations += "<p><strong>Pour maintenir l'équilibre harmonieux:</strong></p><ul>";
+                    recommendations += "<li>Programme d'exercices d'entretien de la musculature cervicale</li>";
+                    recommendations += "<li>Maintien d'une ergonomie optimale au travail et pendant les activités quotidiennes</li>";
+                    recommendations += "<li>Exercices de stabilisation cervicale</li>";
+                    recommendations += "</ul>";
+                } else if (t1sCl > 15) {
+                    recommendations += "<p><strong>Pour le déséquilibre (hypolordose) cervical:</strong></p><ul>";
+                    recommendations += "<li>Étirements des muscles antérieurs du cou</li>";
+                    recommendations += "<li>Renforcement des extenseurs cervicaux profonds</li>";
+                    recommendations += "<li>Techniques de mobilisation pour améliorer l'extension cervicale</li>";
+                    recommendations += "<li>Correction de la posture 'tête en avant' avec exercices spécifiques</li>";
+                    recommendations += "<li>Thérapie manuelle ciblant les segments hypomobiles</li>";
+                    recommendations += "</ul>";
+                }
+                
+                // Recommandations supplémentaires basées sur C2-C7 SVA
+                if (c2c7Sva > 20) {
+                    recommendations += "<p><strong>Pour la posture de la tête en avant (C2-C7 SVA augmenté):</strong></p><ul>";
+                    recommendations += "<li>Exercices de rétraction du menton (chin tucks)</li>";
+                    recommendations += "<li>Correction ergonomique (hauteur d'écran, position de travail)</li>";
+                    recommendations += "<li>Renforcement des muscles stabilisateurs scapulaires</li>";
+                    recommendations += "<li>Techniques de relâchement myofascial pour les trapèzes et les élévateurs</li>";
+                    recommendations += "</ul>";
+                }
+                
+                // Recommandations générales
+                recommendations += "<p><strong>Recommandations générales:</strong></p><ul>";
+                recommendations += "<li>Maintenir une hydratation adéquate et une nutrition équilibrée pour la santé des disques</li>";
+                recommendations += "<li>Éviter les positions prolongées, surtout avec flexion cervicale (ex. utilisation du téléphone)</li>";
+                recommendations += "<li>Pratique régulière d'activités favorisant la posture (yoga, Pilates, tai-chi)</li>";
+                recommendations += "<li>Échauffement avant activité physique avec mobilisations cervicales douces</li>";
+                recommendations += "</ul>";
+                
+                return recommendations;
+            }
+            
+            // Fonction pour déterminer si une intervention chirurgicale est indiquée
+            function getSurgicalIndication(cl, t1s, t1sCl, c2c7Sva) {
+                // Indications chirurgicales basées sur les valeurs des paramètres
+                if (t1sCl > 25 || c2c7Sva > 50 || cl < 0 || (t1s > 35 && cl < 10)) {
+                    return true;
+                }
+                return false;
+            }
+            
+            // Fonction pour les recommandations chirurgicales
+            function getSurgicalRecommendations(cl, t1s, t1sCl, c2c7Sva) {
+                let recommendations = "<p><strong>Considérations chirurgicales:</strong> Les paramètres indiquent un déséquilibre significatif qui pourrait bénéficier d'une évaluation chirurgicale, particulièrement si associé à:</p><ul>";
+                recommendations += "<li>Des symptômes neurologiques (radiculopathie, myélopathie)</li>";
+                recommendations += "<li>Des douleurs cervicales persistantes malgré un traitement conservateur adéquat</li>";
+                recommendations += "<li>Une progression documentée de la déformation</li>";
+                recommendations += "<li>Une instabilité segmentaire</li>";
+                recommendations += "</ul><p><strong>Options chirurgicales potentielles:</strong></p>";
+                
+                // Recommandations spécifiques basées sur les valeurs
+                if (cl < 0) {
+                    // Cyphose cervicale
+                    recommendations += "<p class='alert-box'><strong>Correction de cyphose cervicale:</strong> Approche combinée antérieure-postérieure souvent nécessaire pour les cyphoses rigides. Une arthrodèse circonférentielle avec placement de cages intersomatiques lordosantes par voie antérieure, suivie d'une instrumentation postérieure, peut être envisagée.</p>";
+                } else if (t1sCl > 25) {
+                    // Hypolordose sévère
+                    recommendations += "<p class='alert-box'><strong>Correction d'hypolordose sévère:</strong> L'approche antérieure par ACDF (Arthrodèse Cervicale Antérieure avec Discectomie) ou corpectomie avec cages lordosantes peut être indiquée. Pour les cas plus sévères, une approche combinée avec instrumentation postérieure peut être nécessaire.</p>";
+                }
+                
+                if (c2c7Sva > 50) {
+                    recommendations += "<p class='alert-box'><strong>Correction de déséquilibre sagittal cervical avancé:</strong> Une planification chirurgicale complexe est nécessaire. Envisager une ostéotomie cervicale (PSO - Pedicle Subtraction Osteotomy) dans les cas très sévères. L'extension de la fusion au niveau thoracique proximal peut être nécessaire pour gérer la transition cervico-thoracique.</p>";
+                }
+                
+                recommendations += "<p class='danger-box'><strong>Important:</strong> Une consultation avec un chirurgien du rachis spécialisé est essentielle pour une évaluation complète. La décision chirurgicale doit être basée sur une corrélation entre les paramètres radiologiques, les symptômes cliniques et l'impact fonctionnel.</p>";
+                
+                return recommendations;
+            }
+            
+            // Bouton Réinitialiser
+            resetBtn.addEventListener('click', function() {
+                clInput.value = '';
+                t1sInput.value = '';
+                c2c7SvaInput.value = '';
+                c2sInput.value = '';
+                tiaInput.value = '';
+                ntInput.value = '';
+                resultsDiv.style.display = 'none';
+                warningDiv.textContent = '';
+            });
+            
+            // Bouton Importer
+            importBtn.addEventListener('click', function() {
+                // Afficher le panneau de code d'exportation
+                exportCodePanel.style.display = 'block';
+                
+                // Vérifier si des paramètres d'URL sont présents et les utiliser si c'est le cas
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('cl')) {
+                    clInput.value = urlParams.get('cl');
+                }
+                if (urlParams.has('t1s')) {
+                    t1sInput.value = urlParams.get('t1s');
+                }
+                if (urlParams.has('c2c7Sva')) {
+                    c2c7SvaInput.value = urlParams.get('c2c7Sva');
+                }
+                if (urlParams.has('c2s')) {
+                    c2sInput.value = urlParams.get('c2s');
+                }
+                if (urlParams.has('tia')) {
+                    tiaInput.value = urlParams.get('tia');
+                }
+                if (urlParams.has('nt')) {
+                    ntInput.value = urlParams.get('nt');
+                }
+                
+                // Si des paramètres ont été importés, calculer automatiquement
+                if (urlParams.has('cl') || urlParams.has('t1s') || urlParams.has('c2c7Sva')) {
+                    calculateBtn.click();
+                }
+            });
+            
+            // Vérifier si des paramètres d'URL sont présents au chargement initial
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('cl') || urlParams.has('t1s') || urlParams.has('c2c7Sva')) {
+                if (urlParams.has('cl')) {
+                    clInput.value = urlParams.get('cl');
+                }
+                if (urlParams.has('t1s')) {
+                    t1sInput.value = urlParams.get('t1s');
+                }
+                if (urlParams.has('c2c7Sva')) {
+                    c2c7SvaInput.value = urlParams.get('c2c7Sva');
+                }
+                if (urlParams.has('c2s')) {
+                    c2sInput.value = urlParams.get('c2s');
+                }
+                if (urlParams.has('tia')) {
+                    tiaInput.value = urlParams.get('tia');
+                }
+                if (urlParams.has('nt')) {
+                    ntInput.value = urlParams.get('nt');
+                }
+                
+                // Calculer automatiquement
+                calculateBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
