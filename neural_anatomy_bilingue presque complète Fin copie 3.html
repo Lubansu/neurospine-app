@@ -1,0 +1,3984 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlas Nerveux Interactif / Interactieve Zenuwatlas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+         .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* RESPONSIVE DESIGN POUR MOBILE */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            header {
+                margin-bottom: 20px;
+                padding-top: 50px; /* Espace pour les boutons de langue */
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 8px;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+
+            .language-selector {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 1000;
+                gap: 5px;
+            }
+
+            .lang-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.active {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 5px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .tab-btn.active {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .results-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            min-height: 500px;
+        }
+
+        .results-list {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .result-item:hover {
+            transform: translateX(5px);
+            border-left-color: #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-item.selected {
+            border-left-color: #667eea;
+            background: #e3f2fd;
+        }
+
+        .details-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .nerve-path {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .path-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f0f4f8;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .path-step:not(:last-child)::after {
+            content: '↓';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .brain-icon { background: #e91e63; }
+        .spinal-icon { background: #9c27b0; }
+        .nerve-icon { background: #2196f3; }
+        .muscle-icon { background: #4caf50; }
+
+        .function-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .quiz-container {
+            text-align: center;
+        }
+
+        .quiz-question {
+            background: #f0f4f8;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .quiz-option {
+            padding: 15px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .quiz-option.correct {
+            background: #4caf50 !important;
+            color: white !important;
+            border-color: #4caf50 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .quiz-option.incorrect {
+            background: #f44336 !important;
+            color: white !important;
+            border-color: #f44336 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+        }
+
+        .quiz-stats {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn.active {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .flag-icon {
+            width: 20px;
+            height: 15px;
+            display: inline-block;
+            margin-right: 5px;
+            border-radius: 2px;
+        }
+
+        .flag-fr {
+            background: linear-gradient(to right, #002395 33%, white 33%, white 66%, #ED2939 66%);
+        }
+
+        .flag-nl {
+            background: linear-gradient(to bottom, #AE1C28 33%, white 33%, white 66%, #21468B 66%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="language-selector">
+                <button class="lang-btn active" onclick="changeLanguage('fr')">
+                    <span class="flag-icon flag-fr"></span>FR
+                </button>
+                <button class="lang-btn" onclick="changeLanguage('nl')">
+                    <span class="flag-icon flag-nl"></span>NL
+                </button>
+            </div>
+            <h1 id="main-title">🧠 Atlas Nerveux Interactif</h1>
+            <p class="subtitle" id="main-subtitle">Explorez l'anatomie nerveuse du corps humain</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('nerve-to-muscle')" id="tab-nerve-muscle">Nerf → Muscle</button>
+            <button class="tab-btn" onclick="switchTab('muscle-to-nerve')" id="tab-muscle-nerve">Muscle → Nerf</button>
+            <button class="tab-btn" onclick="switchTab('quiz')" id="tab-quiz">Quiz</button>
+        </div>
+
+        <!-- Nerf vers Muscle -->
+        <div id="nerve-to-muscle" class="tab-content active">
+            <div class="search-section">
+                <input type="text" class="search-box" id="nerve-search" placeholder="Rechercher un nerf..." onkeyup="searchNerves(this.value)">
+                <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn active" style="padding: 8px 16px; font-size: 14px;" onclick="filterNervesByCategory('all')" id="filter-all-nerves">Tous</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterNervesByCategory('Nerf crânien')" id="filter-cranial">Nerfs Crâniens</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterNervesByCategory('Membre supérieur')" id="filter-upper">Membre Supérieur</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterNervesByCategory('Membre inférieur')" id="filter-lower">Membre Inférieur</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterNervesByCategory('Nerf thoracique')" id="filter-thoracic">Nerfs Thoraciques</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterNervesByCategory('Nerf rachidien')" id="filter-spinal">Nerfs Rachidiens</button>
+                </div>
+            </div>
+            <div class="results-section">
+                <div class="results-list">
+                    <h3 id="nerves-available">Nerfs disponibles <span id="nerve-count"></span></h3>
+                    <div id="nerve-results"></div>
+                </div>
+                <div class="details-panel">
+                    <div id="nerve-details">
+                        <p style="text-align: center; color: #666; margin-top: 50px;" id="select-nerve">Sélectionnez un nerf pour voir ses détails</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Muscle vers Nerf -->
+        <div id="muscle-to-nerve" class="tab-content">
+            <div class="search-section">
+                <input type="text" class="search-box" id="muscle-search" placeholder="Rechercher un muscle..." onkeyup="searchMuscles(this.value)">
+                <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn active" style="padding: 8px 16px; font-size: 14px;" onclick="filterMusclesByCategory('all')" id="filter-all-muscles">Tous</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterMusclesByCategory('Nerf crânien')" id="filter-cranial-muscles">Muscles Crâniens</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterMusclesByCategory('Membre supérieur')" id="filter-upper-muscles">Membre Supérieur</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterMusclesByCategory('Membre inférieur')" id="filter-lower-muscles">Membre Inférieur</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterMusclesByCategory('Nerf thoracique')" id="filter-thoracic-muscles">Muscles Thoraciques</button>
+                    <button class="btn" style="padding: 8px 16px; font-size: 14px;" onclick="filterMusclesByCategory('Nerf rachidien')" id="filter-spinal-muscles">Muscles Rachidiens</button>
+                </div>
+            </div>
+            <div class="results-section">
+                <div class="results-list">
+                    <h3 id="muscles-available">Muscles disponibles <span id="muscle-count"></span></h3>
+                    <div id="muscle-results"></div>
+                </div>
+                <div class="details-panel">
+                    <div id="muscle-details">
+                        <p style="text-align: center; color: #666; margin-top: 50px;" id="select-muscle">Sélectionnez un muscle pour voir son innervation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz -->
+        <div id="quiz" class="tab-content">
+            <div class="quiz-container">
+                <!-- Configuration du quiz -->
+                <div id="quiz-setup" class="quiz-question">
+                    <h2 id="quiz-config-title">🎯 Configuration du Quiz</h2>
+                    <p style="margin-bottom: 20px;" id="quiz-config-subtitle">Choisissez le nombre de questions pour votre session d'entraînement :</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;">
+                        <button class="quiz-option" onclick="setupQuiz(5)">5 <span id="questions-text">questions</span><br><small id="quick-quiz">Quiz rapide</small></button>
+                        <button class="quiz-option" onclick="setupQuiz(10)">10 <span id="questions-text2">questions</span><br><small id="training-text">Entraînement</small></button>
+                        <button class="quiz-option" onclick="setupQuiz(15)">15 <span id="questions-text3">questions</span><br><small id="complete-session">Session complète</small></button>
+                        <button class="quiz-option" onclick="setupQuiz(20)">20 <span id="questions-text4">questions</span><br><small id="evaluation-text">Évaluation</small></button>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; margin-bottom: 10px;" id="custom-number">Ou choisissez un nombre personnalisé :</label>
+                        <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+                            <input type="number" id="custom-questions" min="1" max="25" value="10" style="padding: 10px; border: 2px solid #ddd; border-radius: 5px; width: 80px;">
+                            <button class="btn" onclick="setupQuiz(parseInt(document.getElementById('custom-questions').value))" id="start-btn">Commencer</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistiques du quiz -->
+                <div class="quiz-stats" id="quiz-stats" style="display: none;">
+                    <div class="stat-item">
+                        <div class="stat-number" id="score">0</div>
+                        <div id="score-label">Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="question-count">1</div>
+                        <div id="question-label">Question</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="correct-answers">0</div>
+                        <div id="correct-label">Bonnes réponses</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="total-questions">10</div>
+                        <div id="total-label">Total</div>
+                    </div>
+                </div>
+
+                <!-- Question du quiz -->
+                <div class="quiz-question" id="quiz-question-container" style="display: none;">
+                    <h3 id="quiz-question-text">Chargement...</h3>
+                    <div class="quiz-options" id="quiz-options"></div>
+                    <button class="btn" id="next-question" onclick="nextQuestion()" style="display: none;">Question suivante</button>
+                </div>
+
+                <!-- Résultats et synthèse -->
+                <div id="quiz-results" style="display: none;">
+                    <div class="quiz-question">
+                        <div id="quiz-final-score"></div>
+                        <button class="btn" onclick="resetQuiz()" style="margin-top: 20px;" id="new-quiz-btn">Nouveau Quiz</button>
+                    </div>
+
+                    <!-- Synthèse des erreurs -->
+                    <div id="error-synthesis" style="margin-top: 30px; display: none;">
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px; padding: 20px;">
+                            <h3 style="color: #856404; margin-top: 0;" id="learning-synthesis">📚 Synthèse d'apprentissage</h3>
+                            <p style="color: #856404;" id="learning-text">Voici les domaines à réviser selon vos réponses incorrectes :</p>
+                            
+                            <div id="error-topics" style="margin: 20px 0;"></div>
+                            
+                            <div style="background: white; border-radius: 8px; padding: 15px; margin-top: 20px;">
+                                <h4 style="margin-top: 0; color: #495057;" id="resources-title">🔗 Ressources recommandées</h4>
+                                <div id="learning-resources"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== SYSTÈME MULTILINGUE ==========
+        let currentLanguage = 'fr';
+
+        const translations = {
+            fr: {
+                // Interface principale
+                mainTitle: "🧠 Atlas Nerveux Interactif",
+                mainSubtitle: "Explorez l'anatomie nerveuse du corps humain",
+                tabNerveMuscle: "Nerf → Muscle",
+                tabMuscleNerve: "Muscle → Nerf",
+                tabQuiz: "Quiz",
+                
+                // Recherche et filtres
+                searchNerve: "Rechercher un nerf (ex: ulnaire, médian, sciatique, facial...)",
+                searchMuscle: "Rechercher un muscle (ex: biceps, triceps, fléchisseurs...)",
+                filterAll: "Tous",
+                filterCranial: "Nerfs Crâniens (I-XII)",
+                filterUpper: "Membre Supérieur",
+                filterLower: "Membre Inférieur",
+                filterThoracic: "Nerfs Thoraciques",
+                filterSpinal: "Nerfs Rachidiens",
+                filterCranialMuscles: "Muscles Crâniens",
+                filterUpperMuscles: "Membre Supérieur",
+                filterLowerMuscles: "Membre Inférieur",
+                filterThoracicMuscles: "Muscles Thoraciques",
+                filterSpinalMuscles: "Muscles Rachidiens",
+                
+                // Listes
+                nervesAvailable: "Nerfs disponibles",
+                musclesAvailable: "Muscles disponibles",
+                selectNerve: "Sélectionnez un nerf pour voir ses détails",
+                selectMuscle: "Sélectionnez un muscle pour voir son innervation",
+                nerveCount: "nerfs",
+                muscleCount: "muscles",
+                
+                // Détails
+                generalInfo: "📍 Informations générales",
+                origin: "Origine",
+                spinalLevel: "Niveau spinal",
+                category: "Catégorie",
+                nervePath: "🧭 Trajet nerveux",
+                musclesInnervated: "💪 Muscles/Structures innervés",
+                mainFunctions: "🎯 Fonctions principales",
+                responsibleNerve: "⚡ Nerf responsable",
+                nerveFunctions: "🎯 Fonctions du nerf",
+                innervationPath: "🔄 Trajet d'innervation (muscle → origine)",
+                selectedMuscle: "Muscle sélectionné",
+                innervatedBy: "Innervé par",
+                unspecified: "Non spécifiée",
+                
+                // Quiz
+                quizConfigTitle: "🎯 Configuration du Quiz",
+                quizConfigSubtitle: "Choisissez le nombre de questions pour votre session d'entraînement :",
+                questions: "questions",
+                quickQuiz: "Quiz rapide",
+                training: "Entraînement",
+                completeSession: "Session complète",
+                evaluation: "Évaluation",
+                customNumber: "Ou choisissez un nombre personnalisé :",
+                startBtn: "Commencer",
+                score: "Score",
+                question: "Question",
+                correctAnswers: "Bonnes réponses",
+                total: "Total",
+                nextQuestion: "Question suivante",
+                seeResults: "Voir les résultats",
+                newQuiz: "Nouveau Quiz",
+                loading: "Chargement...",
+                
+                // Résultats quiz
+                quizFinished: "Quiz terminé !",
+                totalScore: "Score total",
+                errors: "Erreurs",
+                percentage: "Pourcentage",
+                excellentWork: "Excellent travail !",
+                wellDone: "Bien joué !",
+                keepStudying: "Continuez à étudier !",
+                
+                // Synthèse d'apprentissage
+                learningSynthesis: "📚 Synthèse d'apprentissage",
+                learningText: "Voici les domaines à réviser selon vos réponses incorrectes :",
+                errorDetails: "📋 Détail de vos erreurs :",
+                domainsToReview: "📚 Domaines à réviser :",
+                recommendedResources: "🔗 Ressources recommandées pour approfondir :",
+                yourAnswer: "Votre réponse",
+                correctAnswer: "Bonne réponse",
+                explanation: "Explication",
+                error: "erreur",
+                errors2: "erreurs",
+                questionToReview: "question à revoir dans cette thématique",
+                questionsToReview: "questions à revoir dans cette thématique",
+                clickLinks: "Cliquez sur les liens pour accéder aux ressources d'apprentissage"
+            },
+            nl: {
+                // Interface principale
+                mainTitle: "🧠 Interactieve Zenuwatlas",
+                mainSubtitle: "Verken de zenuwanatomie van het menselijk lichaam",
+                tabNerveMuscle: "Zenuw → Spier",
+                tabMuscleNerve: "Spier → Zenuw",
+                tabQuiz: "Quiz",
+                
+                // Recherche et filtres
+                searchNerve: "Zoek een zenuw (bijv: ulnaris, medianus, ischiadicus, facialis...)",
+                searchMuscle: "Zoek een spier (bijv: biceps, triceps, flexoren...)",
+                filterAll: "Alle",
+                filterCranial: "Hersenzenuwjen (I-XII)",
+                filterUpper: "Bovenste Ledemaat",
+                filterLower: "Onderste Ledemaat",
+                filterThoracic: "Thoracale Zenuwen",
+                filterSpinal: "Ruggemergzenuwen",
+                filterCranialMuscles: "Hersenspieren",
+                filterUpperMuscles: "Bovenste Ledemaat",
+                filterLowerMuscles: "Onderste Ledemaat", 
+                filterThoracicMuscles: "Thoracale Spieren",
+                filterSpinalMuscles: "Ruggemergspieren",
+                
+                // Listes
+                nervesAvailable: "Beschikbare zenuwen",
+                musclesAvailable: "Beschikbare spieren",
+                selectNerve: "Selecteer een zenuw om details te zien",
+                selectMuscle: "Selecteer een spier om de innervatie te zien",
+                nerveCount: "zenuwen",
+                muscleCount: "spieren",
+                
+                // Détails
+                generalInfo: "📍 Algemene informatie",
+                origin: "Oorsprong",
+                spinalLevel: "Ruggenmerg niveau",
+                category: "Categorie",
+                nervePath: "🧭 Zenuwbaan",
+                musclesInnervated: "💪 Geïnnerveerde spieren/structuren",
+                mainFunctions: "🎯 Hoofdfuncties",
+                responsibleNerve: "⚡ Verantwoordelijke zenuw",
+                nerveFunctions: "🎯 Functies van de zenuw",
+                innervationPath: "🔄 Innervatiebaan (spier → oorsprong)",
+                selectedMuscle: "Geselecteerde spier",
+                innervatedBy: "Geïnnerveerd door",
+                unspecified: "Niet gespecificeerd",
+                
+                // Quiz
+                quizConfigTitle: "🎯 Quiz Configuratie",
+                quizConfigSubtitle: "Kies het aantal vragen voor uw trainingssessie:",
+                questions: "vragen",
+                quickQuiz: "Snelle quiz",
+                training: "Training",
+                completeSession: "Volledige sessie",
+                evaluation: "Evaluatie",
+                customNumber: "Of kies een aangepast aantal:",
+                startBtn: "Beginnen",
+                score: "Score",
+                question: "Vraag",
+                correctAnswers: "Juiste antwoorden",
+                total: "Totaal",
+                nextQuestion: "Volgende vraag",
+                seeResults: "Resultaten bekijken",
+                newQuiz: "Nieuwe Quiz",
+                loading: "Laden...",
+                
+                // Résultats quiz
+                quizFinished: "Quiz voltooid!",
+                totalScore: "Totale score",
+                errors: "Fouten",
+                percentage: "Percentage",
+                excellentWork: "Uitstekend werk!",
+                wellDone: "Goed gedaan!",
+                keepStudying: "Blijf studeren!",
+                
+                // Synthèse d'apprentissage
+                learningSynthesis: "📚 Leersynthese",
+                learningText: "Hier zijn de domeinen om te herzien volgens uw onjuiste antwoorden:",
+                errorDetails: "📋 Details van uw fouten:",
+                domainsToReview: "📚 Te herzien domeinen:",
+                recommendedResources: "🔗 Aanbevolen bronnen voor verdieping:",
+                yourAnswer: "Uw antwoord",
+                correctAnswer: "Juist antwoord",
+                explanation: "Uitleg",
+                error: "fout",
+                errors2: "fouten",
+                questionToReview: "vraag om te herzien in dit thema",
+                questionsToReview: "vragen om te herzien in dit thema",
+                clickLinks: "Klik op de links om toegang te krijgen tot leerbronnen"
+            }
+        };
+
+        // Base de données anatomique multilingue COMPLÈTE
+        const anatomyData = {
+            fr: {
+                nerves: {
+                    // ========== NERFS CRÂNIENS (I-XII) ==========
+                    "olfactif": {
+                        name: "I - Nerf Olfactif",
+                        origin: "Bulbe olfactif",
+                        spinalLevel: "Télencéphale",
+                        category: "Nerf crânien",
+                        path: [
+                            { type: "brain", name: "Cortex olfactif", description: "Aires olfactives primaires" },
+                            { type: "brain", name: "Bulbe olfactif", description: "Relais olfactif principal" },
+                            { type: "nerve", name: "Tractus olfactif", description: "Faisceaux nerveux olfactifs" },
+                            { type: "nerve", name: "Lame criblée", description: "Passage à travers l'ethmoïde" },
+                            { type: "muscle", name: "Épithélium olfactif", description: "Récepteurs sensoriels" }
+                        ],
+                        muscles: ["Récepteurs olfactifs de la muqueuse nasale"],
+                        functions: ["Olfaction (perception des odeurs)", "Réflexes olfactifs"]
+                    },
+                    "optique": {
+                        name: "II - Nerf Optique",
+                        origin: "Rétine",
+                        spinalLevel: "Diencéphale",
+                        category: "Nerf crânien",
+                        path: [
+                            { type: "brain", name: "Cortex visuel", description: "Aires visuelles occipitales" },
+                            { type: "brain", name: "Corps genouillé latéral", description: "Relais thalamique" },
+                            { type: "brain", name: "Chiasma optique", description: "Croisement des fibres" },
+                            { type: "nerve", name: "Nerf optique", description: "Conduit l'information visuelle" },
+                            { type: "nerve", name: "Canal optique", description: "Passage orbitaire" },
+                            { type: "muscle", name: "Rétine", description: "Récepteurs visuels" }
+                        ],
+                        muscles: ["Cellules ganglionnaires rétiniennes", "Cônes et bâtonnets"],
+                        functions: ["Vision", "Réflexe photomoteur", "Réflexe d'accommodation"]
+                    },
+                    "oculomoteur": {
+                        name: "III - Nerf Oculomoteur",
+                        origin: "Mésencéphale",
+                        spinalLevel: "Tronc cérébral",
+                        category: "Nerf crânien",
+                        path: [
+                            { type: "brain", name: "Noyau oculomoteur", description: "Mésencéphale dorsal" },
+                            { type: "brain", name: "Noyau d'Edinger-Westphal", description: "Contrôle parasympathique" },
+                            { type: "nerve", name: "Fissure orbitaire supérieure", description: "Passage orbitaire" },
+                            { type: "nerve", name: "Orbite", description: "Distribution aux muscles" },
+                            { type: "muscle", name: "Muscles oculomoteurs", description: "Motricité oculaire" }
+                        ],
+                        muscles: [
+                            "Droit supérieur", "Droit inférieur", "Droit médial",
+                            "Petit oblique", "Releveur de la paupière supérieure",
+                            "Sphincter pupillaire", "Muscle ciliaire"
+                        ],
+                        functions: [
+                            "Mouvements oculaires (haut, bas, dedans)",
+                            "Élévation de la paupière supérieure",
+                            "Constriction pupillaire",
+                            "Accommodation"
+                        ]
+                    },
+                    "trijumeau": {
+                        name: "V - Nerf Trijumeau",
+                        origin: "Pont",
+                        spinalLevel: "Tronc cérébral",
+                        category: "Nerf crânien",
+                        path: [
+                            { type: "brain", name: "Noyaux trigéminaux", description: "Noyaux sensitifs et moteur" },
+                            { type: "brain", name: "Ganglion de Gasser", description: "Ganglion trigéminal" },
+                            { type: "nerve", name: "Trois branches", description: "Ophtalmique, maxillaire, mandibulaire" },
+                            { type: "nerve", name: "Foramens crâniens", description: "Passages multiples" },
+                            { type: "muscle", name: "Muscles masticateurs", description: "Motricité et sensibilité" }
+                        ],
+                        muscles: [
+                            "Masséter", "Temporal", "Ptérygoïdiens",
+                            "Mylohyoïdien", "Ventre antérieur du digastrique",
+                            "Tenseur du tympan", "Tenseur du voile du palais"
+                        ],
+                        functions: [
+                            "Sensibilité de la face",
+                            "Mastication",
+                            "Réflexe cornéen",
+                            "Sensibilité de la cavité buccale",
+                            "Proprioception faciale"
+                        ]
+                    },
+                    "facial": {
+                        name: "VII - Nerf Facial",
+                        origin: "Pont",
+                        spinalLevel: "Tronc cérébral",
+                        category: "Nerf crânien",
+                        path: [
+                            { type: "brain", name: "Noyau facial", description: "Pont dorsal" },
+                            { type: "brain", name: "Noyau salivaire supérieur", description: "Contrôle parasympathique" },
+                            { type: "nerve", name: "Conduit auditif interne", description: "Passage temporal" },
+                            { type: "nerve", name: "Canal de Fallope", description: "Traverse l'os temporal" },
+                            { type: "nerve", name: "Foramen stylo-mastoïdien", description: "Sortie du crâne" },
+                            { type: "muscle", name: "Muscles faciaux", description: "Expression et sécrétion" }
+                        ],
+                        muscles: [
+                            "Muscles de l'expression faciale", "Orbiculaire des paupières",
+                            "Orbiculaire des lèvres", "Muscles du front", "Buccinateur",
+                            "Platysma", "Stapédien", "Muscle stylohyoïdien",
+                            "Ventre postérieur du digastrique"
+                        ],
+                        functions: [
+                            "Expression faciale", "Fermeture des paupières",
+                            "Sourire et mimique", "Sécrétion lacrymale",
+                            "Sécrétion salivaire (glandes sous-maxillaire et sublinguale)",
+                            "Goût (2/3 antérieurs de la langue)"
+                        ]
+                    },
+                    "ulnaire": {
+                        name: "Nerf Ulnaire",
+                        origin: "Plexus brachial (C8-T1)",
+                        spinalLevel: "C8-T1",
+                        category: "Membre supérieur",
+                        path: [
+                            { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+                            { type: "spinal", name: "Moelle épinière C8-T1", description: "Segments cervicaux inférieurs" },
+                            { type: "nerve", name: "Plexus brachial", description: "Formation du nerf ulnaire" },
+                            { type: "nerve", name: "Bras médial", description: "Descente le long du bras" },
+                            { type: "nerve", name: "Gouttière épitrochléenne", description: "Passage au coude" },
+                            { type: "muscle", name: "Muscles cibles", description: "Innervation des muscles" }
+                        ],
+                        muscles: [
+                            "Fléchisseur ulnaire du carpe", "Fléchisseur profond des doigts (4e et 5e doigts)",
+                            "Muscles de l'éminence hypothénar", "Interosseux", "Lombricaux 3 et 4",
+                            "Adducteur du pouce", "Chef profond du court fléchisseur du pouce"
+                        ],
+                        functions: [
+                            "Flexion et adduction du poignet", "Flexion des 4e et 5e doigts",
+                            "Écartement et rapprochement des doigts", "Préhension fine de la main",
+                            "Opposition du 5e doigt", "Adduction du pouce"
+                        ]
+                    },
+                    "médian": {
+                        name: "Nerf Médian",
+                        origin: "Plexus brachial (C6-T1)",
+                        spinalLevel: "C6-T1",
+                        category: "Membre supérieur",
+                        path: [
+                            { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+                            { type: "spinal", name: "Moelle épinière C6-T1", description: "Segments cervicaux" },
+                            { type: "nerve", name: "Plexus brachial", description: "Formation du nerf médian" },
+                            { type: "nerve", name: "Bras antérieur", description: "Descente dans la loge antérieure" },
+                            { type: "nerve", name: "Canal carpien", description: "Passage au poignet" },
+                            { type: "muscle", name: "Muscles cibles", description: "Innervation thénar et fléchisseurs" }
+                        ],
+                        muscles: [
+                            "Rond pronateur", "Fléchisseur radial du carpe", "Long palmaire",
+                            "Fléchisseur superficiel des doigts", "Fléchisseur profond des doigts (2e et 3e doigts)",
+                            "Long fléchisseur du pouce", "Carré pronateur", "Muscles de l'éminence thénar",
+                            "Lombricaux 1 et 2"
+                        ],
+                        functions: [
+                            "Flexion du poignet", "Pronation de l'avant-bras", "Opposition du pouce",
+                            "Flexion des doigts", "Préhension de précision", "Abduction du pouce"
+                        ]
+                    },
+                    "radial": {
+                        name: "Nerf Radial",
+                        origin: "Plexus brachial (C5-T1)",
+                        spinalLevel: "C5-T1",
+                        category: "Membre supérieur",
+                        path: [
+                            { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+                            { type: "spinal", name: "Moelle épinière C5-T1", description: "Segments cervicaux" },
+                            { type: "nerve", name: "Plexus brachial", description: "Formation du nerf radial" },
+                            { type: "nerve", name: "Gouttière radiale", description: "Passage à l'humérus" },
+                            { type: "nerve", name: "Avant-bras postérieur", description: "Innervation des extenseurs" },
+                            { type: "muscle", name: "Muscles cibles", description: "Extenseurs du bras et avant-bras" }
+                        ],
+                        muscles: [
+                            "Triceps brachial", "Anconé", "Long supinateur", "Premier radial",
+                            "Deuxième radial", "Extenseur commun des doigts", "Extenseur du 5e doigt",
+                            "Extenseur ulnaire du carpe", "Long abducteur du pouce", "Court extenseur du pouce",
+                            "Long extenseur du pouce", "Extenseur de l'index"
+                        ],
+                        functions: [
+                            "Extension du coude", "Extension du poignet", "Extension des doigts",
+                            "Supination de l'avant-bras", "Abduction radiale du poignet",
+                            "Extension et abduction du pouce"
+                        ]
+                    },
+                    "sciatique": {
+                        name: "Nerf Sciatique",
+                        origin: "Plexus lombo-sacré (L4-S3)",
+                        spinalLevel: "L4-S3",
+                        category: "Membre inférieur",
+                        path: [
+                            { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+                            { type: "spinal", name: "Moelle épinière L4-S3", description: "Segments lombo-sacrés" },
+                            { type: "nerve", name: "Plexus lombo-sacré", description: "Formation du nerf sciatique" },
+                            { type: "nerve", name: "Foramen sciatique", description: "Sortie du bassin" },
+                            { type: "nerve", name: "Cuisse postérieure", description: "Descente dans la cuisse" },
+                            { type: "muscle", name: "Muscles cibles", description: "Muscles de la cuisse et jambe" }
+                        ],
+                        muscles: [
+                            "Ischio-jambiers", "Biceps fémoral", "Semi-tendineux", "Semi-membraneux",
+                            "Muscles de la jambe (via fibulaire et tibial)"
+                        ],
+                        functions: [
+                            "Flexion du genou", "Extension de la hanche",
+                            "Dorsiflexion du pied", "Flexion plantaire",
+                            "Inversion et éversion du pied"
+                        ]
+                    },
+                    "fémoral": {
+                        name: "Nerf Fémoral (Crural)",
+                        origin: "Plexus lombaire (L2-L4)",
+                        spinalLevel: "L2-L4",
+                        category: "Membre inférieur",
+                        path: [
+                            { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+                            { type: "spinal", name: "Moelle épinière L2-L4", description: "Segments lombaires" },
+                            { type: "nerve", name: "Plexus lombaire", description: "Formation du nerf fémoral" },
+                            { type: "nerve", name: "Arcade crurale", description: "Passage sous le ligament inguinal" },
+                            { type: "nerve", name: "Triangle de Scarpa", description: "Division en branches" },
+                            { type: "muscle", name: "Muscles antérieurs", description: "Loge antérieure de la cuisse" }
+                        ],
+                        muscles: [
+                            "Quadriceps fémoral", "Droit antérieur", "Vaste externe",
+                            "Vaste interne", "Vaste intermédiaire", "Sartorius", "Pectinée"
+                        ],
+                        functions: [
+                            "Extension du genou", "Flexion de la hanche",
+                            "Sensibilité de la face antérieure de la cuisse",
+                            "Sensibilité de la face interne de la jambe"
+                        ]
+                    },
+                    "phrénique": {
+                        name: "Nerf Phrénique",
+                        origin: "Plexus cervical (C3-C5)",
+                        spinalLevel: "C3-C5",
+                        category: "Nerf rachidien",
+                        path: [
+                            { type: "brain", name: "Centre respiratoire", description: "Bulbe rachidien" },
+                            { type: "spinal", name: "Moelle épinière C3-C5", description: "Segments cervicaux" },
+                            { type: "nerve", name: "Plexus cervical", description: "Formation du phrénique" },
+                            { type: "nerve", name: "Cou et thorax", description: "Descente vers le diaphragme" },
+                            { type: "nerve", name: "Péricarde", description: "Passage médiastinal" },
+                            { type: "muscle", name: "Diaphragme", description: "Muscle respiratoire principal" }
+                        ],
+                        muscles: ["Diaphragme"],
+                        functions: [
+                            "Respiration (inspiration)", "Contrôle du hoquet",
+                            "Sensibilité du péricarde", "Sensibilité de la plèvre diaphragmatique"
+                        ]
+                    },
+"thoracique_long": {
+    name: "Nerf Thoracique Long (de Bell)",
+    origin: "Plexus brachial (C5-C7)",
+    spinalLevel: "C5-C7",
+    category: "Nerf thoracique",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière C5-C7", description: "Segments cervicaux moyens" },
+        { type: "nerve", name: "Plexus brachial", description: "Formation du thoracique long" },
+        { type: "nerve", name: "Paroi thoracique", description: "Descente sur la cage thoracique" },
+        { type: "nerve", name: "Face latérale du thorax", description: "Vers le grand dentelé" },
+        { type: "muscle", name: "Grand dentelé", description: "Stabilisation de l'omoplate" }
+    ],
+    muscles: ["Grand dentelé"],
+    functions: [
+        "Stabilisation de l'omoplate",
+        "Protraction de l'omoplate",
+        "Prévention du décollement de l'omoplate"
+    ]
+},
+"intercostaux": {
+    name: "Nerfs Intercostaux",
+    origin: "Branches antérieures T1-T12",
+    spinalLevel: "T1-T12",
+    category: "Nerf thoracique",
+    path: [
+        { type: "spinal", name: "Moelle épinière T1-T12", description: "Segments thoraciques" },
+        { type: "nerve", name: "Branches antérieures", description: "Racines nerveuses thoraciques" },
+        { type: "nerve", name: "Espaces intercostaux", description: "Trajet entre les côtes" },
+        { type: "nerve", name: "Gouttière costale", description: "Cheminement sous-costal" },
+        { type: "muscle", name: "Muscles intercostaux", description: "Respiration et stabilité" }
+    ],
+    muscles: [
+        "Muscles intercostaux externes",
+        "Muscles intercostaux internes",
+        "Muscles de la paroi abdominale"
+    ],
+    functions: [
+        "Respiration (inspiration et expiration)",
+        "Stabilisation de la cage thoracique",
+        "Sensibilité de la peau thoracique et abdominale",
+        "Réflexes abdominaux"
+    ]
+}, 
+"trochléaire": {
+    name: "IV - Nerf Trochléaire",
+    origin: "Mésencéphale",
+    spinalLevel: "Tronc cérébral",
+    category: "Nerf crânien",
+    path: [
+        { type: "brain", name: "Noyau trochléaire", description: "Mésencéphale caudal" },
+        { type: "nerve", name: "Décussation dorsale", description: "Croisement complet" },
+        { type: "nerve", name: "Fissure orbitaire supérieure", description: "Passage orbitaire" },
+        { type: "nerve", name: "Orbite", description: "Vers le grand oblique" },
+        { type: "muscle", name: "Grand oblique", description: "Muscle oculaire" }
+    ],
+    muscles: ["Grand oblique (muscle oblique supérieur)"],
+    functions: [
+        "Rotation de l'œil vers le bas et l'extérieur",
+        "Intorsion de l'œil",
+        "Mouvements oculaires fins"
+    ]
+},
+"abducens": {
+    name: "VI - Nerf Abducens",
+    origin: "Pont",
+    spinalLevel: "Tronc cérébral",
+    category: "Nerf crânien",
+    path: [
+        { type: "brain", name: "Noyau abducens", description: "Pont ventral" },
+        { type: "nerve", name: "Sinus caverneux", description: "Trajet intracaverneux" },
+        { type: "nerve", name: "Fissure orbitaire supérieure", description: "Passage orbitaire" },
+        { type: "nerve", name: "Orbite", description: "Vers le droit externe" },
+        { type: "muscle", name: "Droit latéral", description: "Abduction oculaire" }
+    ],
+    muscles: ["Droit latéral (droit externe)"],
+    functions: [
+        "Abduction de l'œil (mouvement vers l'extérieur)",
+        "Coordination des mouvements oculaires horizontaux"
+    ]
+},
+"vestibulocochléaire": {
+    name: "VIII - Nerf Vestibulo-cochléaire",
+    origin: "Oreille interne",
+    spinalLevel: "Pont/Bulbe",
+    category: "Nerf crânien",
+    path: [
+        { type: "brain", name: "Noyaux cochléaires", description: "Pont et bulbe" },
+        { type: "brain", name: "Noyaux vestibulaires", description: "Plancher du 4e ventricule" },
+        { type: "nerve", name: "Conduit auditif interne", description: "Passage temporal" },
+        { type: "nerve", name: "Labyrinthe osseux", description: "Oreille interne" },
+        { type: "muscle", name: "Organes sensoriels", description: "Audition et équilibre" }
+    ],
+    muscles: [
+        "Organe de Corti (cochlée)", "Macules utriculaire et sacculaire",
+        "Crêtes ampullaires", "Cellules ciliées vestibulaires"
+    ],
+    functions: [
+        "Audition", "Équilibre statique", "Équilibre dynamique",
+        "Réflexes vestibulo-oculaires", "Orientation spatiale"
+    ]
+},
+"glossopharyngien": {
+    name: "IX - Nerf Glosso-pharyngien",
+    origin: "Bulbe rachidien",
+    spinalLevel: "Tronc cérébral",
+    category: "Nerf crânien",
+    path: [
+        { type: "brain", name: "Noyaux du glosso-pharyngien", description: "Bulbe dorsal" },
+        { type: "brain", name: "Noyau salivaire inférieur", description: "Contrôle parasympathique" },
+        { type: "nerve", name: "Foramen jugulaire", description: "Sortie crânienne" },
+        { type: "nerve", name: "Fosse ptérygo-palatine", description: "Relais ganglionnaire" },
+        { type: "muscle", name: "Pharynx et glandes", description: "Déglutition et sécrétion" }
+    ],
+    muscles: [
+        "Stylo-pharyngien", "Muscle constricteur supérieur du pharynx",
+        "Glande parotide"
+    ],
+    functions: [
+        "Goût (1/3 postérieur de la langue)",
+        "Sensibilité pharyngée", "Déglutition",
+        "Sécrétion salivaire (parotide)",
+        "Réflexe nauséeux", "Contrôle de la pression artérielle"
+    ]
+},
+"vague": {
+    name: "X - Nerf Vague (Pneumogastrique)",
+    origin: "Bulbe rachidien",
+    spinalLevel: "Tronc cérébral",
+    category: "Nerf crânien",
+    path: [
+        { type: "brain", name: "Noyau dorsal du vague", description: "Bulbe dorsal" },
+        { type: "brain", name: "Noyau ambigu", description: "Bulbe ventral" },
+        { type: "nerve", name: "Foramen jugulaire", description: "Sortie crânienne" },
+        { type: "nerve", name: "Cou et thorax", description: "Descente vers les viscères" },
+        { type: "nerve", name: "Abdomen", description: "Innervation viscérale" },
+        { type: "muscle", name: "Organes viscéraux", description: "Contrôle parasympathique" }
+    ],
+    muscles: [
+        "Muscles du pharynx", "Muscles du larynx",
+        "Muscle cardiaque", "Muscle lisse digestif",
+        "Muscle lisse bronchique"
+    ],
+    functions: [
+        "Déglutition", "Phonation", "Ralentissement cardiaque",
+        "Péristaltisme digestif", "Sécrétion digestive",
+        "Bronchoconstriction", "Réflexe de toux"
+    ]
+},
+"accessoire": {
+    name: "XI - Nerf Accessoire (Spinal)",
+    origin: "Bulbe et moelle cervicale",
+    spinalLevel: "C1-C5",
+    category: "Nerf crânien",
+    path: [
+        { type: "brain", name: "Noyau ambigu", description: "Partie crânienne" },
+        { type: "spinal", name: "Corne antérieure C1-C5", description: "Partie spinale" },
+        { type: "nerve", name: "Foramen jugulaire", description: "Sortie crânienne" },
+        { type: "nerve", name: "Cou", description: "Vers les muscles du cou" },
+        { type: "muscle", name: "Muscles cervicaux", description: "Rotation et inclinaison" }
+    ],
+    muscles: [
+        "Sterno-cléido-mastoïdien", "Trapèze",
+        "Muscles du larynx (partie crânienne)"
+    ],
+    functions: [
+        "Rotation de la tête", "Inclinaison cervicale",
+        "Élévation de l'épaule", "Phonation (partie crânienne)"
+    ]
+},
+"hypoglosse": {
+    name: "XII - Nerf Hypoglosse",
+    origin: "Bulbe rachidien",
+    spinalLevel: "Tronc cérébral",
+    category: "Nerf crânien",
+    path: [
+        { type: "brain", name: "Noyau hypoglosse", description: "Bulbe ventral" },
+        { type: "nerve", name: "Canal hypoglosse", description: "Sortie crânienne" },
+        { type: "nerve", name: "Cou", description: "Arc cervical" },
+        { type: "nerve", name: "Plancher buccal", description: "Vers la langue" },
+        { type: "muscle", name: "Muscles linguaux", description: "Motricité linguale" }
+    ],
+    muscles: [
+        "Muscles intrinsèques de la langue",
+        "Génio-glosse", "Hyo-glosse", "Stylo-glosse"
+    ],
+    functions: [
+        "Mouvements de la langue", "Déglutition",
+        "Mastication", "Phonation", "Articulation"
+    ]
+},
+"musculocutané": {
+    name: "Nerf Musculo-cutané",
+    origin: "Plexus brachial (C5-C7)",
+    spinalLevel: "C5-C7",
+    category: "Membre supérieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière C5-C7", description: "Segments cervicaux moyens" },
+        { type: "nerve", name: "Plexus brachial", description: "Faisceau latéral" },
+        { type: "nerve", name: "Loge antérieure du bras", description: "Traverse le coraco-brachial" },
+        { type: "nerve", name: "Nerf cutané latéral", description: "Branche sensitive de l'avant-bras" },
+        { type: "muscle", name: "Muscles fléchisseurs", description: "Loge antérieure du bras" }
+    ],
+    muscles: [
+        "Coraco-brachial", "Biceps brachial", "Brachial antérieur"
+    ],
+    functions: [
+        "Flexion du coude", "Supination de l'avant-bras",
+        "Flexion de l'épaule", "Sensibilité cutanée de l'avant-bras externe"
+    ]
+},
+"axillaire": {
+    name: "Nerf Axillaire (Circonflexe)",
+    origin: "Plexus brachial (C5-C6)",
+    spinalLevel: "C5-C6",
+    category: "Membre supérieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière C5-C6", description: "Segments cervicaux supérieurs" },
+        { type: "nerve", name: "Plexus brachial", description: "Faisceau postérieur" },
+        { type: "nerve", name: "Espace quadrilatère", description: "Passage sous l'épaule" },
+        { type: "nerve", name: "Face profonde du deltoïde", description: "Innervation musculaire" },
+        { type: "muscle", name: "Muscles de l'épaule", description: "Abduction du bras" }
+    ],
+    muscles: [
+        "Deltoïde", "Petit rond"
+    ],
+    functions: [
+        "Abduction du bras", "Flexion et extension de l'épaule",
+        "Rotation externe du bras", "Sensibilité du moignon de l'épaule"
+    ]
+},
+"obturateur": {
+    name: "Nerf Obturateur",
+    origin: "Plexus lombaire (L2-L4)",
+    spinalLevel: "L2-L4",
+    category: "Membre inférieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière L2-L4", description: "Segments lombaires" },
+        { type: "nerve", name: "Plexus lombaire", description: "Formation du nerf obturateur" },
+        { type: "nerve", name: "Foramen obturé", description: "Passage pelvien" },
+        { type: "nerve", name: "Loge médiale", description: "Innervation des adducteurs" },
+        { type: "muscle", name: "Muscles adducteurs", description: "Adduction de la cuisse" }
+    ],
+    muscles: [
+        "Grand adducteur", "Long adducteur", "Court adducteur",
+        "Droit interne", "Obturateur externe"
+    ],
+    functions: [
+        "Adduction de la cuisse", "Rotation externe de la hanche",
+        "Sensibilité de la face interne de la cuisse"
+    ]
+},
+"fibulaire": {
+    name: "Nerf Fibulaire Commun",
+    origin: "Division du sciatique",
+    spinalLevel: "L4-S2",
+    category: "Membre inférieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière L4-S2", description: "Segments lombo-sacrés" },
+        { type: "nerve", name: "Nerf sciatique", description: "Division latérale" },
+        { type: "nerve", name: "Tête du péroné", description: "Contournement fibulaire" },
+        { type: "nerve", name: "Loge antéro-externe", description: "Branches superficielle et profonde" },
+        { type: "muscle", name: "Muscles péroniers", description: "Dorsiflexion et éversion" }
+    ],
+    muscles: [
+        "Jambier antérieur", "Extenseur commun des orteils",
+        "Extenseur propre du gros orteil", "Troisième péronier",
+        "Long péronier", "Court péronier"
+    ],
+    functions: [
+        "Dorsiflexion du pied", "Éversion du pied",
+        "Extension des orteils", "Sensibilité du dos du pied"
+    ]
+},
+"tibial": {
+    name: "Nerf Tibial",
+    origin: "Division du sciatique",
+    spinalLevel: "L4-S3",
+    category: "Membre inférieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière L4-S3", description: "Segments lombo-sacrés" },
+        { type: "nerve", name: "Nerf sciatique", description: "Division médiale" },
+        { type: "nerve", name: "Fosse poplitée", description: "Descente postérieure" },
+        { type: "nerve", name: "Tunnel tarsien", description: "Passage à la malléole" },
+        { type: "muscle", name: "Muscles postérieurs", description: "Flexion plantaire" }
+    ],
+    muscles: [
+        "Triceps sural", "Gastrocnémiens", "Soléaire", "Jambier postérieur",
+        "Long fléchisseur des orteils", "Long fléchisseur du gros orteil",
+        "Muscles plantaires intrinsèques"
+    ],
+    functions: [
+        "Flexion plantaire du pied", "Inversion du pied",
+        "Flexion des orteils", "Sensibilité de la plante du pied",
+        "Marche et propulsion"
+    ]
+},
+"grand_auriculaire": {
+    name: "Nerf Grand Auriculaire",
+    origin: "Plexus cervical (C2-C3)",
+    spinalLevel: "C2-C3",
+    category: "Nerf rachidien",
+    path: [
+        { type: "spinal", name: "Moelle épinière C2-C3", description: "Segments cervicaux supérieurs" },
+        { type: "nerve", name: "Plexus cervical", description: "Formation du grand auriculaire" },
+        { type: "nerve", name: "Bord postérieur du SCM", description: "Point de Erb" },
+        { type: "nerve", name: "Région auriculaire", description: "Montée vers l'oreille" },
+        { type: "muscle", name: "Peau auriculaire", description: "Sensibilité de l'oreille" }
+    ],
+    muscles: ["Aucun muscle (nerf purement sensitif)"],
+    functions: [
+        "Sensibilité de la peau de l'oreille",
+        "Sensibilité de la région mastoïdienne",
+        "Sensibilité de l'angle de la mâchoire"
+    ]
+},
+"suprascapulaire": {
+    name: "Nerf Suprascapulaire",
+    origin: "Plexus brachial (C5-C6)",
+    spinalLevel: "C5-C6",
+    category: "Membre supérieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière C5-C6", description: "Segments cervicaux supérieurs" },
+        { type: "nerve", name: "Plexus brachial", description: "Tronc supérieur" },
+        { type: "nerve", name: "Échancrure scapulaire", description: "Passage sous le ligament" },
+        { type: "nerve", name: "Fosse supra-épineuse", description: "Division en branches" },
+        { type: "muscle", name: "Muscles rotateurs", description: "Rotation externe de l'épaule" }
+    ],
+    muscles: ["Sus-épineux", "Sous-épineux"],
+    functions: [
+        "Rotation externe du bras",
+        "Initiation de l'abduction",
+        "Stabilisation de l'épaule"
+    ]
+},
+"subscapulaire": {
+    name: "Nerfs Subscapulaires",
+    origin: "Plexus brachial (C5-C7)",
+    spinalLevel: "C5-C7",
+    category: "Membre supérieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière C5-C7", description: "Segments cervicaux" },
+        { type: "nerve", name: "Plexus brachial", description: "Faisceau postérieur" },
+        { type: "nerve", name: "Creux axillaire", description: "Distribution postérieure" },
+        { type: "nerve", name: "Face postérieure de l'épaule", description: "Innervation musculaire" },
+        { type: "muscle", name: "Muscles rotateurs", description: "Rotation interne" }
+    ],
+    muscles: ["Subscapulaire", "Grand rond"],
+    functions: [
+        "Rotation interne du bras",
+        "Adduction du bras",
+        "Stabilisation de l'épaule"
+    ]
+},
+"fessier_supérieur": {
+    name: "Nerf Fessier Supérieur",
+    origin: "Plexus lombo-sacré (L4-S1)",
+    spinalLevel: "L4-S1",
+    category: "Membre inférieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière L4-S1", description: "Segments lombo-sacrés" },
+        { type: "nerve", name: "Plexus lombo-sacré", description: "Formation du fessier supérieur" },
+        { type: "nerve", name: "Foramen supra-piriforme", description: "Sortie pelvienne" },
+        { type: "nerve", name: "Région fessière", description: "Distribution aux muscles fessiers" },
+        { type: "muscle", name: "Muscles abducteurs", description: "Abduction de la hanche" }
+    ],
+    muscles: ["Moyen fessier", "Petit fessier", "Tenseur du fascia lata"],
+    functions: [
+        "Abduction de la hanche",
+        "Stabilisation du bassin",
+        "Rotation interne de la hanche",
+        "Marche (éviter la chute du bassin)"
+    ]
+},
+"fessier_inférieur": {
+    name: "Nerf Fessier Inférieur",
+    origin: "Plexus lombo-sacré (L5-S2)",
+    spinalLevel: "L5-S2",
+    category: "Membre inférieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière L5-S2", description: "Segments lombo-sacrés" },
+        { type: "nerve", name: "Plexus lombo-sacré", description: "Formation du fessier inférieur" },
+        { type: "nerve", name: "Foramen sous-piriforme", description: "Sortie pelvienne" },
+        { type: "nerve", name: "Région fessière profonde", description: "Vers le grand fessier" },
+        { type: "muscle", name: "Grand fessier", description: "Extension de la hanche" }
+    ],
+    muscles: ["Grand fessier"],
+    functions: [
+        "Extension de la hanche",
+        "Rotation externe de la hanche",
+        "Stabilisation du bassin",
+        "Propulsion lors de la marche"
+    ]
+},
+// ========== BRANCHES DU PLEXUS BRACHIAL ==========
+"scapulaire_dorsal": {
+    name: "Nerf Scapulaire Dorsal",
+    origin: "Plexus brachial (C5)",
+    spinalLevel: "C5",
+    category: "Membre supérieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière C5", description: "Segment cervical moyen" },
+        { type: "nerve", name: "Racine C5", description: "Émergence précoce" },
+        { type: "nerve", name: "Bord médial de la scapula", description: "Trajet vers les rhomboïdes" },
+        { type: "muscle", name: "Muscles scapulaires", description: "Stabilisation de l'omoplate" }
+    ],
+    muscles: ["Rhomboïde majeur", "Rhomboïde mineur", "Élévateur de la scapula"],
+    functions: [
+        "Rétraction de la scapula",
+        "Élévation de la scapula",
+        "Stabilisation scapulaire",
+        "Rapprochement des omoplates"
+    ]
+},
+"subclavier": {
+    name: "Nerf Subclavier",
+    origin: "Plexus brachial (C5-C6)",
+    spinalLevel: "C5-C6",
+    category: "Membre supérieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière C5-C6", description: "Segments cervicaux moyens" },
+        { type: "nerve", name: "Tronc supérieur", description: "Branche du tronc primaire supérieur" },
+        { type: "nerve", name: "Région sous-claviculaire", description: "Trajet vers le subclavier" },
+        { type: "muscle", name: "Muscle subclavier", description: "Stabilisation claviculaire" }
+    ],
+    muscles: ["Subclavier"],
+    functions: [
+        "Abaissement de la clavicule",
+        "Stabilisation de l'articulation sterno-claviculaire",
+        "Protection des vaisseaux sous-claviers"
+    ]
+},
+"pectoraux": {
+    name: "Nerfs Pectoraux (Latéral et Médial)",
+    origin: "Plexus brachial (C5-T1)",
+    spinalLevel: "C5-T1",
+    category: "Membre supérieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière C5-T1", description: "Segments cervicaux et T1" },
+        { type: "nerve", name: "Faisceaux latéral et médial", description: "Deux nerfs distincts" },
+        { type: "nerve", name: "Région pectorale", description: "Distribution aux pectoraux" },
+        { type: "muscle", name: "Muscles pectoraux", description: "Adduction et rotation du bras" }
+    ],
+    muscles: ["Grand pectoral", "Petit pectoral"],
+    functions: [
+        "Adduction du bras",
+        "Rotation interne du bras",
+        "Flexion du bras (partie claviculaire)",
+        "Abaissement de l'épaule"
+    ]
+},
+"thoracodorsal": {
+    name: "Nerf Thoraco-dorsal",
+    origin: "Plexus brachial (C6-C8)",
+    spinalLevel: "C6-C8",
+    category: "Membre supérieur",
+    path: [
+        { type: "brain", name: "Cortex moteur", description: "Aire motrice primaire" },
+        { type: "spinal", name: "Moelle épinière C6-C8", description: "Segments cervicaux moyens-inférieurs" },
+        { type: "nerve", name: "Faisceau postérieur", description: "Branche du faisceau postérieur" },
+        { type: "nerve", name: "Paroi thoracique postérieure", description: "Trajet vers le grand dorsal" },
+        { type: "muscle", name: "Grand dorsal", description: "Adduction et extension du bras" }
+    ],
+    muscles: ["Grand dorsal"],
+    functions: [
+        "Adduction puissante du bras",
+        "Extension du bras",
+        "Rotation interne du bras",
+        "Participation aux mouvements de traction"
+    ]
+},
+"cutanes_mediaux": {
+    name: "Nerfs Cutanés Médiaux du Bras et Avant-bras",
+    origin: "Plexus brachial (C8-T1)",
+    spinalLevel: "C8-T1",
+    category: "Membre supérieur",
+    path: [
+        { type: "spinal", name: "Moelle épinière C8-T1", description: "Segments cervicaux inférieurs" },
+        { type: "nerve", name: "Faisceau médial", description: "Branches du faisceau médial" },
+        { type: "nerve", name: "Face médiale du bras", description: "Distribution sensitive pure" },
+        { type: "nerve", name: "Face médiale de l'avant-bras", description: "Extension sensitive" },
+        { type: "muscle", name: "Peau médiale", description: "Sensibilité médiale du membre" }
+    ],
+    muscles: ["Aucun muscle (nerfs purement sensitifs)"],
+    functions: [
+        "Sensibilité face médiale du bras",
+        "Sensibilité face médiale de l'avant-bras",
+        "Sensibilité jusqu'au poignet",
+        "Information sensitive proprioceptive"
+    ]
+},
+// ========== NERFS CERVICAUX SUPPLÉMENTAIRES ==========
+"petit_occipital": {
+    name: "Nerf Petit Occipital",
+    origin: "Plexus cervical (C2)",
+    spinalLevel: "C2",
+    category: "Nerf rachidien",
+    path: [
+        { type: "spinal", name: "Moelle épinière C2", description: "Segment cervical supérieur" },
+        { type: "nerve", name: "Plexus cervical", description: "Formation du petit occipital" },
+        { type: "nerve", name: "Bord postérieur du SCM", description: "Point de Erb" },
+        { type: "nerve", name: "Région mastoïdienne", description: "Montée vers l'occiput" },
+        { type: "muscle", name: "Peau occipitale", description: "Sensibilité post-auriculaire" }
+    ],
+    muscles: ["Aucun muscle (nerf purement sensitif)"],
+    functions: [
+        "Sensibilité de la peau parotidienne",
+        "Sensibilité de la région mastoïdienne",
+        "Sensibilité du lobule et de la conque auriculaire",
+        "Sensibilité post-auriculaire"
+    ]
+},
+"transverse_cou": {
+    name: "Nerf Transverse du Cou",
+    origin: "Plexus cervical (C2-C3)",
+    spinalLevel: "C2-C3",
+    category: "Nerf rachidien",
+    path: [
+        { type: "spinal", name: "Moelle épinière C2-C3", description: "Segments cervicaux supérieurs" },
+        { type: "nerve", name: "Plexus cervical", description: "Formation du transverse du cou" },
+        { type: "nerve", name: "Point de Erb", description: "Émergence au bord du SCM" },
+        { type: "nerve", name: "Région cervicale antérieure", description: "Distribution horizontale" },
+        { type: "muscle", name: "Peau cervicale", description: "Sensibilité antéro-latérale" }
+    ],
+    muscles: ["Aucun muscle (nerf purement sensitif)"],
+    functions: [
+        "Sensibilité de la région sous-mandibulaire",
+        "Sensibilité antéro-latérale du cou",
+        "Sensibilité de la région thyroïdienne",
+        "Sensibilité sus-claviculaire médiale"
+    ]
+},
+"supraclaviculaires": {
+    name: "Nerfs Supraclaviculaires",
+    origin: "Plexus cervical (C3-C4)",
+    spinalLevel: "C3-C4",
+    category: "Nerf rachidien",
+    path: [
+        { type: "spinal", name: "Moelle épinière C3-C4", description: "Segments cervicaux moyens" },
+        { type: "nerve", name: "Plexus cervical", description: "Formation des supraclaviculaires" },
+        { type: "nerve", name: "Point de Erb", description: "Émergence commune" },
+        { type: "nerve", name: "Région sus-claviculaire", description: "Division en trois groupes" },
+        { type: "muscle", name: "Peau d'épaule", description: "Sensibilité sus-claviculaire" }
+    ],
+    muscles: ["Aucun muscle (nerf purement sensitif)"],
+    functions: [
+        "Sensibilité au-dessus de la clavicule",
+        "Sensibilité de la région deltoïdienne",
+        "Sensibilité de l'épaule antérieure",
+        "Sensibilité du décolleté supérieur"
+    ]
+},
+"grand_occipital": {
+    name: "Nerf Grand Occipital",
+    origin: "Branche postérieure C2",
+    spinalLevel: "C2",
+    category: "Nerf rachidien",
+    path: [
+        { type: "spinal", name: "Moelle épinière C2", description: "Segment cervical supérieur" },
+        { type: "nerve", name: "Branche postérieure C2", description: "Division dorsale" },
+        { type: "nerve", name: "Muscles cervicaux postérieurs", description: "Traversée musculaire" },
+        { type: "nerve", name: "Ligne nuchale supérieure", description: "Perforation aponévrotique" },
+        { type: "muscle", name: "Cuir chevelu postérieur", description: "Distribution occipitale" }
+    ],
+    muscles: ["Muscles de la nuque (branches motrices)", "Cuir chevelu (branches sensitives)"],
+    functions: [
+        "Motricité des muscles cervicaux postérieurs",
+        "Sensibilité du cuir chevelu postérieur",
+        "Sensibilité de la région occipitale",
+        "Participation aux céphalées occipitales"
+    ]
+},
+
+// ========== NERFS DU PLEXUS LOMBAIRE ==========
+"ilio_hypogastrique": {
+    name: "Nerf Ilio-hypogastrique",
+    origin: "Plexus lombaire (L1)",
+    spinalLevel: "L1",
+    category: "Nerf rachidien",
+    path: [
+        { type: "spinal", name: "Moelle épinière L1", description: "Segment lombaire supérieur" },
+        { type: "nerve", name: "Plexus lombaire", description: "Formation ilio-hypogastrique" },
+        { type: "nerve", name: "Muscle psoas", description: "Émergence latérale" },
+        { type: "nerve", name: "Paroi abdominale", description: "Trajet dans les muscles" },
+        { type: "muscle", name: "Muscles abdominaux", description: "Innervation motrice et sensitive" }
+    ],
+    muscles: [
+        "Transverse de l'abdomen", "Oblique interne", "Oblique externe",
+        "Droit de l'abdomen (partie inférieure)"
+    ],
+    functions: [
+        "Motricité des muscles abdominaux inférieurs",
+        "Sensibilité des téguments abdominaux inférieurs",
+        "Sensibilité de la région sus-pubienne",
+        "Participation à la sangle abdominale"
+    ]
+},
+"ilio_inguinal": {
+    name: "Nerf Ilio-inguinal",
+    origin: "Plexus lombaire (L1)",
+    spinalLevel: "L1",
+    category: "Nerf rachidien",
+    path: [
+        { type: "spinal", name: "Moelle épinière L1", description: "Segment lombaire supérieur" },
+        { type: "nerve", name: "Plexus lombaire", description: "Formation ilio-inguinal" },
+        { type: "nerve", name: "Crête iliaque", description: "Trajet parallèle à l'ilio-hypogastrique" },
+        { type: "nerve", name: "Canal inguinal", description: "Passage dans le canal" },
+        { type: "muscle", name: "Région génitale", description: "Distribution sensitive" }
+    ],
+    muscles: ["Participation mineure aux muscles abdominaux"],
+    functions: [
+        "Sensibilité de la région inguinale",
+        "Sensibilité des organes génitaux externes",
+        "Sensibilité de la face interne de la cuisse proximale",
+        "Réflexe crémastérien (participation)"
+    ]
+},
+"genitofemoral": {
+    name: "Nerf Génitofémoral",
+    origin: "Plexus lombaire (L1-L2)",
+    spinalLevel: "L1-L2",
+    category: "Nerf rachidien",
+    path: [
+        { type: "spinal", name: "Moelle épinière L1-L2", description: "Segments lombaires supérieurs" },
+        { type: "nerve", name: "Plexus lombaire", description: "Formation génitofémorale" },
+        { type: "nerve", name: "Face antérieure du psoas", description: "Descente sur le psoas" },
+        { type: "nerve", name: "Division en deux branches", description: "Branche génitale et fémorale" },
+        { type: "muscle", name: "Crémaster et région fémorale", description: "Innervation mixte" }
+    ],
+    muscles: ["Muscle crémaster (chez l'homme)", "Muscle dartos"],
+    functions: [
+        "Motricité du crémaster (réflexe crémastérien)",
+        "Sensibilité du scrotum (homme) ou grandes lèvres (femme)",
+        "Sensibilité de la face antéro-latérale de la cuisse proximale",
+        "Thermorégulation génitale"
+    ]
+},
+"cutane_lateral_cuisse": {
+    name: "Nerf Cutané Latéral de la Cuisse",
+    origin: "Plexus lombaire (L2-L3)",
+    spinalLevel: "L2-L3",
+    category: "Nerf rachidien",
+    path: [
+        { type: "spinal", name: "Moelle épinière L2-L3", description: "Segments lombaires moyens" },
+        { type: "nerve", name: "Plexus lombaire", description: "Formation cutané latéral" },
+        { type: "nerve", name: "Bord latéral du psoas", description: "Trajet vers l'épine iliaque" },
+        { type: "nerve", name: "Épine iliaque antéro-supérieure", description: "Passage sous le ligament inguinal" },
+        { type: "muscle", name: "Face externe de la cuisse", description: "Distribution sensitive pure" }
+    ],
+    muscles: ["Aucun muscle (nerf purement sensitif)"],
+    functions: [
+        "Sensibilité de la face externe de la cuisse",
+        "Sensibilité de la région trochantérienne",
+        "Diagnostic de la méralgie paresthésique",
+        "Sensibilité jusqu'au genou (face externe)"
+    ]
+},// ========== NERFS DU PLEXUS SACRÉ ==========
+"cutane_posterieur_cuisse": {
+    name: "Nerf Cutané Postérieur de la Cuisse",
+    origin: "Plexus sacré (S1-S3)",
+    spinalLevel: "S1-S3",
+    category: "Membre inférieur",
+    path: [
+        { type: "spinal", name: "Moelle épinière S1-S3", description: "Segments sacrés" },
+        { type: "nerve", name: "Plexus sacré", description: "Formation cutané postérieur" },
+        { type: "nerve", name: "Foramen sciatique", description: "Sortie pelvienne avec le sciatique" },
+        { type: "nerve", name: "Face postérieure de la cuisse", description: "Distribution sensitive" },
+        { type: "muscle", name: "Peau postérieure", description: "Sensibilité cuisse et périnée" }
+    ],
+    muscles: ["Aucun muscle (nerf purement sensitif)"],
+    functions: [
+        "Sensibilité face postérieure de la cuisse",
+        "Sensibilité région fessière inférieure (nerfs cluniaux inférieurs)",
+        "Sensibilité périnéale (branche périnéale)",
+        "Sensibilité scrotale/labiale postérieure"
+    ]
+},
+"pudendal": {
+    name: "Nerf Pudendal",
+    origin: "Plexus sacré (S2-S4)",
+    spinalLevel: "S2-S4",
+    category: "Membre inférieur",
+    path: [
+        { type: "spinal", name: "Moelle épinière S2-S4", description: "Segments sacrés moyens" },
+        { type: "nerve", name: "Plexus sacré", description: "Formation du pudendal" },
+        { type: "nerve", name: "Épine sciatique", description: "Contournement de l'épine" },
+        { type: "nerve", name: "Canal d'Alcock", description: "Trajet dans la fosse ischio-rectale" },
+        { type: "muscle", name: "Périnée", description: "Innervation périnéale complète" }
+    ],
+    muscles: [
+        "Sphincter anal externe", "Muscles du périnée",
+        "Bulbo-spongieux", "Ischio-caverneux", "Sphincter urétral externe"
+    ],
+    functions: [
+        "Motricité des muscles périnéaux",
+        "Contrôle sphinctérien anal et urétral",
+        "Sensibilité génitale externe",
+        "Fonction sexuelle et mictionnelle",
+        "Sensibilité anale et périnéale"
+    ]
+},
+"piriformis": {
+    name: "Nerf du Piriforme",
+    origin: "Plexus sacré (S1-S2)",
+    spinalLevel: "S1-S2",
+    category: "Membre inférieur",
+    path: [
+        { type: "spinal", name: "Moelle épinière S1-S2", description: "Segments sacrés supérieurs" },
+        { type: "nerve", name: "Plexus sacré", description: "Formation du nerf piriformis" },
+        { type: "nerve", name: "Face antérieure du piriforme", description: "Innervation directe" },
+        { type: "muscle", name: "Muscle piriforme", description: "Rotation externe de la hanche" }
+    ],
+    muscles: ["Piriforme"],
+    functions: [
+        "Rotation externe de la hanche",
+        "Abduction de la hanche en flexion",
+        "Stabilisation de l'articulation sacro-iliaque",
+        "Rôle dans le syndrome du piriforme"
+    ]
+},
+
+// ========== SUBDIVISIONS DES NERFS EXISTANTS ==========
+"fibulaire_superficiel": {
+    name: "Nerf Fibulaire Superficiel",
+    origin: "Division du fibulaire commun",
+    spinalLevel: "L4-S2",
+    category: "Membre inférieur",
+    path: [
+        { type: "spinal", name: "Moelle épinière L4-S2", description: "Via nerf fibulaire commun" },
+        { type: "nerve", name: "Nerf fibulaire commun", description: "Division superficielle" },
+        { type: "nerve", name: "Loge externe de la jambe", description: "Trajet dans les péroniers" },
+        { type: "nerve", name: "Tiers distal de la jambe", description: "Devient cutané" },
+        { type: "muscle", name: "Muscles péroniers et peau", description: "Éversion et sensibilité" }
+    ],
+    muscles: ["Long péronier", "Court péronier"],
+    functions: [
+        "Éversion du pied",
+        "Flexion plantaire accessoire",
+        "Sensibilité du dos du pied (sauf 1er espace)",
+        "Sensibilité de la face externe de la jambe distale"
+    ]
+},
+"fibulaire_profond": {
+    name: "Nerf Fibulaire Profond",
+    origin: "Division du fibulaire commun",
+    spinalLevel: "L4-S2",
+    category: "Membre inférieur",
+    path: [
+        { type: "spinal", name: "Moelle épinière L4-S2", description: "Via nerf fibulaire commun" },
+        { type: "nerve", name: "Nerf fibulaire commun", description: "Division profonde" },
+        { type: "nerve", name: "Loge antérieure de la jambe", description: "Trajet avec les extenseurs" },
+        { type: "nerve", name: "Face dorsale du pied", description: "Distribution terminale" },
+        { type: "muscle", name: "Muscles dorsifléchisseurs", description: "Dorsiflexion et extension" }
+    ],
+    muscles: [
+        "Jambier antérieur", "Extenseur commun des orteils",
+        "Extenseur propre du gros orteil", "Troisième péronier",
+        "Court extenseur des orteils", "Court extenseur du gros orteil"
+    ],
+    functions: [
+        "Dorsiflexion du pied",
+        "Extension des orteils",
+        "Inversion du pied",
+        "Sensibilité du 1er espace interdigital"
+    ]
+},
+"plantaire_medial": {
+    name: "Nerf Plantaire Médial",
+    origin: "Division du nerf tibial",
+    spinalLevel: "L4-S3",
+    category: "Membre inférieur",
+    path: [
+        { type: "spinal", name: "Moelle épinière L4-S3", description: "Via nerf tibial" },
+        { type: "nerve", name: "Nerf tibial", description: "Division médiale au tunnel tarsien" },
+        { type: "nerve", name: "Plante du pied médiale", description: "Distribution aux muscles médiaux" },
+        { type: "nerve", name: "Orteils médiaux", description: "Innervation sensitive" },
+        { type: "muscle", name: "Muscles plantaires médiaux", description: "Flexion et support de la voûte" }
+    ],
+    muscles: [
+        "Court fléchisseur des orteils", "Abducteur du gros orteil",
+        "Court fléchisseur du gros orteil", "Lombricaux 1 et 2"
+    ],
+    functions: [
+        "Flexion des orteils médiaux",
+        "Abduction du gros orteil",
+        "Support de l'arche médiale du pied",
+        "Sensibilité de la plante médiale et 3,5 premiers orteils"
+    ]
+},
+"plantaire_lateral": {
+    name: "Nerf Plantaire Latéral",
+    origin: "Division du nerf tibial",
+    spinalLevel: "L4-S3",
+    category: "Membre inférieur",
+    path: [
+        { type: "spinal", name: "Moelle épinière L4-S3", description: "Via nerf tibial" },
+        { type: "nerve", name: "Nerf tibial", description: "Division latérale au tunnel tarsien" },
+        { type: "nerve", name: "Plante du pied latérale", description: "Distribution aux muscles latéraux" },
+        { type: "nerve", name: "Orteils latéraux", description: "Innervation sensitive" },
+        { type: "muscle", name: "Muscles plantaires latéraux", description: "Flexion et stabilité" }
+    ],
+    muscles: [
+        "Abducteur du 5e orteil", "Court fléchisseur du 5e orteil",
+        "Opposant du 5e orteil", "Interosseux", "Lombricaux 3 et 4",
+        "Adducteur du gros orteil", "Carré plantaire"
+    ],
+    functions: [
+        "Flexion du 5e orteil",
+        "Abduction du 5e orteil",
+        "Mouvement des orteils (interosseux)",
+        "Sensibilité de la plante latérale et 1,5 orteils latéraux"
+    ]
+},
+"sural": {
+    name: "Nerf Sural",
+    origin: "Branches du tibial et fibulaire commun",
+    spinalLevel: "S1-S2",
+    category: "Membre inférieur",
+    path: [
+        { type: "spinal", name: "Moelle épinière S1-S2", description: "Via nerfs tibial et fibulaire" },
+        { type: "nerve", name: "Formation mixte", description: "Anastomose tibio-fibulaire" },
+        { type: "nerve", name: "Mollet postérieur", description: "Descente sous-cutanée" },
+        { type: "nerve", name: "Malléole externe", description: "Contournement de la malléole" },
+        { type: "muscle", name: "Bord externe du pied", description: "Sensibilité pure" }
+    ],
+    muscles: ["Aucun muscle (nerf purement sensitif)"],
+    functions: [
+        "Sensibilité de la face postéro-externe de la jambe",
+        "Sensibilité du bord externe du pied",
+        "Sensibilité du 5e orteil",
+        "Sensibilité de la région malléolaire externe"
+    ]
+},
+
+// ========== NERFS AUTONOMES ==========
+"splanchnique_grand": {
+    name: "Grand Nerf Splanchnique",
+    origin: "Chaîne sympathique (T5-T9)",
+    spinalLevel: "T5-T9",
+    category: "Nerf autonome",
+    path: [
+        { type: "spinal", name: "Moelle épinière T5-T9", description: "Segments thoraciques moyens" },
+        { type: "nerve", name: "Chaîne sympathique thoracique", description: "Ganglions sympathiques" },
+        { type: "nerve", name: "Traversée diaphragmatique", description: "Passage dans l'abdomen" },
+        { type: "nerve", name: "Plexus cœliaque", description: "Relais dans le plexus" },
+        { type: "muscle", name: "Viscères abdominaux", description: "Innervation sympathique" }
+    ],
+    muscles: ["Muscle lisse des organes abdominaux", "Vaisseaux sanguins"],
+    functions: [
+        "Innervation sympathique des viscères abdominaux",
+        "Vasoconstriction splanchnique",
+        "Inhibition du péristaltisme digestif",
+        "Stimulation de la sécrétion surrénalienne"
+    ]
+},
+"splanchnique_petit": {
+    name: "Petit Nerf Splanchnique",
+    origin: "Chaîne sympathique (T10-T11)",
+    spinalLevel: "T10-T11",
+    category: "Nerf autonome",
+    path: [
+        { type: "spinal", name: "Moelle épinière T10-T11", description: "Segments thoraciques inférieurs" },
+        { type: "nerve", name: "Chaîne sympathique thoracique", description: "Ganglions sympathiques inférieurs" },
+        { type: "nerve", name: "Traversée diaphragmatique", description: "Passage abdominal" },
+        { type: "nerve", name: "Plexus aortico-rénal", description: "Relais ganglionnaire" },
+        { type: "muscle", name: "Reins et surrénales", description: "Innervation rénale" }
+    ],
+    muscles: ["Muscle lisse rénal", "Vaisseaux rénaux"],
+    functions: [
+        "Innervation sympathique rénale",
+        "Vasoconstriction rénale",
+        "Régulation de la pression artérielle",
+        "Contrôle de la sécrétion rénine"
+    ]
+},
+"splanchnique_lombal": {
+    name: "Nerfs Splanchniques Lombaux",
+    origin: "Chaîne sympathique (L1-L2)",
+    spinalLevel: "L1-L2",
+    category: "Nerf autonome",
+    path: [
+        { type: "spinal", name: "Moelle épinière L1-L2", description: "Segments lombaires supérieurs" },
+        { type: "nerve", name: "Chaîne sympathique lombaire", description: "Ganglions sympathiques lombaires" },
+        { type: "nerve", name: "Plexus hypogastrique supérieur", description: "Convergence vers le plexus" },
+        { type: "nerve", name: "Plexus hypogastriques inférieurs", description: "Distribution pelvienne" },
+        { type: "muscle", name: "Viscères pelviens", description: "Innervation sympathique pelvienne" }
+    ],
+    muscles: ["Muscle lisse vésical", "Muscle lisse des organes génitaux"],
+    functions: [
+        "Innervation sympathique des viscères pelviens",
+        "Contrôle de la vessie (relaxation du détrusor)",
+        "Fonction sexuelle (éjaculation)",
+        "Vasoconstriction pelvienne"
+    ]
+},
+"plexus_coeliaque": {
+    name: "Plexus Cœliaque (Solaire)",
+    origin: "Convergence nerfs splanchniques",
+    spinalLevel: "T5-T12",
+    category: "Nerf autonome",
+    path: [
+        { type: "nerve", name: "Nerfs splanchniques", description: "Convergence des splanchniques" },
+        { type: "nerve", name: "Ganglions cœliaques", description: "Relais ganglionnaires principaux" },
+        { type: "nerve", name: "Plexus périartériels", description: "Distribution le long des artères" },
+        { type: "nerve", name: "Organes digestifs", description: "Innervation viscérale" },
+        { type: "muscle", name: "Tube digestif supérieur", description: "Contrôle sympathique digestif" }
+    ],
+    muscles: ["Estomac", "Duodénum", "Foie", "Pancréas", "Rate"],
+    functions: [
+        "Contrôle sympathique du tube digestif supérieur",
+        "Inhibition de la motricité gastrique",
+        "Vasoconstriction splanchnique",
+        "Régulation de la sécrétion digestive"
+    ]
+},
+"plexus_mesenterique": {
+    name: "Plexus Mésentériques (Supérieur et Inférieur)",
+    origin: "Extensions du plexus cœliaque",
+    spinalLevel: "T10-L2",
+    category: "Nerf autonome",
+    path: [
+        { type: "nerve", name: "Plexus cœliaque", description: "Extension du plexus principal" },
+        { type: "nerve", name: "Artères mésentériques", description: "Distribution péri-artérielle" },
+        { type: "nerve", name: "Mésos intestinaux", description: "Innervation mésentérique" },
+        { type: "nerve", name: "Paroi intestinale", description: "Plexus intramuraux" },
+        { type: "muscle", name: "Intestin grêle et côlon", description: "Motricité intestinale" }
+    ],
+    muscles: ["Jéjunum", "Iléon", "Côlon", "Rectum proximal"],
+    functions: [
+        "Contrôle de la motricité intestinale",
+        "Régulation de la sécrétion intestinale",
+        "Vasoconstriction mésentérique",
+        "Modulation du péristaltisme"
+    ]
+},
+"plexus_hypogastrique": {
+    name: "Plexus Hypogastriques (Supérieur et Inférieurs)",
+    origin: "Nerfs splanchniques lombaux et sacrés",
+    spinalLevel: "L1-S4",
+    category: "Nerf autonome",
+    path: [
+        { type: "nerve", name: "Nerfs splanchniques lombaux", description: "Composante sympathique" },
+        { type: "nerve", name: "Nerfs splanchniques sacrés", description: "Composante parasympathique" },
+        { type: "nerve", name: "Plexus hypogastrique supérieur", description: "Relais pré-sacré" },
+        { type: "nerve", name: "Plexus hypogastriques inférieurs", description: "Distribution pelvienne" },
+        { type: "muscle", name: "Organes pelviens", description: "Innervation autonome mixte" }
+    ],
+    muscles: ["Vessie", "Rectum", "Organes génitaux", "Utérus"],
+    functions: [
+        "Contrôle vésical (miction)",
+        "Contrôle rectal (défécation)",
+        "Fonction sexuelle",
+        "Contrôle utérin (accouchement)"
+    ]
+},
+
+                }
+            },
+            nl: {
+                nerves: {
+                    "olfactif": {
+                        name: "I - Nervus Olfactorius",
+                        origin: "Bulbus olfactorius",
+                        spinalLevel: "Telencephalon",
+                        category: "Hersenzenuw",
+                        path: [
+                            { type: "brain", name: "Olfactorische cortex", description: "Primaire reukgebieden" },
+                            { type: "brain", name: "Bulbus olfactorius", description: "Hoofdreukrelais" },
+                            { type: "nerve", name: "Tractus olfactorius", description: "Olfactorische zenuwbundels" },
+                            { type: "nerve", name: "Lamina cribrosa", description: "Doorgang door ethmoid" },
+                            { type: "muscle", name: "Reukepitheel", description: "Sensorische receptoren" }
+                        ],
+                        muscles: ["Olfactorische receptoren van neusslijmvlies"],
+                        functions: ["Reuk (geurperceptie)", "Olfactorische reflexen"]
+                    },
+                    "optique": {
+                        name: "II - Nervus Opticus",
+                        origin: "Retina",
+                        spinalLevel: "Diencephalon",
+                        category: "Hersenzenuw",
+                        path: [
+                            { type: "brain", name: "Visuele cortex", description: "Occipitale visuele gebieden" },
+                            { type: "brain", name: "Corpus geniculatum laterale", description: "Thalamisch relais" },
+                            { type: "brain", name: "Chiasma opticum", description: "Vezelkruising" },
+                            { type: "nerve", name: "Nervus opticus", description: "Geleidt visuele informatie" },
+                            { type: "nerve", name: "Canalis opticus", description: "Orbitale doorgang" },
+                            { type: "muscle", name: "Retina", description: "Visuele receptoren" }
+                        ],
+                        muscles: ["Retinale ganglioncellen", "Kegeltjes en staafjes"],
+                        functions: ["Zicht", "Fotomotorische reflex", "Accommodatiereflex"]
+                    },
+                    "oculomoteur": {
+                        name: "III - Nervus Oculomotorius",
+                        origin: "Mesencephalon",
+                        spinalLevel: "Hersenstam",
+                        category: "Hersenzenuw",
+                        path: [
+                            { type: "brain", name: "Nucleus oculomotorius", description: "Dorsaal mesencephalon" },
+                            { type: "brain", name: "Nucleus Edinger-Westphal", description: "Parasympathische controle" },
+                            { type: "nerve", name: "Fissura orbitalis superior", description: "Orbitale doorgang" },
+                            { type: "nerve", name: "Orbita", description: "Distributie naar spieren" },
+                            { type: "muscle", name: "Oogspieren", description: "Oogmotoriek" }
+                        ],
+                        muscles: [
+                            "Rectus superior", "Rectus inferior", "Rectus medialis",
+                            "Obliquus inferior", "Levator palpebrae superioris",
+                            "Sphincter pupillae", "Musculus ciliaris"
+                        ],
+                        functions: [
+                            "Oogbewegingen (omhoog, omlaag, naar binnen)",
+                            "Verheffen van bovenste ooglid",
+                            "Pupilvernauwing",
+                            "Accommodatie"
+                        ]
+                    },
+                    "trijumeau": {
+                        name: "V - Nervus Trigeminus",
+                        origin: "Pons",
+                        spinalLevel: "Hersenstam",
+                        category: "Hersenzenuw",
+                        path: [
+                            { type: "brain", name: "Trigeminale kernen", description: "Sensorische en motorische kernen" },
+                            { type: "brain", name: "Ganglion trigeminale", description: "Trigeminaal ganglion" },
+                            { type: "nerve", name: "Drie takken", description: "Oftalmische, maxillaire, mandibulaire" },
+                            { type: "nerve", name: "Craniale foramina", description: "Meerdere doorgangen" },
+                            { type: "muscle", name: "Kauwspieren", description: "Motoriek en sensibiliteit" }
+                        ],
+                        muscles: [
+                            "Masseter", "Temporalis", "Pterygoidei",
+                            "Mylohyoideus", "Anterior digastricus",
+                            "Tensor tympani", "Tensor veli palatini"
+                        ],
+                        functions: [
+                            "Gelaatsgevoeligheid",
+                            "Kauwen",
+                            "Corneareflex",
+                            "Mondholte gevoeligheid",
+                            "Gelaatsproprioceptie"
+                        ]
+                    },
+                    "facial": {
+                        name: "VII - Nervus Facialis",
+                        origin: "Pons",
+                        spinalLevel: "Hersenstam",
+                        category: "Hersenzenuw",
+                        path: [
+                            { type: "brain", name: "Nucleus facialis", description: "Dorsale pons" },
+                            { type: "brain", name: "Nucleus salivatorius superior", description: "Parasympathische controle" },
+                            { type: "nerve", name: "Meatus acusticus internus", description: "Temporale doorgang" },
+                            { type: "nerve", name: "Canalis facialis", description: "Door temporaal bot" },
+                            { type: "nerve", name: "Foramen stylomastoideum", description: "Schedel uitgang" },
+                            { type: "muscle", name: "Gelaatsspieren", description: "Expressie en secretie" }
+                        ],
+                        muscles: [
+                            "Gelaatsexpressiespieren", "Orbicularis oculi",
+                            "Orbicularis oris", "Frontaalspieren", "Buccinator",
+                            "Platysma", "Stapedius", "Stylohyoideus",
+                            "Posterior digastricus"
+                        ],
+                        functions: [
+                            "Gelaatsexpressie", "Oogledsluiting",
+                            "Glimlachen en mimiek", "Traansecretie",
+                            "Speekselsecretie (submandibulaire en sublinguale klieren)",
+                            "Smaak (voorste 2/3 van tong)"
+                        ]
+                    },
+                    "ulnaire": {
+                        name: "Nervus Ulnaris",
+                        origin: "Plexus brachialis (C8-T1)",
+                        spinalLevel: "C8-T1",
+                        category: "Bovenste ledemaat",
+                        path: [
+                            { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+                            { type: "spinal", name: "Ruggenmerg C8-T1", description: "Onderste cervicale segmenten" },
+                            { type: "nerve", name: "Plexus brachialis", description: "Vorming nervus ulnaris" },
+                            { type: "nerve", name: "Mediale arm", description: "Afdaling langs arm" },
+                            { type: "nerve", name: "Sulcus ulnaris", description: "Doorgang bij elleboog" },
+                            { type: "muscle", name: "Doelspieren", description: "Spierinnervatie" }
+                        ],
+                        muscles: [
+                            "Flexor carpi ulnaris", "Flexor digitorum profundus (4e en 5e vinger)",
+                            "Hypothenarspieren", "Interossei", "Lumbricales 3 en 4",
+                            "Adductor pollicis", "Diepe kop flexor pollicis brevis"
+                        ],
+                        functions: [
+                            "Polsflexie en adductie", "Flexie 4e en 5e vinger",
+                            "Vingerspreiden en sluiten", "Fijne handgrijp",
+                            "Oppositie 5e vinger", "Duimadductie"
+                        ]
+                    },
+                    "médian": {
+                        name: "Nervus Medianus",
+                        origin: "Plexus brachialis (C6-T1)",
+                        spinalLevel: "C6-T1",
+                        category: "Bovenste ledemaat",
+                        path: [
+                            { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+                            { type: "spinal", name: "Ruggenmerg C6-T1", description: "Cervicale segmenten" },
+                            { type: "nerve", name: "Plexus brachialis", description: "Vorming nervus medianus" },
+                            { type: "nerve", name: "Anterieure arm", description: "Afdaling in voorste compartiment" },
+                            { type: "nerve", name: "Carpale tunnel", description: "Doorgang bij pols" },
+                            { type: "muscle", name: "Doelspieren", description: "Thenar en flexoren innervatie" }
+                        ],
+                        muscles: [
+                            "Pronator teres", "Flexor carpi radialis", "Palmaris longus",
+                            "Flexor digitorum superficialis", "Flexor digitorum profundus (2e en 3e vinger)",
+                            "Flexor pollicis longus", "Pronator quadratus", "Thenarspieren",
+                            "Lumbricales 1 en 2"
+                        ],
+                        functions: [
+                            "Polsflexie", "Onderarmpronadie", "Duimoppositie",
+                            "Vingerflexie", "Precisiegrip", "Duimabductie"
+                        ]
+                    },
+                    "radial": {
+                        name: "Nervus Radialis",
+                        origin: "Plexus brachialis (C5-T1)",
+                        spinalLevel: "C5-T1",
+                        category: "Bovenste ledemaat",
+                        path: [
+                            { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+                            { type: "spinal", name: "Ruggenmerg C5-T1", description: "Cervicale segmenten" },
+                            { type: "nerve", name: "Plexus brachialis", description: "Vorming nervus radialis" },
+                            { type: "nerve", name: "Sulcus radialis", description: "Doorgang bij humerus" },
+                            { type: "nerve", name: "Posterieure onderarm", description: "Innervatie extensoren" },
+                            { type: "muscle", name: "Doelspieren", description: "Extensoren arm en onderarm" }
+                        ],
+                        muscles: [
+                            "Triceps brachii", "Anconeus", "Brachioradialis", "Extensor carpi radialis longus",
+                            "Extensor carpi radialis brevis", "Extensor digitorum", "Extensor digiti minimi",
+                            "Extensor carpi ulnaris", "Abductor pollicis longus", "Extensor pollicis brevis",
+                            "Extensor pollicis longus", "Extensor indicis"
+                        ],
+                        functions: [
+                            "Elleboogextensie", "Polsextensie", "Vingerextensie",
+                            "Onderarmsupinadie", "Radiale polsabductie",
+                            "Duimextensie en abductie"
+                        ]
+                    },
+                    "sciatique": {
+                        name: "Nervus Ischiadicus",
+                        origin: "Plexus lumbosacralis (L4-S3)",
+                        spinalLevel: "L4-S3",
+                        category: "Onderste ledemaat",
+                        path: [
+                            { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+                            { type: "spinal", name: "Ruggenmerg L4-S3", description: "Lumbosacrale segmenten" },
+                            { type: "nerve", name: "Plexus lumbosacralis", description: "Vorming nervus ischiadicus" },
+                            { type: "nerve", name: "Foramen ischiadicum", description: "Bekken uitgang" },
+                            { type: "nerve", name: "Posterieure dij", description: "Afdaling in dij" },
+                            { type: "muscle", name: "Doelspieren", description: "Dij- en beenspieren" }
+                        ],
+                        muscles: [
+                            "Hamstrings", "Biceps femoris", "Semitendinosus", "Semimembranosus",
+                            "Beenspieren (via fibularis en tibialis)"
+                        ],
+                        functions: [
+                            "Knieflexie", "Heupextensie",
+                            "Voetdorsiflexie", "Voetplantairflexie",
+                            "Voetinversie en eversie"
+                        ]
+                    },
+                    "fémoral": {
+                        name: "Nervus Femoralis",
+                        origin: "Plexus lumbalis (L2-L4)",
+                        spinalLevel: "L2-L4",
+                        category: "Onderste ledemaat",
+                        path: [
+                            { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+                            { type: "spinal", name: "Ruggenmerg L2-L4", description: "Lumbale segmenten" },
+                            { type: "nerve", name: "Plexus lumbalis", description: "Vorming nervus femoralis" },
+                            { type: "nerve", name: "Ligamentum inguinale", description: "Doorgang onder lies" },
+                            { type: "nerve", name: "Trigonum femorale", description: "Verdeling in takken" },
+                            { type: "muscle", name: "Anterieure spieren", description: "Voorste dijcompartiment" }
+                        ],
+                        muscles: [
+                            "Quadriceps femoris", "Rectus femoris", "Vastus lateralis",
+                            "Vastus medialis", "Vastus intermedius", "Sartorius", "Pectineus"
+                        ],
+                        functions: [
+                            "Knie-extensie", "Heupflexie",
+                            "Gevoeligheid voorste dij",
+                            "Gevoeligheid mediale been"
+                        ]
+                    },
+                    "phrénique": {
+                        name: "Nervus Phrenicus",
+                        origin: "Plexus cervicalis (C3-C5)",
+                        spinalLevel: "C3-C5",
+                        category: "Ruggemergzenuw",
+                        path: [
+                            { type: "brain", name: "Ademhalingscentrum", description: "Medulla oblongata" },
+                            { type: "spinal", name: "Ruggenmerg C3-C5", description: "Cervicale segmenten" },
+                            { type: "nerve", name: "Plexus cervicalis", description: "Vorming nervus phrenicus" },
+                            { type: "nerve", name: "Hals en thorax", description: "Afdaling naar diafragma" },
+                            { type: "nerve", name: "Pericardium", description: "Mediastinale doorgang" },
+                            { type: "muscle", name: "Diafragma", description: "Hoofdademhalingsspier" }
+                        ],
+                        muscles: ["Diafragma"],
+                        functions: [
+                            "Ademhaling (inspiratie)", "Hikcontrole",
+                            "Pericardgevoeligheid", "Diafragmatische pleuragevoeligheid"
+                        ]
+                    },
+"thoracique_long": {
+    name: "Nervus Thoracicus Longus (van Bell)",
+    origin: "Plexus brachialis (C5-C7)",
+    spinalLevel: "C5-C7",
+    category: "Thoracale zenuw",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg C5-C7", description: "Middelste cervicale segmenten" },
+        { type: "nerve", name: "Plexus brachialis", description: "Vorming thoracicus longus" },
+        { type: "nerve", name: "Thoraxwand", description: "Afdaling over ribbenkast" },
+        { type: "nerve", name: "Laterale thoraxzijde", description: "Naar serratus anterior" },
+        { type: "muscle", name: "Serratus anterior", description: "Scapulastabilisatie" }
+    ],
+    muscles: ["Serratus anterior"],
+    functions: [
+        "Scapulastabilisatie",
+        "Scapulaprotractie",
+        "Voorkoming scapula-afwijking"
+    ]
+},
+"intercostaux": {
+    name: "Nervus Intercostales",
+    origin: "Anterieure takken T1-T12",
+    spinalLevel: "T1-T12",
+    category: "Thoracale zenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg T1-T12", description: "Thoracale segmenten" },
+        { type: "nerve", name: "Anterieure takken", description: "Thoracale zenuwwortels" },
+        { type: "nerve", name: "Intercostale ruimten", description: "Verloop tussen ribben" },
+        { type: "nerve", name: "Costale groeve", description: "Subcostaal verloop" },
+        { type: "muscle", name: "Intercostale spieren", description: "Ademhaling en stabiliteit" }
+    ],
+    muscles: [
+        "Musculi intercostales externi",
+        "Musculi intercostales interni",
+        "Buikwandspieren"
+    ],
+    functions: [
+        "Ademhaling (inspiratie en expiratie)",
+        "Stabilisatie ribbenkast",
+        "Gevoeligheid thorax- en buikhuid",
+        "Abdominale reflexen"
+    ]
+},
+"trochléaire": {
+    name: "IV - Nervus Trochlearis",
+    origin: "Mesencephalon",
+    spinalLevel: "Hersenstam",
+    category: "Hersenzenuw",
+    path: [
+        { type: "brain", name: "Nucleus trochlearis", description: "Caudaal mesencephalon" },
+        { type: "nerve", name: "Dorsale decussatie", description: "Volledige kruising" },
+        { type: "nerve", name: "Fissura orbitalis superior", description: "Orbitale doorgang" },
+        { type: "nerve", name: "Orbita", description: "Naar obliquus superior" },
+        { type: "muscle", name: "Obliquus superior", description: "Oogspier" }
+    ],
+    muscles: ["Obliquus superior"],
+    functions: [
+        "Oogrotatie naar beneden en buiten",
+        "Intorsie van het oog",
+        "Fijne oogbewegingen"
+    ]
+},
+"abducens": {
+    name: "VI - Nervus Abducens",
+    origin: "Pons",
+    spinalLevel: "Hersenstam",
+    category: "Hersenzenuw",
+    path: [
+        { type: "brain", name: "Nucleus abducens", description: "Ventrale pons" },
+        { type: "nerve", name: "Sinus cavernosus", description: "Intracaverneus verloop" },
+        { type: "nerve", name: "Fissura orbitalis superior", description: "Orbitale doorgang" },
+        { type: "nerve", name: "Orbita", description: "Naar rectus lateralis" },
+        { type: "muscle", name: "Rectus lateralis", description: "Oogabductie" }
+    ],
+    muscles: ["Rectus lateralis"],
+    functions: [
+        "Oogabductie (beweging naar buiten)",
+        "Coördinatie horizontale oogbewegingen"
+    ]
+},
+"vestibulocochléaire": {
+    name: "VIII - Nervus Vestibulocochlearis",
+    origin: "Binnenoor",
+    spinalLevel: "Pons/Medulla",
+    category: "Hersenzenuw",
+    path: [
+        { type: "brain", name: "Cochleaire kernen", description: "Pons en medulla" },
+        { type: "brain", name: "Vestibulaire kernen", description: "Bodem 4e ventrikel" },
+        { type: "nerve", name: "Meatus acusticus internus", description: "Temporale doorgang" },
+        { type: "nerve", name: "Benig labyrint", description: "Binnenoor" },
+        { type: "muscle", name: "Sensorische organen", description: "Gehoor en evenwicht" }
+    ],
+    muscles: [
+        "Orgaan van Corti (cochlea)", "Maculae utricularis en saccularis",
+        "Cristae ampullares", "Vestibulaire haarcellen"
+    ],
+    functions: [
+        "Gehoor", "Statisch evenwicht", "Dynamisch evenwicht",
+        "Vestibulo-oculaire reflexen", "Ruimtelijke oriëntatie"
+    ]
+},
+"glossopharyngien": {
+    name: "IX - Nervus Glossopharyngeus",
+    origin: "Medulla oblongata",
+    spinalLevel: "Hersenstam",
+    category: "Hersenzenuw",
+    path: [
+        { type: "brain", name: "Glossopharyngeale kernen", description: "Dorsale medulla" },
+        { type: "brain", name: "Nucleus salivatorius inferior", description: "Parasympathische controle" },
+        { type: "nerve", name: "Foramen jugulare", description: "Schedel uitgang" },
+        { type: "nerve", name: "Fossa pterygopalatina", description: "Ganglionair relais" },
+        { type: "muscle", name: "Pharynx en klieren", description: "Slikken en secretie" }
+    ],
+    muscles: [
+        "Stylopharyngeus", "Constrictor pharyngis superior",
+        "Parotisklier"
+    ],
+    functions: [
+        "Smaak (achterste 1/3 tong)",
+        "Pharyngeale sensibiliteit", "Slikken",
+        "Speekselsecretie (parotis)",
+        "Braakreflex", "Bloeddrukcontrole"
+    ]
+},
+"vague": {
+    name: "X - Nervus Vagus",
+    origin: "Medulla oblongata",
+    spinalLevel: "Hersenstam",
+    category: "Hersenzenuw",
+    path: [
+        { type: "brain", name: "Dorsale vaguskern", description: "Dorsale medulla" },
+        { type: "brain", name: "Nucleus ambiguus", description: "Ventrale medulla" },
+        { type: "nerve", name: "Foramen jugulare", description: "Schedel uitgang" },
+        { type: "nerve", name: "Hals en thorax", description: "Afdaling naar viscera" },
+        { type: "nerve", name: "Abdomen", description: "Viscerale innervatie" },
+        { type: "muscle", name: "Viscerale organen", description: "Parasympathische controle" }
+    ],
+    muscles: [
+        "Pharynxspieren", "Larynxspieren",
+        "Hartspier", "Gladde spieren digestief",
+        "Gladde bronchiale spieren"
+    ],
+    functions: [
+        "Slikken", "Fonatie", "Hartremming",
+        "Digestieve peristaltiek", "Digestieve secretie",
+        "Bronchoconstricie", "Hoestreflex"
+    ]
+},
+"accessoire": {
+    name: "XI - Nervus Accessorius",
+    origin: "Medulla en cervicaal ruggenmerg",
+    spinalLevel: "C1-C5",
+    category: "Hersenzenuw",
+    path: [
+        { type: "brain", name: "Nucleus ambiguus", description: "Craniale deel" },
+        { type: "spinal", name: "Voorhorn C1-C5", description: "Spinaal deel" },
+        { type: "nerve", name: "Foramen jugulare", description: "Schedel uitgang" },
+        { type: "nerve", name: "Hals", description: "Naar halsspieren" },
+        { type: "muscle", name: "Cervicale spieren", description: "Rotatie en inclinatie" }
+    ],
+    muscles: [
+        "Sternocleidomastoideus", "Trapezius",
+        "Larynxspieren (craniaal deel)"
+    ],
+    functions: [
+        "Hoofdrotatie", "Cervicale inclinatie",
+        "Schouderverheving", "Fonatie (craniaal deel)"
+    ]
+},
+"hypoglosse": {
+    name: "XII - Nervus Hypoglossus",
+    origin: "Medulla oblongata",
+    spinalLevel: "Hersenstam",
+    category: "Hersenzenuw",
+    path: [
+        { type: "brain", name: "Nucleus hypoglossus", description: "Ventrale medulla" },
+        { type: "nerve", name: "Canalis hypoglossi", description: "Schedel uitgang" },
+        { type: "nerve", name: "Hals", description: "Cervicale boog" },
+        { type: "nerve", name: "Mondbodem", description: "Naar de tong" },
+        { type: "muscle", name: "Tongspieren", description: "Tongmotoriek" }
+    ],
+    muscles: [
+        "Intrinsieke tongspieren",
+        "Genioglossus", "Hyoglossus", "Styloglossus"
+    ],
+    functions: [
+        "Tongbewegingen", "Slikken",
+        "Kauwen", "Fonatie", "Articulatie"
+    ]
+},
+"musculocutané": {
+    name: "Nervus Musculocutaneus",
+    origin: "Plexus brachialis (C5-C7)",
+    spinalLevel: "C5-C7",
+    category: "Bovenste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg C5-C7", description: "Middelste cervicale segmenten" },
+        { type: "nerve", name: "Plexus brachialis", description: "Laterale bundel" },
+        { type: "nerve", name: "Voorste armcompartiment", description: "Door coracobrachialis" },
+        { type: "nerve", name: "Laterale cutane zenuw", description: "Sensorische onderarmtak" },
+        { type: "muscle", name: "Flexorspieren", description: "Voorste armcompartiment" }
+    ],
+    muscles: [
+        "Coracobrachialis", "Biceps brachii", "Brachialis"
+    ],
+    functions: [
+        "Elleboogflexie", "Onderarmsupinadie",
+        "Schouderflexie", "Cutane sensibiliteit laterale onderarm"
+    ]
+},
+"axillaire": {
+    name: "Nervus Axillaris",
+    origin: "Plexus brachialis (C5-C6)",
+    spinalLevel: "C5-C6",
+    category: "Bovenste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg C5-C6", description: "Bovenste cervicale segmenten" },
+        { type: "nerve", name: "Plexus brachialis", description: "Posterieure bundel" },
+        { type: "nerve", name: "Quadrilaterale ruimte", description: "Doorgang onder schouder" },
+        { type: "nerve", name: "Diepe deltoideus", description: "Spierinnervatie" },
+        { type: "muscle", name: "Schouderspieren", description: "Armabductie" }
+    ],
+    muscles: [
+        "Deltoideus", "Teres minor"
+    ],
+    functions: [
+        "Armabductie", "Schouderflexie en extensie",
+        "Externe armrotatie", "Sensibiliteit schouderregio"
+    ]
+},
+"obturateur": {
+    name: "Nervus Obturatorius",
+    origin: "Plexus lumbalis (L2-L4)",
+    spinalLevel: "L2-L4",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg L2-L4", description: "Lumbale segmenten" },
+        { type: "nerve", name: "Plexus lumbalis", description: "Vorming nervus obturatorius" },
+        { type: "nerve", name: "Foramen obturatum", description: "Bekken doorgang" },
+        { type: "nerve", name: "Mediale compartiment", description: "Innervatie adductoren" },
+        { type: "muscle", name: "Adductorspieren", description: "Dijadductie" }
+    ],
+    muscles: [
+        "Adductor magnus", "Adductor longus", "Adductor brevis",
+        "Gracilis", "Obturator externus"
+    ],
+    functions: [
+        "Dijadductie", "Externe heuprotatie",
+        "Sensibiliteit mediale dij"
+    ]
+},
+"fibulaire": {
+    name: "Nervus Fibularis Communis",
+    origin: "Ischiadicusdeling",
+    spinalLevel: "L4-S2",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg L4-S2", description: "Lumbosacrale segmenten" },
+        { type: "nerve", name: "Nervus ischiadicus", description: "Laterale deling" },
+        { type: "nerve", name: "Fibulakop", description: "Fibulaire omlooping" },
+        { type: "nerve", name: "Antero-lateraal compartiment", description: "Oppervlakkige en diepe takken" },
+        { type: "muscle", name: "Peroneale spieren", description: "Dorsiflexie en eversie" }
+    ],
+    muscles: [
+        "Tibialis anterior", "Extensor digitorum longus",
+        "Extensor hallucis longus", "Fibularis tertius",
+        "Fibularis longus", "Fibularis brevis"
+    ],
+    functions: [
+        "Voetdorsiflexie", "Voeteversie",
+        "Teenextensie", "Voetrug sensibiliteit"
+    ]
+},
+"tibial": {
+    name: "Nervus Tibialis",
+    origin: "Ischiadicusdeling",
+    spinalLevel: "L4-S3",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg L4-S3", description: "Lumbosacrale segmenten" },
+        { type: "nerve", name: "Nervus ischiadicus", description: "Mediale deling" },
+        { type: "nerve", name: "Fossa poplitea", description: "Posterieure afdaling" },
+        { type: "nerve", name: "Tarsale tunnel", description: "Doorgang bij malleolus" },
+        { type: "muscle", name: "Posterieure spieren", description: "Plantairflexie" }
+    ],
+    muscles: [
+        "Triceps surae", "Gastrocnemius", "Soleus", "Tibialis posterior",
+        "Flexor digitorum longus", "Flexor hallucis longus",
+        "Intrinsieke plantaire spieren"
+    ],
+    functions: [
+        "Voetplantairflexie", "Voetinversie",
+        "Teenflexie", "Voetzool sensibiliteit",
+        "Lopen en voortstuwing"
+    ]
+},
+"grand_auriculaire": {
+    name: "Nervus Auricularis Magnus",
+    origin: "Plexus cervicalis (C2-C3)",
+    spinalLevel: "C2-C3",
+    category: "Ruggemergzenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg C2-C3", description: "Bovenste cervicale segmenten" },
+        { type: "nerve", name: "Plexus cervicalis", description: "Vorming auricularis magnus" },
+        { type: "nerve", name: "Posterieure SCM rand", description: "Erb punt" },
+        { type: "nerve", name: "Auriculaire regio", description: "Stijging naar oor" },
+        { type: "muscle", name: "Oorhuid", description: "Oorsensibiliteit" }
+    ],
+    muscles: ["Geen spieren (puur sensorische zenuw)"],
+    functions: [
+        "Oorhuidsensibiliteit",
+        "Mastoïdale regio sensibiliteit",
+        "Kaakhoek sensibiliteit"
+    ]
+},
+"suprascapulaire": {
+    name: "Nervus Suprascapularis",
+    origin: "Plexus brachialis (C5-C6)",
+    spinalLevel: "C5-C6",
+    category: "Bovenste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg C5-C6", description: "Bovenste cervicale segmenten" },
+        { type: "nerve", name: "Plexus brachialis", description: "Bovenste stam" },
+        { type: "nerve", name: "Scapulaire incisuur", description: "Doorgang onder ligament" },
+        { type: "nerve", name: "Supraspinatus fossa", description: "Verdeling in takken" },
+        { type: "muscle", name: "Rotatorspieren", description: "Externe schouderrotatie" }
+    ],
+    muscles: ["Supraspinatus", "Infraspinatus"],
+    functions: [
+        "Externe armrotatie",
+        "Abductie-initiatie",
+        "Schouderstabilisatie"
+    ]
+},
+"subscapulaire": {
+    name: "Nervi Subscapulares",
+    origin: "Plexus brachialis (C5-C7)",
+    spinalLevel: "C5-C7",
+    category: "Bovenste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg C5-C7", description: "Cervicale segmenten" },
+        { type: "nerve", name: "Plexus brachialis", description: "Posterieure bundel" },
+        { type: "nerve", name: "Axillaire holte", description: "Posterieure distributie" },
+        { type: "nerve", name: "Posterieure schouder", description: "Spierinnervatie" },
+        { type: "muscle", name: "Rotatorspieren", description: "Interne rotatie" }
+    ],
+    muscles: ["Subscapularis", "Teres major"],
+    functions: [
+        "Interne armrotatie",
+        "Armadductie",
+        "Schouderstabilisatie"
+    ]
+},
+
+// ========== EXTRA CERVICALE ZENUWEN ==========
+"petit_occipital": {
+    name: "Nervus Occipitalis Minor",
+    origin: "Plexus cervicalis (C2)",
+    spinalLevel: "C2",
+    category: "Ruggemergzenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg C2", description: "Bovenste cervicaal segment" },
+        { type: "nerve", name: "Plexus cervicalis", description: "Vorming occipitalis minor" },
+        { type: "nerve", name: "Posterieure SCM rand", description: "Erb punt" },
+        { type: "nerve", name: "Mastoïdale regio", description: "Stijging naar occiput" },
+        { type: "muscle", name: "Occipitale huid", description: "Post-auriculaire sensibiliteit" }
+    ],
+    muscles: ["Geen spieren (puur sensorische zenuw)"],
+    functions: [
+        "Sensibiliteit parotide huid",
+        "Sensibiliteit mastoïdale regio",
+        "Sensibiliteit oorlel en concha",
+        "Post-auriculaire sensibiliteit"
+    ]
+},
+"transverse_cou": {
+    name: "Nervus Transversus Colli",
+    origin: "Plexus cervicalis (C2-C3)",
+    spinalLevel: "C2-C3",
+    category: "Ruggemergzenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg C2-C3", description: "Bovenste cervicale segmenten" },
+        { type: "nerve", name: "Plexus cervicalis", description: "Vorming transversus colli" },
+        { type: "nerve", name: "Erb punt", description: "Uittreding bij SCM rand" },
+        { type: "nerve", name: "Anterieure cervicale regio", description: "Horizontale distributie" },
+        { type: "muscle", name: "Cervicale huid", description: "Antero-laterale sensibiliteit" }
+    ],
+    muscles: ["Geen spieren (puur sensorische zenuw)"],
+    functions: [
+        "Sensibiliteit submandibulaire regio",
+        "Antero-laterale hals sensibiliteit",
+        "Sensibiliteit thyroïdale regio",
+        "Mediale supraclaviculaire sensibiliteit"
+    ]
+},
+"supraclaviculaires": {
+    name: "Nervi Supraclaviculares",
+    origin: "Plexus cervicalis (C3-C4)",
+    spinalLevel: "C3-C4",
+    category: "Ruggemergzenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg C3-C4", description: "Middelste cervicale segmenten" },
+        { type: "nerve", name: "Plexus cervicalis", description: "Vorming supraclaviculares" },
+        { type: "nerve", name: "Erb punt", description: "Gemeenschappelijke uittreding" },
+        { type: "nerve", name: "Supraclaviculaire regio", description: "Verdeling in drie groepen" },
+        { type: "muscle", name: "Schouderhuid", description: "Supraclaviculaire sensibiliteit" }
+    ],
+    muscles: ["Geen spieren (puur sensorische zenuw)"],
+    functions: [
+        "Sensibiliteit boven clavicula",
+        "Sensibiliteit deltoïdale regio",
+        "Sensibiliteit anterieure schouder",
+        "Sensibiliteit bovenste decolleté"
+    ]
+},
+"grand_occipital": {
+    name: "Nervus Occipitalis Major",
+    origin: "Posterieure tak C2",
+    spinalLevel: "C2",
+    category: "Ruggemergzenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg C2", description: "Bovenste cervicaal segment" },
+        { type: "nerve", name: "Posterieure tak C2", description: "Dorsale verdeling" },
+        { type: "nerve", name: "Posterieure cervicale spieren", description: "Spierdoorgang" },
+        { type: "nerve", name: "Superieure nuchale lijn", description: "Aponeurotische doorpriem" },
+        { type: "muscle", name: "Posterieure hoofdhuid", description: "Occipitale distributie" }
+    ],
+    muscles: ["Nekspieren (motorische takken)", "Hoofdhuid (sensorische takken)"],
+    functions: [
+        "Motoriek posterieure cervicale spieren",
+        "Sensibiliteit posterieure hoofdhuid",
+        "Sensibiliteit occipitale regio",
+        "Betrokkenheid bij occipitale hoofdpijn"
+    ]
+},
+
+// ========== PLEXUS LUMBALIS ZENUWEN ==========
+"ilio_hypogastrique": {
+    name: "Nervus Iliohypogastricus",
+    origin: "Plexus lumbalis (L1)",
+    spinalLevel: "L1",
+    category: "Ruggemergzenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg L1", description: "Bovenste lumbaal segment" },
+        { type: "nerve", name: "Plexus lumbalis", description: "Vorming iliohypogastricus" },
+        { type: "nerve", name: "Psoas spier", description: "Laterale uittreding" },
+        { type: "nerve", name: "Buikwand", description: "Verloop in spieren" },
+        { type: "muscle", name: "Buikspieren", description: "Motorische en sensorische innervatie" }
+    ],
+    muscles: [
+        "Transversus abdominis", "Obliquus internus", "Obliquus externus",
+        "Rectus abdominis (onderste deel)"
+    ],
+    functions: [
+        "Motoriek onderste buikspieren",
+        "Sensibiliteit onderste buiktegumenten",
+        "Sensibiliteit suprapubische regio",
+        "Deelname buikspanningsband"
+    ]
+},
+"ilio_inguinal": {
+    name: "Nervus Ilioinguinalis",
+    origin: "Plexus lumbalis (L1)",
+    spinalLevel: "L1",
+    category: "Ruggemergzenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg L1", description: "Bovenste lumbaal segment" },
+        { type: "nerve", name: "Plexus lumbalis", description: "Vorming ilioinguinalis" },
+        { type: "nerve", name: "Crista iliaca", description: "Parallel aan iliohypogastricus" },
+        { type: "nerve", name: "Canalis inguinalis", description: "Doorgang door kanaal" },
+        { type: "muscle", name: "Genitale regio", description: "Sensorische distributie" }
+    ],
+    muscles: ["Kleine bijdrage buikspieren"],
+    functions: [
+        "Sensibiliteit inguinale regio",
+        "Sensibiliteit externe geslachtsorganen",
+        "Sensibiliteit mediale dijbinnenzijde proximaal",
+        "Cremasterreflex (deelname)"
+    ]
+},
+"genitofemoral": {
+    name: "Nervus Genitofemoralis",
+    origin: "Plexus lumbalis (L1-L2)",
+    spinalLevel: "L1-L2",
+    category: "Ruggemergzenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg L1-L2", description: "Bovenste lumbale segmenten" },
+        { type: "nerve", name: "Plexus lumbalis", description: "Vorming genitofemoralis" },
+        { type: "nerve", name: "Anterieure psoas", description: "Afdaling op psoas" },
+        { type: "nerve", name: "Verdeling in twee takken", description: "Genitale en femorale tak" },
+        { type: "muscle", name: "Cremaster en femorale regio", description: "Gemengde innervatie" }
+    ],
+    muscles: ["Musculus cremaster (man)", "Musculus dartos"],
+    functions: [
+        "Motoriek cremaster (cremasterreflex)",
+        "Sensibiliteit scrotum (man) of labia majora (vrouw)",
+        "Sensibiliteit antero-laterale proximale dij",
+        "Genitale thermoregulatie"
+    ]
+},
+"cutane_lateral_cuisse": {
+    name: "Nervus Cutaneus Femoris Lateralis",
+    origin: "Plexus lumbalis (L2-L3)",
+    spinalLevel: "L2-L3",
+    category: "Ruggemergzenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg L2-L3", description: "Middelste lumbale segmenten" },
+        { type: "nerve", name: "Plexus lumbalis", description: "Vorming cutaneus lateralis" },
+        { type: "nerve", name: "Laterale psoas rand", description: "Verloop naar spina iliaca" },
+        { type: "nerve", name: "Spina iliaca anterior superior", description: "Doorgang onder ligamentum inguinale" },
+        { type: "muscle", name: "Laterale dij", description: "Pure sensorische distributie" }
+    ],
+    muscles: ["Geen spieren (puur sensorische zenuw)"],
+    functions: [
+        "Sensibiliteit laterale dij",
+        "Sensibiliteit trochanterregio",
+        "Diagnose meralgia paraesthetica",
+        "Sensibiliteit tot knie (lateraal)"
+    ]
+},
+
+"fessier_supérieur": {
+    name: "Nervus Gluteus Superior",
+    origin: "Plexus lumbosacralis (L4-S1)",
+    spinalLevel: "L4-S1",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg L4-S1", description: "Lumbosacrale segmenten" },
+        { type: "nerve", name: "Plexus lumbosacralis", description: "Vorming gluteus superior" },
+        { type: "nerve", name: "Foramen suprapiriforme", description: "Bekken uitgang" },
+        { type: "nerve", name: "Gluteale regio", description: "Distributie naar gluteale spieren" },
+        { type: "muscle", name: "Abductorspieren", description: "Heupabductie" }
+    ],
+    muscles: ["Gluteus medius", "Gluteus minimus", "Tensor fasciae latae"],
+    functions: [
+        "Heupabductie",
+        "Bekkenstabilisatie",
+        "Interne heuprotatie",
+        "Lopen (bekkenval voorkomen)"
+    ]
+},
+"fessier_inférieur": {
+    name: "Nervus Gluteus Inferior",
+    origin: "Plexus lumbosacralis (L5-S2)",
+    spinalLevel: "L5-S2",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg L5-S2", description: "Lumbosacrale segmenten" },
+        { type: "nerve", name: "Plexus lumbosacralis", description: "Vorming gluteus inferior" },
+        { type: "nerve", name: "Foramen infrapiriforme", description: "Bekken uitgang" },
+        { type: "nerve", name: "Diepe gluteale regio", description: "Naar gluteus maximus" },
+        { type: "muscle", name: "Gluteus maximus", description: "Heupextensie" }
+    ],
+    muscles: ["Gluteus maximus"],
+    functions: [
+        "Heupextensie",
+        "Externe heuprotatie",
+        "Bekkenstabilisatie",
+        "Voortstuwing bij lopen"
+    ]
+},
+// ========== PLEXUS BRACHIALIS TAKKEN ==========
+"scapulaire_dorsal": {
+    name: "Nervus Dorsalis Scapulae",
+    origin: "Plexus brachialis (C5)",
+    spinalLevel: "C5",
+    category: "Bovenste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg C5", description: "Middelste cervicaal segment" },
+        { type: "nerve", name: "C5 wortel", description: "Vroege uittreding" },
+        { type: "nerve", name: "Mediale scapularand", description: "Verloop naar rhomboïden" },
+        { type: "muscle", name: "Scapulaire spieren", description: "Scapulastabilisatie" }
+    ],
+    muscles: ["Rhomboideus major", "Rhomboideus minor", "Levator scapulae"],
+    functions: [
+        "Scapularetractie",
+        "Scapulaelevatie",
+        "Scapulaire stabilisatie",
+        "Schouderbladen samenbrengen"
+    ]
+},
+"subclavier": {
+    name: "Nervus Subclavius",
+    origin: "Plexus brachialis (C5-C6)",
+    spinalLevel: "C5-C6",
+    category: "Bovenste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg C5-C6", description: "Middelste cervicale segmenten" },
+        { type: "nerve", name: "Superieure stam", description: "Tak van superieure primaire stam" },
+        { type: "nerve", name: "Subclaviculaire regio", description: "Verloop naar subclavius" },
+        { type: "muscle", name: "Subclavius spier", description: "Claviculaire stabilisatie" }
+    ],
+    muscles: ["Subclavius"],
+    functions: [
+        "Claviculadepressie",
+        "Sternoclaviculaire gewrichtsstabilisatie",
+        "Bescherming subclaviculaire vaten"
+    ]
+},
+"pectoraux": {
+    name: "Nervi Pectorales (Lateralis et Medialis)",
+    origin: "Plexus brachialis (C5-T1)",
+    spinalLevel: "C5-T1",
+    category: "Bovenste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg C5-T1", description: "Cervicale segmenten en T1" },
+        { type: "nerve", name: "Laterale en mediale bundels", description: "Twee afzonderlijke zenuwen" },
+        { type: "nerve", name: "Pectorale regio", description: "Distributie naar pectorales" },
+        { type: "muscle", name: "Pectorale spieren", description: "Armadductie en rotatie" }
+    ],
+    muscles: ["Pectoralis major", "Pectoralis minor"],
+    functions: [
+        "Armadductie",
+        "Interne armrotatie",
+        "Armflexie (claviculair deel)",
+        "Schouderdepressie"
+    ]
+},
+"thoracodorsal": {
+    name: "Nervus Thoracodorsalis",
+    origin: "Plexus brachialis (C6-C8)",
+    spinalLevel: "C6-C8",
+    category: "Bovenste ledemaat",
+    path: [
+        { type: "brain", name: "Motorische cortex", description: "Primair motorisch gebied" },
+        { type: "spinal", name: "Ruggenmerg C6-C8", description: "Middelste-onderste cervicale segmenten" },
+        { type: "nerve", name: "Posterieure bundel", description: "Tak van posterieure bundel" },
+        { type: "nerve", name: "Posterieure thoraxwand", description: "Verloop naar latissimus dorsi" },
+        { type: "muscle", name: "Latissimus dorsi", description: "Armadductie en extensie" }
+    ],
+    muscles: ["Latissimus dorsi"],
+    functions: [
+        "Krachtige armadductie",
+        "Armextensie",
+        "Interne armrotatie",
+        "Deelname trekkingsbewegingen"
+    ]
+},
+"cutanes_mediaux": {
+    name: "Nervi Cutanei Mediales Brachii et Antebrachii",
+    origin: "Plexus brachialis (C8-T1)",
+    spinalLevel: "C8-T1",
+    category: "Bovenste ledemaat",
+    path: [
+        { type: "spinal", name: "Ruggenmerg C8-T1", description: "Onderste cervicale segmenten" },
+        { type: "nerve", name: "Mediale bundel", description: "Takken van mediale bundel" },
+        { type: "nerve", name: "Mediale armzijde", description: "Pure sensorische distributie" },
+        { type: "nerve", name: "Mediale onderarmzijde", description: "Sensorische uitbreiding" },
+        { type: "muscle", name: "Mediale huid", description: "Mediale ledemaat sensibiliteit" }
+    ],
+    muscles: ["Geen spieren (puur sensorische zenuwen)"],
+    functions: [
+        "Sensibiliteit mediale armzijde",
+        "Sensibiliteit mediale onderarmzijde",
+        "Sensibiliteit tot pols",
+        "Proprioceptieve sensorische informatie"
+    ]
+},
+// ========== PLEXUS SACRALIS ZENUWEN ==========
+"cutane_posterieur_cuisse": {
+    name: "Nervus Cutaneus Femoris Posterior",
+    origin: "Plexus sacralis (S1-S3)",
+    spinalLevel: "S1-S3",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "spinal", name: "Ruggenmerg S1-S3", description: "Sacrale segmenten" },
+        { type: "nerve", name: "Plexus sacralis", description: "Vorming cutaneus posterior" },
+        { type: "nerve", name: "Foramen ischiadicum", description: "Bekken uitgang met ischiadicus" },
+        { type: "nerve", name: "Posterieure dijzijde", description: "Sensorische distributie" },
+        { type: "muscle", name: "Posterieure huid", description: "Dij en perineum sensibiliteit" }
+    ],
+    muscles: ["Geen spieren (puur sensorische zenuw)"],
+    functions: [
+        "Sensibiliteit posterieure dijzijde",
+        "Sensibiliteit onderste gluteale regio (nervi clunium inferiores)",
+        "Sensibiliteit perineaal (perineale tak)",
+        "Sensibiliteit posterieur scrotum/labia"
+    ]
+},
+"pudendal": {
+    name: "Nervus Pudendus",
+    origin: "Plexus sacralis (S2-S4)",
+    spinalLevel: "S2-S4",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "spinal", name: "Ruggenmerg S2-S4", description: "Middelste sacrale segmenten" },
+        { type: "nerve", name: "Plexus sacralis", description: "Vorming nervus pudendus" },
+        { type: "nerve", name: "Spina ischiadica", description: "Omloop van spina" },
+        { type: "nerve", name: "Alcock kanaal", description: "Verloop in ischioanale fossa" },
+        { type: "muscle", name: "Perineum", description: "Volledige perineale innervatie" }
+    ],
+    muscles: [
+        "Sphincter ani externus", "Perineale spieren",
+        "Bulbospongiosus", "Ischiocavernosus", "Sphincter urethrae externus"
+    ],
+    functions: [
+        "Motoriek perineale spieren",
+        "Anale en urethrale sphinctercontrole",
+        "Externe genitale sensibiliteit",
+        "Seksuele en mictie functie",
+        "Anale en perineale sensibiliteit"
+    ]
+},
+"piriformis": {
+    name: "Nervus Piriformis",
+    origin: "Plexus sacralis (S1-S2)",
+    spinalLevel: "S1-S2",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "spinal", name: "Ruggenmerg S1-S2", description: "Bovenste sacrale segmenten" },
+        { type: "nerve", name: "Plexus sacralis", description: "Vorming nervus piriformis" },
+        { type: "nerve", name: "Anterieure piriformis", description: "Directe innervatie" },
+        { type: "muscle", name: "Piriformis spier", description: "Externe heuprotatie" }
+    ],
+    muscles: ["Piriformis"],
+    functions: [
+        "Externe heuprotatie",
+        "Heupabductie in flexie",
+        "Sacro-iliacale gewrichtsstabilisatie",
+        "Rol in piriformis syndroom"
+    ]
+},
+
+// ========== ZENUW SUBDIVISIONS ==========
+"fibulaire_superficiel": {
+    name: "Nervus Fibularis Superficialis",
+    origin: "Deling fibularis communis",
+    spinalLevel: "L4-S2",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "spinal", name: "Ruggenmerg L4-S2", description: "Via nervus fibularis communis" },
+        { type: "nerve", name: "Nervus fibularis communis", description: "Oppervlakkige deling" },
+        { type: "nerve", name: "Lateraal beencompartiment", description: "Verloop in peroneale spieren" },
+        { type: "nerve", name: "Distaal been derde", description: "Wordt cutaan" },
+        { type: "muscle", name: "Peroneale spieren en huid", description: "Eversie en sensibiliteit" }
+    ],
+    muscles: ["Fibularis longus", "Fibularis brevis"],
+    functions: [
+        "Voeteversie",
+        "Accessoire plantairflexie",
+        "Sensibiliteit voetrug (behalve 1e ruimte)",
+        "Sensibiliteit laterale distale been"
+    ]
+},
+"fibulaire_profond": {
+    name: "Nervus Fibularis Profundus",
+    origin: "Deling fibularis communis",
+    spinalLevel: "L4-S2",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "spinal", name: "Ruggenmerg L4-S2", description: "Via nervus fibularis communis" },
+        { type: "nerve", name: "Nervus fibularis communis", description: "Diepe deling" },
+        { type: "nerve", name: "Anterieur beencompartiment", description: "Verloop met extensoren" },
+        { type: "nerve", name: "Dorsale voetzijde", description: "Terminale distributie" },
+        { type: "muscle", name: "Dorsiflexorspieren", description: "Dorsiflexie en extensie" }
+    ],
+    muscles: [
+        "Tibialis anterior", "Extensor digitorum longus",
+        "Extensor hallucis longus", "Fibularis tertius",
+        "Extensor digitorum brevis", "Extensor hallucis brevis"
+    ],
+    functions: [
+        "Voetdorsiflexie",
+        "Teenextensie",
+        "Voetinversie",
+        "Sensibiliteit 1e interdigitale ruimte"
+    ]
+},
+"plantaire_medial": {
+    name: "Nervus Plantaris Medialis",
+    origin: "Deling nervus tibialis",
+    spinalLevel: "L4-S3",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "spinal", name: "Ruggenmerg L4-S3", description: "Via nervus tibialis" },
+        { type: "nerve", name: "Nervus tibialis", description: "Mediale deling bij tarsale tunnel" },
+        { type: "nerve", name: "Mediale voetzool", description: "Distributie naar mediale spieren" },
+        { type: "nerve", name: "Mediale tenen", description: "Sensorische innervatie" },
+        { type: "muscle", name: "Mediale plantaire spieren", description: "Flexie en voetboogondersteuning" }
+    ],
+    muscles: [
+        "Flexor digitorum brevis", "Abductor hallucis",
+        "Flexor hallucis brevis", "Lumbricales 1 en 2"
+    ],
+    functions: [
+        "Flexie mediale tenen",
+        "Abductie grote teen",
+        "Ondersteuning mediale voetboog",
+        "Sensibiliteit mediale voetzool en 3,5 eerste tenen"
+    ]
+},
+"plantaire_lateral": {
+    name: "Nervus Plantaris Lateralis",
+    origin: "Deling nervus tibialis",
+    spinalLevel: "L4-S3",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "spinal", name: "Ruggenmerg L4-S3", description: "Via nervus tibialis" },
+        { type: "nerve", name: "Nervus tibialis", description: "Laterale deling bij tarsale tunnel" },
+        { type: "nerve", name: "Laterale voetzool", description: "Distributie naar laterale spieren" },
+        { type: "nerve", name: "Laterale tenen", description: "Sensorische innervatie" },
+        { type: "muscle", name: "Laterale plantaire spieren", description: "Flexie en stabiliteit" }
+    ],
+    muscles: [
+        "Abductor digiti minimi", "Flexor digiti minimi brevis",
+        "Opponens digiti minimi", "Interossei", "Lumbricales 3 en 4",
+        "Adductor hallucis", "Quadratus plantae"
+    ],
+    functions: [
+        "Flexie 5e teen",
+        "Abductie 5e teen",
+        "Teenbeweging (interossei)",
+        "Sensibiliteit laterale voetzool en 1,5 laterale tenen"
+    ]
+},
+"sural": {
+    name: "Nervus Suralis",
+    origin: "Takken van tibialis en fibularis communis",
+    spinalLevel: "S1-S2",
+    category: "Onderste ledemaat",
+    path: [
+        { type: "spinal", name: "Ruggenmerg S1-S2", description: "Via tibialis en fibularis zenuwen" },
+        { type: "nerve", name: "Gemengde vorming", description: "Tibio-fibulaire anastomose" },
+        { type: "nerve", name: "Posterieure kuit", description: "Subcutane afdaling" },
+        { type: "nerve", name: "Laterale malleolus", description: "Omloop van malleolus" },
+        { type: "muscle", name: "Laterale voetrand", description: "Pure sensibiliteit" }
+    ],
+    muscles: ["Geen spieren (puur sensorische zenuw)"],
+    functions: [
+        "Sensibiliteit postero-laterale been",
+        "Sensibiliteit laterale voetrand",
+        "Sensibiliteit 5e teen",
+        "Sensibiliteit laterale malleolaire regio"
+    ]
+},
+
+// ========== AUTONOME ZENUWEN ==========
+"splanchnique_grand": {
+    name: "Nervus Splanchnicus Major",
+    origin: "Sympathische keten (T5-T9)",
+    spinalLevel: "T5-T9",
+    category: "Autonome zenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg T5-T9", description: "Middelste thoracale segmenten" },
+        { type: "nerve", name: "Thoracale sympathische keten", description: "Sympathische ganglia" },
+        { type: "nerve", name: "Diafragmatische doorgang", description: "Passage naar abdomen" },
+        { type: "nerve", name: "Plexus coeliacus", description: "Relais in plexus" },
+        { type: "muscle", name: "Abdominale viscera", description: "Sympathische innervatie" }
+    ],
+    muscles: ["Gladde spieren abdominale organen", "Bloedvaten"],
+    functions: [
+        "Sympathische innervatie abdominale viscera",
+        "Splanchnische vasoconstrictie",
+        "Inhibitie digestieve peristaltiek",
+        "Stimulatie bijniersecretie"
+    ]
+},
+"splanchnique_petit": {
+    name: "Nervus Splanchnicus Minor",
+    origin: "Sympathische keten (T10-T11)",
+    spinalLevel: "T10-T11",
+    category: "Autonome zenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg T10-T11", description: "Onderste thoracale segmenten" },
+        { type: "nerve", name: "Thoracale sympathische keten", description: "Onderste sympathische ganglia" },
+        { type: "nerve", name: "Diafragmatische doorgang", description: "Abdominale passage" },
+        { type: "nerve", name: "Plexus aorticorenalis", description: "Ganglionair relais" },
+        { type: "muscle", name: "Nieren en bijnieren", description: "Renale innervatie" }
+    ],
+    muscles: ["Gladde niermusculatuur", "Renale bloedvaten"],
+    functions: [
+        "Sympathische renale innervatie",
+        "Renale vasoconstrictie",
+        "Bloeddrukregulatie",
+        "Controle reninesecretie"
+    ]
+},
+"splanchnique_lombal": {
+    name: "Nervi Splanchnici Lumbales",
+    origin: "Sympathische keten (L1-L2)",
+    spinalLevel: "L1-L2",
+    category: "Autonome zenuw",
+    path: [
+        { type: "spinal", name: "Ruggenmerg L1-L2", description: "Bovenste lumbale segmenten" },
+        { type: "nerve", name: "Lumbale sympathische keten", description: "Lumbale sympathische ganglia" },
+        { type: "nerve", name: "Plexus hypogastricus superior", description: "Convergentie naar plexus" },
+        { type: "nerve", name: "Plexus hypogastrici inferiores", description: "Pelvische distributie" },
+        { type: "muscle", name: "Pelvische viscera", description: "Sympathische pelvische innervatie" }
+    ],
+    muscles: ["Gladde blaasmusculatuur", "Gladde spieren geslachtsorganen"],
+    functions: [
+        "Sympathische innervatie pelvische viscera",
+        "Blaascontrole (detrusorrelaxatie)",
+        "Seksuele functie (ejaculatie)",
+        "Pelvische vasoconstrictie"
+    ]
+},
+"plexus_coeliaque": {
+    name: "Plexus Coeliacus (Solaris)",
+    origin: "Convergentie splanchnische zenuwen",
+    spinalLevel: "T5-T12",
+    category: "Autonome zenuw",
+    path: [
+        { type: "nerve", name: "Splanchnische zenuwen", description: "Convergentie splanchnici" },
+        { type: "nerve", name: "Ganglia coeliaca", description: "Hoofdganglionaire relais" },
+        { type: "nerve", name: "Periarteriële plexus", description: "Distributie langs arteriën" },
+        { type: "nerve", name: "Digestieve organen", description: "Viscerale innervatie" },
+        { type: "muscle", name: "Bovenste digestieve tractus", description: "Sympathische digestieve controle" }
+    ],
+    muscles: ["Maag", "Duodenum", "Lever", "Pancreas", "Milt"],
+    functions: [
+        "Sympathische controle bovenste digestieve tractus",
+        "Inhibitie gastrische motiliteit",
+        "Splanchnische vasoconstrictie",
+        "Regulatie digestieve secretie"
+    ]
+},
+"plexus_mesenterique": {
+    name: "Plexus Mesenterici (Superior et Inferior)",
+    origin: "Uitbreidingen plexus coeliacus",
+    spinalLevel: "T10-L2",
+    category: "Autonome zenuw",
+    path: [
+        { type: "nerve", name: "Plexus coeliacus", description: "Uitbreiding hoofdplexus" },
+        { type: "nerve", name: "Mesenterische arteriën", description: "Peri-arteriële distributie" },
+        { type: "nerve", name: "Intestinale meso's", description: "Mesenterische innervatie" },
+        { type: "nerve", name: "Darmwand", description: "Intramurale plexus" },
+        { type: "muscle", name: "Dunne darm en colon", description: "Intestinale motiliteit" }
+    ],
+    muscles: ["Jejunum", "Ileum", "Colon", "Proximaal rectum"],
+    functions: [
+        "Controle intestinale motiliteit",
+        "Regulatie intestinale secretie",
+        "Mesenterische vasoconstrictie",
+        "Modulatie peristaltiek"
+    ]
+},
+"plexus_hypogastrique": {
+    name: "Plexus Hypogastrici (Superior et Inferiores)",
+    origin: "Lumbale en sacrale splanchnische zenuwen",
+    spinalLevel: "L1-S4",
+    category: "Autonome zenuw",
+    path: [
+        { type: "nerve", name: "Lumbale splanchnische zenuwen", description: "Sympathische component" },
+        { type: "nerve", name: "Sacrale splanchnische zenuwen", description: "Parasympathische component" },
+        { type: "nerve", name: "Plexus hypogastricus superior", description: "Pre-sacraal relais" },
+        { type: "nerve", name: "Plexus hypogastrici inferiores", description: "Pelvische distributie" },
+        { type: "muscle", name: "Pelvische organen", description: "Gemengde autonome innervatie" }
+    ],
+    muscles: ["Blaas", "Rectum", "Geslachtsorganen", "Uterus"],
+    functions: [
+        "Blaascontrole (mictie)",
+        "Rectale controle (defecatie)",
+        "Seksuele functie",
+        "Uteriene controle (bevalling)"
+    ]
+},
+                }
+            }
+        };
+
+        // Questions du quiz multilingues
+        const quizQuestionsData = {
+            fr: [
+                {
+                    question: "Quel nerf crânien est responsable de l'olfaction ?",
+                    options: ["Nerf optique (II)", "Nerf olfactif (I)", "Nerf trijumeau (V)", "Nerf facial (VII)"],
+                    correct: 1,
+                    explanation: "Le nerf olfactif (I) est le premier nerf crânien, responsable de la perception des odeurs.",
+                    topic: "nerfs_craniens"
+                },
+{
+    question: "Quel nerf innerve le muscle grand dentelé ?",
+    options: ["Nerf thoracique long", "Nerf intercostal", "Nerf phrénique", "Nerf subscapulaire"],
+    correct: 0,
+    explanation: "Le nerf thoracique long (de Bell) innerve le grand dentelé, important pour la stabilisation de l'omoplate.",
+    topic: "nerfs_thoraciques"
+},
+{
+    question: "Les nerfs intercostaux proviennent de quels segments ?",
+    options: ["C5-T1", "T1-T12", "L1-L5", "S1-S5"],
+    correct: 1,
+    explanation: "Les nerfs intercostaux proviennent des branches antérieures de T1 à T12.",
+    topic: "nerfs_thoraciques"
+},
+                {
+                    question: "Le nerf oculomoteur (III) innerve combien de muscles oculaires ?",
+                    options: ["2 muscles", "4 muscles", "5 muscles", "6 muscles"],
+                    correct: 2,
+                    explanation: "Le nerf oculomoteur (III) innerve 5 muscles : droit supérieur, inférieur, médial, petit oblique et releveur de la paupière.",
+                    topic: "nerfs_craniens"
+                },
+                {
+                    question: "Quel nerf crânien contrôle la mastication ?",
+                    options: ["Nerf facial (VII)", "Nerf trijumeau (V)", "Nerf hypoglosse (XII)", "Nerf accessoire (XI)"],
+                    correct: 1,
+                    explanation: "Le nerf trijumeau (V) innerve les muscles masticateurs : masséter, temporal et ptérygoïdiens.",
+                    topic: "nerfs_craniens"
+                },
+                {
+                    question: "Quel nerf innerve principalement les muscles fléchisseurs de l'avant-bras ?",
+                    options: ["Nerf ulnaire", "Nerf médian", "Nerf radial", "Nerf musculo-cutané"],
+                    correct: 1,
+                    explanation: "Le nerf médian innerve la plupart des muscles fléchisseurs de l'avant-bras.",
+                    topic: "plexus_brachial"
+                },
+                {
+                    question: "Le nerf ulnaire passe par quelle structure au niveau du coude ?",
+                    options: ["Canal carpien", "Gouttière épitrochléenne", "Gouttière radiale", "Canal de Guyon"],
+                    correct: 1,
+                    explanation: "Le nerf ulnaire passe dans la gouttière épitrochléenne au niveau du coude.",
+                    topic: "plexus_brachial"
+                },
+                {
+                    question: "Quel nerf innerve le diaphragme ?",
+                    options: ["Nerf vague", "Nerf phrénique", "Nerf accessoire", "Nerf intercostal"],
+                    correct: 1,
+                    explanation: "Le nerf phrénique (C3-C5) innerve le diaphragme, muscle principal de la respiration.",
+                    topic: "nerfs_thoraciques"
+                }
+            ],
+            nl: [
+                {
+                    question: "Welke hersenzenuw is verantwoordelijk voor de reuk?",
+                    options: ["Nervus opticus (II)", "Nervus olfactorius (I)", "Nervus trigeminus (V)", "Nervus facialis (VII)"],
+                    correct: 1,
+                    explanation: "De nervus olfactorius (I) is de eerste hersenzenuw, verantwoordelijk voor geurperceptie.",
+                    topic: "nerfs_craniens"
+                },
+                {
+                    question: "Hoeveel oogspieren worden geïnnerveerd door de nervus oculomotorius (III)?",
+                    options: ["2 spieren", "4 spieren", "5 spieren", "6 spieren"],
+                    correct: 2,
+                    explanation: "De nervus oculomotorius (III) innerveert 5 spieren: rectus superior, inferior, medialis, obliquus inferior en levator palpebrae.",
+                    topic: "nerfs_craniens"
+                },
+                {
+                    question: "Welke hersenzenuw controleert het kauwen?",
+                    options: ["Nervus facialis (VII)", "Nervus trigeminus (V)", "Nervus hypoglossus (XII)", "Nervus accessorius (XI)"],
+                    correct: 1,
+                    explanation: "De nervus trigeminus (V) innerveert de kauwspieren: masseter, temporalis en pterygoidei.",
+                    topic: "nerfs_craniens"
+                },
+{
+    question: "Welke zenuw innerveert de serratus anterior?",
+    options: ["Nervus thoracicus longus", "Nervus intercostalis", "Nervus phrenicus", "Nervus subscapularis"],
+    correct: 0,
+    explanation: "De nervus thoracicus longus (van Bell) innerveert de serratus anterior, belangrijk voor scapulastabilisatie.",
+    topic: "nerfs_thoraciques"
+},
+{
+    question: "De intercostale zenuwen komen van welke segmenten?",
+    options: ["C5-T1", "T1-T12", "L1-L5", "S1-S5"],
+    correct: 1,
+    explanation: "De intercostale zenuwen komen van de anterieure takken van T1 tot T12.",
+    topic: "nerfs_thoraciques"
+},
+                {
+                    question: "Welke zenuw innerveert voornamelijk de flexorspieren van de onderarm?",
+                    options: ["Nervus ulnaris", "Nervus medianus", "Nervus radialis", "Nervus musculocutaneus"],
+                    correct: 1,
+                    explanation: "De nervus medianus innerveert de meeste flexorspieren van de onderarm.",
+                    topic: "plexus_brachial"
+                },
+                {
+                    question: "Welke zenuw innerveert het diafragma?",
+                    options: ["Nervus vagus", "Nervus phrenicus", "Nervus accessorius", "Nervus intercostalis"],
+                    correct: 1,
+                    explanation: "De nervus phrenicus (C3-C5) innerveert het diafragma, de hoofdademhalingsspier.",
+                    topic: "nerfs_thoraciques"
+                }
+            ]
+        };
+
+        const learningResourcesData = {
+            fr: {
+                "nerfs_craniens": {
+                    title: "Nerfs Crâniens",
+                    pubmed: "https://pubmed.ncbi.nlm.nih.gov/?term=cranial+nerves+anatomy",
+                    educational: "https://www.kenhub.com/fr/library/anatomie/nerfs-craniens",
+                    youtube: "https://www.youtube.com/results?search_query=nerfs+craniens+anatomie+francais"
+                },
+                "plexus_brachial": {
+                    title: "Plexus Brachial",
+                    pubmed: "https://pubmed.ncbi.nlm.nih.gov/?term=brachial+plexus+anatomy",
+                    educational: "https://www.kenhub.com/fr/library/anatomie/plexus-brachial",
+                    youtube: "https://www.youtube.com/results?search_query=plexus+brachial+anatomie"
+                },
+                "nerfs_thoraciques": {
+                    title: "Nerfs Thoraciques",
+                    pubmed: "https://pubmed.ncbi.nlm.nih.gov/?term=thoracic+nerves+anatomy",
+                    educational: "https://www.kenhub.com/fr/library/anatomie/nerfs-thoraciques",
+                    youtube: "https://www.youtube.com/results?search_query=nerfs+thoraciques+intercostaux"
+                }
+            },
+            nl: {
+                "nerfs_craniens": {
+                    title: "Hersenzenuwjen",
+                    pubmed: "https://pubmed.ncbi.nlm.nih.gov/?term=cranial+nerves+anatomy",
+                    educational: "https://www.kenhub.com/en/library/anatomy/cranial-nerves",
+                    youtube: "https://www.youtube.com/results?search_query=hersenzenuwjen+anatomie+nederlands"
+                },
+                "plexus_brachial": {
+                    title: "Plexus Brachialis",
+                    pubmed: "https://pubmed.ncbi.nlm.nih.gov/?term=brachial+plexus+anatomy",
+                    educational: "https://www.kenhub.com/en/library/anatomy/brachial-plexus",
+                    youtube: "https://www.youtube.com/results?search_query=plexus+brachialis+anatomie"
+                },
+                "nerfs_thoraciques": {
+                    title: "Thoracale Zenuwen",
+                    pubmed: "https://pubmed.ncbi.nlm.nih.gov/?term=thoracic+nerves+anatomy",
+                    educational: "https://www.kenhub.com/en/library/anatomy/thoracic-nerves",
+                    youtube: "https://www.youtube.com/results?search_query=thoracale+zenuwen+intercostaal"
+                }
+            }
+        };
+
+        // Variables globales
+        let currentNerveFilter = 'all';
+        let currentMuscleFilter = 'all';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let totalQuestions = 10;
+        let quizQuestions = [];
+        let selectedQuestions = [];
+        let wrongAnswers = [];
+
+        // ========== FONCTIONS DE NAVIGATION ==========
+        function switchTab(tabName) {
+            // Masquer tous les onglets
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Masquer tous les boutons actifs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Afficher l'onglet sélectionné
+            document.getElementById(tabName).classList.add('active');
+            
+            // Activer le bouton correspondant
+            event.target.classList.add('active');
+            
+            // Réinitialiser le quiz si on va sur l'onglet quiz
+            if (tabName === 'quiz') {
+                resetQuizToSetup();
+            }
+        }
+
+        function filterNervesByCategory(category) {
+            currentNerveFilter = category;
+            
+            // Mettre à jour l'apparence des boutons
+            document.querySelectorAll('[onclick*="filterNervesByCategory"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Appliquer le filtre
+            const searchValue = document.getElementById('nerve-search').value;
+            searchNerves(searchValue);
+        }
+
+        function filterMusclesByCategory(category) {
+            currentMuscleFilter = category;
+            
+            // Mettre à jour l'apparence des boutons
+            document.querySelectorAll('[onclick*="filterMusclesByCategory"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Appliquer le filtre
+            const searchValue = document.getElementById('muscle-search').value;
+            searchMuscles(searchValue);
+        }
+
+        // Fonction pour changer de langue
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Mettre à jour les boutons de langue
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Mettre à jour l'interface
+            updateInterface();
+            
+            // Recharger les données
+            displayAllNerves();
+            displayAllMuscles();
+            generateQuizQuestions();
+            
+            // Remettre à zéro les filtres
+            currentNerveFilter = 'all';
+            currentMuscleFilter = 'all';
+            
+            // Remettre à zéro le quiz si on est dans l'onglet quiz
+            const quizTab = document.getElementById('quiz');
+            if (quizTab.classList.contains('active')) {
+                resetQuizToSetup();
+            }
+        }
+
+        function updateInterface() {
+            const t = translations[currentLanguage];
+            
+            // Titre et sous-titre
+            document.getElementById('main-title').textContent = t.mainTitle;
+            document.getElementById('main-subtitle').textContent = t.mainSubtitle;
+            
+            // Onglets
+            document.getElementById('tab-nerve-muscle').textContent = t.tabNerveMuscle;
+            document.getElementById('tab-muscle-nerve').textContent = t.tabMuscleNerve;
+            document.getElementById('tab-quiz').textContent = t.tabQuiz;
+            
+            // Recherche
+            document.getElementById('nerve-search').placeholder = t.searchNerve;
+            document.getElementById('muscle-search').placeholder = t.searchMuscle;
+            
+            // Filtres nerfs
+            document.getElementById('filter-all-nerves').textContent = t.filterAll;
+            document.getElementById('filter-cranial').textContent = t.filterCranial;
+            document.getElementById('filter-upper').textContent = t.filterUpper;
+            document.getElementById('filter-lower').textContent = t.filterLower;
+            document.getElementById('filter-thoracic').textContent = t.filterThoracic;
+            document.getElementById('filter-spinal').textContent = t.filterSpinal;
+            
+            // Filtres muscles
+            document.getElementById('filter-all-muscles').textContent = t.filterAll;
+            document.getElementById('filter-cranial-muscles').textContent = t.filterCranialMuscles;
+            document.getElementById('filter-upper-muscles').textContent = t.filterUpperMuscles;
+            document.getElementById('filter-lower-muscles').textContent = t.filterLowerMuscles;
+            document.getElementById('filter-thoracic-muscles').textContent = t.filterThoracicMuscles;
+            document.getElementById('filter-spinal-muscles').textContent = t.filterSpinalMuscles;
+            
+            // Listes
+            document.getElementById('nerves-available').innerHTML = t.nervesAvailable + ' <span id="nerve-count"></span>';
+            document.getElementById('muscles-available').innerHTML = t.musclesAvailable + ' <span id="muscle-count"></span>';
+            document.getElementById('select-nerve').textContent = t.selectNerve;
+            document.getElementById('select-muscle').textContent = t.selectMuscle;
+            
+            // Quiz
+            document.getElementById('quiz-config-title').textContent = t.quizConfigTitle;
+            document.getElementById('quiz-config-subtitle').textContent = t.quizConfigSubtitle;
+            document.getElementById('custom-number').textContent = t.customNumber;
+            document.getElementById('start-btn').textContent = t.startBtn;
+            
+            // Textes des questions
+            document.getElementById('questions-text').textContent = t.questions;
+            document.getElementById('questions-text2').textContent = t.questions;
+            document.getElementById('questions-text3').textContent = t.questions;
+            document.getElementById('questions-text4').textContent = t.questions;
+            document.getElementById('quick-quiz').textContent = t.quickQuiz;
+            document.getElementById('training-text').textContent = t.training;
+            document.getElementById('complete-session').textContent = t.completeSession;
+            document.getElementById('evaluation-text').textContent = t.evaluation;
+            
+            // Stats quiz
+            document.getElementById('score-label').textContent = t.score;
+            document.getElementById('question-label').textContent = t.question;
+            document.getElementById('correct-label').textContent = t.correctAnswers;
+            document.getElementById('total-label').textContent = t.total;
+            
+            // Boutons quiz
+            const nextBtn = document.getElementById('next-question');
+            if (nextBtn) {
+                if (currentQuestionIndex === totalQuestions - 1) {
+                    nextBtn.textContent = t.seeResults;
+                } else {
+                    nextBtn.textContent = t.nextQuestion;
+                }
+            }
+            document.getElementById('new-quiz-btn').textContent = t.newQuiz;
+            
+            // Synthèse
+            document.getElementById('learning-synthesis').textContent = t.learningSynthesis;
+            document.getElementById('learning-text').textContent = t.learningText;
+            document.getElementById('resources-title').textContent = t.recommendedResources;
+        }
+
+        function getCategoryTranslation(category) {
+            const categoryMap = {
+                'fr': {
+                    'Nerf crânien': 'Nerf crânien',
+                    'Membre supérieur': 'Membre supérieur',
+                    'Membre inférieur': 'Membre inférieur',
+                    'Nerf thoracique': 'Nerf thoracique',
+                    'Nerf rachidien': 'Nerf rachidien'
+                },
+                'nl': {
+                    'Nerf crânien': 'Hersenzenuw',
+                    'Membre supérieur': 'Bovenste ledemaat',
+                    'Membre inférieur': 'Onderste ledemaat',
+                    'Nerf thoracique': 'Thoracale zenuw',
+                    'Nerf rachidien': 'Ruggemergzenuw'
+                }
+            };
+            
+            if (currentLanguage === 'nl' && categoryMap['fr'][category]) {
+                return categoryMap['nl'][category];
+            } else if (currentLanguage === 'fr' && Object.values(categoryMap['nl']).includes(category)) {
+                for (let key in categoryMap['fr']) {
+                    if (categoryMap['nl'][key] === category) {
+                        return categoryMap['fr'][key];
+                    }
+                }
+            }
+            
+            return category;
+        }
+
+        function searchNerves(query) {
+            const nerves = Object.keys(anatomyData[currentLanguage].nerves);
+            let filteredNerves = nerves;
+
+            // Filtrer par catégorie
+            if (currentNerveFilter !== 'all') {
+                filteredNerves = filteredNerves.filter(nerve => 
+                    anatomyData[currentLanguage].nerves[nerve].category === getCategoryTranslation(currentNerveFilter)
+                );
+            }
+
+            // Filtrer par recherche
+            if (query) {
+                filteredNerves = filteredNerves.filter(nerve => 
+                    nerve.toLowerCase().includes(query.toLowerCase()) ||
+                    anatomyData[currentLanguage].nerves[nerve].name.toLowerCase().includes(query.toLowerCase())
+                );
+            }
+
+            displayNerves(filteredNerves);
+        }
+
+        function searchMuscles(query) {
+            const muscles = [];
+            Object.keys(anatomyData[currentLanguage].nerves).forEach(nerveKey => {
+                const nerve = anatomyData[currentLanguage].nerves[nerveKey];
+                nerve.muscles.forEach(muscle => {
+                    if (muscle.toLowerCase().includes(query.toLowerCase())) {
+                        muscles.push({ muscle, nerve: nerveKey });
+                    }
+                });
+            });
+
+            // Filtrer par catégorie
+            let filteredMuscles = muscles;
+            if (currentMuscleFilter !== 'all') {
+                filteredMuscles = muscles.filter(item => 
+                    anatomyData[currentLanguage].nerves[item.nerve].category === getCategoryTranslation(currentMuscleFilter)
+                );
+            }
+
+            displayMuscles(filteredMuscles);
+        }
+
+        function displayAllNerves() {
+            currentNerveFilter = 'all';
+            displayNerves(Object.keys(anatomyData[currentLanguage].nerves));
+        }
+
+        function displayAllMuscles() {
+            currentMuscleFilter = 'all';
+            const muscles = [];
+            Object.keys(anatomyData[currentLanguage].nerves).forEach(nerveKey => {
+                const nerve = anatomyData[currentLanguage].nerves[nerveKey];
+                nerve.muscles.forEach(muscle => {
+                    muscles.push({ muscle, nerve: nerveKey });
+                });
+            });
+            displayMuscles(muscles);
+        }
+
+        function displayNerves(nerveKeys) {
+            const container = document.getElementById('nerve-results');
+            const countElement = document.getElementById('nerve-count');
+            container.innerHTML = '';
+            
+            const t = translations[currentLanguage];
+            countElement.textContent = `(${nerveKeys.length} ${t.nerveCount})`;
+
+            nerveKeys.forEach(nerveKey => {
+                const nerve = anatomyData[currentLanguage].nerves[nerveKey];
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                
+                const categoryBadge = nerve.category ? 
+                    `<span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 5px;">${nerve.category}</span>` : '';
+                
+                div.innerHTML = `
+                    <strong>${nerve.name}</strong>${categoryBadge}<br>
+                    <small>${t.origin}: ${nerve.origin}</small><br>
+                    <small style="color: #888;">${t.spinalLevel}: ${nerve.spinalLevel}</small>
+                `;
+                div.onclick = () => showNerveDetails(nerveKey, div);
+                container.appendChild(div);
+            });
+        }
+
+        function displayMuscles(muscles) {
+            const container = document.getElementById('muscle-results');
+            const countElement = document.getElementById('muscle-count');
+            container.innerHTML = '';
+            
+            const t = translations[currentLanguage];
+            countElement.textContent = `(${muscles.length} ${t.muscleCount})`;
+
+            muscles.forEach(item => {
+                const nerve = anatomyData[currentLanguage].nerves[item.nerve];
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                
+                const categoryBadge = nerve.category ? 
+                    `<span style="background: #4caf50; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 5px;">${nerve.category}</span>` : '';
+                
+                div.innerHTML = `
+                    <strong>${item.muscle}</strong><br>
+                    <small>${t.innervatedBy}: ${nerve.name}</small>${categoryBadge}<br>
+                    <small style="color: #888;">${t.spinalLevel}: ${nerve.spinalLevel}</small>
+                `;
+                div.onclick = () => showMuscleDetails(item, div);
+                container.appendChild(div);
+            });
+        }
+
+        function showNerveDetails(nerveKey, element) {
+            // Marquer comme sélectionné
+            document.querySelectorAll('#nerve-results .result-item').forEach(item => item.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const nerve = anatomyData[currentLanguage].nerves[nerveKey];
+            const container = document.getElementById('nerve-details');
+            const t = translations[currentLanguage];
+            
+            let pathHtml = nerve.path.map(step => `
+                <div class="path-step">
+                    <div class="step-icon ${step.type}-icon">${getStepIcon(step.type)}</div>
+                    <div>
+                        <strong>${step.name}</strong><br>
+                        <small>${step.description}</small>
+                    </div>
+                </div>
+            `).join('');
+
+            const categoryBadge = nerve.category ? 
+                `<span style="background: #667eea; color: white; padding: 5px 15px; border-radius: 15px; font-size: 14px; margin-left: 10px;">${nerve.category}</span>` : '';
+
+            container.innerHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">${nerve.name}</h2>${categoryBadge}
+                </div>
+                
+                <div style="background: #e3f2fd; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <h4 style="margin-top: 0;">${t.generalInfo}</h4>
+                    <p><strong>${t.origin} :</strong> ${nerve.origin}</p>
+                    <p><strong>${t.spinalLevel} :</strong> ${nerve.spinalLevel}</p>
+                    <p><strong>${t.category} :</strong> ${nerve.category || t.unspecified}</p>
+                </div>
+
+                <div class="nerve-path">
+                    <h3>${t.nervePath}</h3>
+                    ${pathHtml}
+                </div>
+                
+                <div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                    <h3>${t.musclesInnervated}</h3>
+                    <ul style="list-style-type: none; padding: 0;">
+                        ${nerve.muscles.map(muscle => `<li style="padding: 8px 0; border-bottom: 1px solid #eee; display: flex; align-items: center;"><span style="color: #4caf50; margin-right: 10px;">●</span> ${muscle}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="function-box">
+                    <h3>${t.mainFunctions}</h3>
+                    <ul style="list-style-type: none; padding: 0; margin-top: 15px;">
+                        ${nerve.functions.map(func => `<li style="padding: 8px 0; display: flex; align-items: center;"><span style="margin-right: 10px;">✓</span> ${func}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function showMuscleDetails(muscleItem, element) {
+            // Marquer comme sélectionné
+            document.querySelectorAll('#muscle-results .result-item').forEach(item => item.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const nerve = anatomyData[currentLanguage].nerves[muscleItem.nerve];
+            const container = document.getElementById('muscle-details');
+            const t = translations[currentLanguage];
+            
+            // Trajet inverse (du muscle vers l'origine)
+            let reversePath = [...nerve.path].reverse().map(step => {
+                if (step.type === 'muscle') {
+                    return { ...step, name: muscleItem.muscle, description: t.selectedMuscle };
+                }
+                return step;
+            });
+
+            let pathHtml = reversePath.map(step => `
+                <div class="path-step">
+                    <div class="step-icon ${step.type}-icon">${getStepIcon(step.type)}</div>
+                    <div>
+                        <strong>${step.name}</strong><br>
+                        <small>${step.description}</small>
+                    </div>
+                </div>
+            `).join('');
+
+            const categoryBadge = nerve.category ? 
+                `<span style="background: #4caf50; color: white; padding: 5px 15px; border-radius: 15px; font-size: 14px; margin-left: 10px;">${nerve.category}</span>` : '';
+
+            container.innerHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">💪 ${muscleItem.muscle}</h2>${categoryBadge}
+                </div>
+                
+                <div class="nerve-path">
+                    <h3>${t.innervationPath}</h3>
+                    ${pathHtml}
+                </div>
+                
+                <div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                    <h3>${t.responsibleNerve}</h3>
+                    <p><strong>${nerve.name}</strong></p>
+                    <p><strong>${t.origin} :</strong> ${nerve.origin}</p>
+                    <p><strong>${t.spinalLevel} :</strong> ${nerve.spinalLevel}</p>
+                    <p><strong>${t.category} :</strong> ${nerve.category || t.unspecified}</p>
+                </div>
+
+                <div class="function-box">
+                    <h3>${t.nerveFunctions} ${nerve.name}</h3>
+                    <ul style="list-style-type: none; padding: 0; margin-top: 15px;">
+                        ${nerve.functions.map(func => `<li style="padding: 8px 0; display: flex; align-items: center;"><span style="margin-right: 10px;">✓</span> ${func}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function getStepIcon(type) {
+            const icons = {
+                brain: '🧠',
+                spinal: '🦴',
+                nerve: '⚡',
+                muscle: '💪'
+            };
+            return icons[type] || '●';
+        }
+
+        // ========== FONCTIONS QUIZ ==========
+        function generateQuizQuestions() {
+            quizQuestions = quizQuestionsData[currentLanguage];
+        }
+
+        function setupQuiz(numQuestions) {
+            if (numQuestions < 1 || numQuestions > 25) {
+                const t = translations[currentLanguage];
+                alert(`${t.customNumber.replace(':', '')} 1-25.`);
+                return;
+            }
+            
+            totalQuestions = Math.min(numQuestions, quizQuestions.length);
+            wrongAnswers = [];
+            
+            // Mélanger toutes les questions et prendre seulement le nombre demandé
+            const shuffledQuestions = [...quizQuestions].sort(() => Math.random() - 0.5);
+            selectedQuestions = shuffledQuestions.slice(0, totalQuestions);
+            
+            // Masquer la configuration et afficher le quiz
+            document.getElementById('quiz-setup').style.display = 'none';
+            document.getElementById('quiz-stats').style.display = 'flex';
+            document.getElementById('quiz-question-container').style.display = 'block';
+            document.getElementById('quiz-results').style.display = 'none';
+            
+            // Initialiser les variables
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswers = 0;
+            
+            document.getElementById('total-questions').textContent = totalQuestions;
+            updateQuizStats();
+            showCurrentQuestion();
+        }
+
+        function showCurrentQuestion() {
+            const t = translations[currentLanguage];
+            
+            // Vérifier si on a terminé
+            if (currentQuestionIndex >= totalQuestions) {
+                showQuizResults();
+                return;
+            }
+
+            const question = selectedQuestions[currentQuestionIndex];
+            document.getElementById('quiz-question-text').textContent = `${t.question} ${currentQuestionIndex + 1}/${totalQuestions}: ${question.question}`;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-option';
+                div.textContent = option;
+                div.onclick = () => selectAnswer(index);
+                div.style.cursor = 'pointer';
+                optionsContainer.appendChild(div);
+            });
+
+            document.getElementById('next-question').style.display = 'none';
+        }
+
+        function selectAnswer(selectedIndex) {
+            const question = selectedQuestions[currentQuestionIndex];
+            const options = document.querySelectorAll('#quiz-options .quiz-option');
+            const t = translations[currentLanguage];
+            
+            // Désactiver tous les clics et appliquer les couleurs
+            options.forEach((option, index) => {
+                option.onclick = null;
+                option.style.cursor = 'default';
+                
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            // Calculer le score
+            if (selectedIndex === question.correct) {
+                score += Math.round(100 / totalQuestions);
+                correctAnswers++;
+            } else {
+                // Enregistrer la mauvaise réponse
+                wrongAnswers.push({
+                    question: question.question,
+                    correctAnswer: question.options[question.correct],
+                    userAnswer: question.options[selectedIndex],
+                    explanation: question.explanation,
+                    topic: question.topic || 'neurologie_generale'
+                });
+            }
+
+            updateQuizStats();
+            
+            const nextBtn = document.getElementById('next-question');
+            nextBtn.style.display = 'block';
+            
+            if (currentQuestionIndex === totalQuestions - 1) {
+                nextBtn.textContent = t.seeResults;
+            } else {
+                nextBtn.textContent = t.nextQuestion;
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex >= totalQuestions) {
+                showQuizResults();
+            } else {
+                showCurrentQuestion();
+            }
+        }
+
+        function updateQuizStats() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('question-count').textContent = currentQuestionIndex + 1;
+            document.getElementById('correct-answers').textContent = correctAnswers;
+        }
+
+        function showQuizResults() {
+            const t = translations[currentLanguage];
+            
+            // Masquer le quiz et afficher les résultats
+            document.getElementById('quiz-stats').style.display = 'none';
+            document.getElementById('quiz-question-container').style.display = 'none';
+            document.getElementById('quiz-results').style.display = 'block';
+            
+            const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+            const resultEmoji = percentage >= 80 ? '🏆' : percentage >= 60 ? '👍' : '📚';
+            const resultMessage = percentage >= 80 ? t.excellentWork : percentage >= 60 ? t.wellDone : t.keepStudying;
+            
+            document.getElementById('quiz-final-score').innerHTML = `
+                <h2>${t.quizFinished} ${resultEmoji}</h2>
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin: 20px 0;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; text-align: center;">
+                        <div>
+                            <div style="font-size: 2em; font-weight: bold; color: #667eea;">${score}</div>
+                            <div>${t.totalScore}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2em; font-weight: bold; color: #4caf50;">${correctAnswers}</div>
+                            <div>${t.correctAnswers}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2em; font-weight: bold; color: #f44336;">${wrongAnswers.length}</div>
+                            <div>${t.errors}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2em; font-weight: bold; color: #ff9800;">${percentage}%</div>
+                            <div>${t.percentage}</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 1.2em; text-align: center; margin: 20px 0;">${resultMessage}</p>
+            `;
+
+            // Afficher la synthèse des erreurs si il y en a
+            if (wrongAnswers.length > 0) {
+                showErrorSynthesis();
+            } else {
+                document.getElementById('error-synthesis').style.display = 'none';
+            }
+        }
+
+        function showErrorSynthesis() {
+            document.getElementById('error-synthesis').style.display = 'block';
+            const t = translations[currentLanguage];
+            
+            // Afficher le détail des erreurs
+            let errorsDetailHtml = `<div style="margin-bottom: 20px;"><h4 style="color: #856404; margin-bottom: 15px;">${t.errorDetails}</h4>`;
+            wrongAnswers.forEach((error, index) => {
+                errorsDetailHtml += `
+                    <div style="background: white; border-left: 4px solid #ff6b6b; padding: 15px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-weight: bold; color: #495057; margin-bottom: 5px;">❌ ${t.question} ${index + 1}</div>
+                        <div style="margin-bottom: 8px;"><strong>${t.question} :</strong> ${error.question}</div>
+                        <div style="margin-bottom: 8px;"><strong>${t.yourAnswer} :</strong> <span style="color: #dc3545;">${error.userAnswer}</span></div>
+                        <div style="margin-bottom: 8px;"><strong>${t.correctAnswer} :</strong> <span style="color: #28a745;">${error.correctAnswer}</span></div>
+                        <div style="font-style: italic; color: #6c757d; font-size: 14px;"><strong>${t.explanation} :</strong> ${error.explanation}</div>
+                    </div>
+                `;
+            });
+            errorsDetailHtml += '</div>';
+
+            document.getElementById('error-topics').innerHTML = errorsDetailHtml;
+            
+            // Générer les liens de ressources
+            const uniqueTopics = [...new Set(wrongAnswers.map(w => w.topic))];
+            let resourcesHtml = '';
+            
+            uniqueTopics.forEach(topic => {
+                const resource = learningResourcesData[currentLanguage][topic];
+                if (resource) {
+                    resourcesHtml += `
+                        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e9ecef; border-radius: 8px; background: white;">
+                            <h5 style="margin: 0 0 12px 0; color: #495057; font-size: 16px;">${resource.title}</h5>
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <a href="${resource.pubmed}" target="_blank" style="display: inline-block; padding: 8px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; font-weight: 500; transition: background-color 0.3s;">
+                                    📚 Articles PubMed
+                                </a>
+                                <a href="${resource.educational}" target="_blank" style="display: inline-block; padding: 8px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; font-weight: 500; transition: background-color 0.3s;">
+                                    🎓 ${currentLanguage === 'fr' ? 'Cours Kenhub' : 'Kenhub Cursus'}
+                                </a>
+                                <a href="${resource.youtube}" target="_blank" style="display: inline-block; padding: 8px 15px; background: #dc3545; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; font-weight: 500; transition: background-color 0.3s;">
+                                    🎥 ${currentLanguage === 'fr' ? 'Vidéos YouTube' : 'YouTube Video\'s'}
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            document.getElementById('learning-resources').innerHTML = resourcesHtml;
+        }
+
+        function resetQuizToSetup() {
+            document.getElementById('quiz-setup').style.display = 'block';
+            document.getElementById('quiz-stats').style.display = 'none';
+            document.getElementById('quiz-question-container').style.display = 'none';
+            document.getElementById('quiz-results').style.display = 'none';
+            document.getElementById('error-synthesis').style.display = 'none';
+            
+            score = 0;
+            correctAnswers = 0;
+            currentQuestionIndex = 0;
+            wrongAnswers = [];
+            selectedQuestions = [];
+        }
+
+        function resetQuiz() {
+            resetQuizToSetup();
+        }
+
+        // Initialisation
+        window.onload = function() {
+            updateInterface();
+            displayAllNerves();
+            displayAllMuscles();
+            generateQuizQuestions();
+        };
+    </script>
+</body>
+</html>
