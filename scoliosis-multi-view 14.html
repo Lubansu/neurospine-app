@@ -1,0 +1,2647 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module de Mesure d'Angles de Cobb - Multi-Vues</title>
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --secondary-color: #f50057;
+            --light-bg: #f5f7fa;
+            --dark-text: #333333;
+            --light-text: #ffffff;
+            --border-color: #dddddd;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            font-style: italic;
+            opacity: 0.8;
+        }
+        
+        .panel {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .panel-header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 15px 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-body {
+            padding: 20px;
+        }
+        
+        .upload-area {
+            width: 100%;
+            max-width: 600px;
+            height: 180px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin: 0 auto 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .upload-area:hover {
+            background-color: rgba(63, 81, 181, 0.1);
+        }
+        
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            fill: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            text-align: center;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 5px 5px 0;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #303f9f;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #388e3c;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #f57c00;
+        }
+        
+        .btn-danger {
+            background-color: var(--error-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .canvas-container {
+            position: relative;
+            margin: 20px auto;
+            max-width: 100%;
+            border: 1px solid var(--border-color);
+            display: none;
+            overflow: hidden;
+        }
+        
+        #canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .tools-container {
+            margin-bottom: 15px;
+        }
+        
+        .tools-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        
+        .point-indicator {
+            background-color: white;
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .instruction-panel {
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .results-container {
+            display: none;
+        }
+        
+        .view-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .view-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+        
+        .view-btn.active {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .view-progress {
+            display: flex;
+            justify-content: space-between;
+            margin: 50px auto;
+            max-width: 500px;
+            position: relative;
+        }
+        
+        .progress-step {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .progress-step.completed {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .progress-step.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.3);
+        }
+        
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 25px;
+            right: 25px;
+            height: 2px;
+            background-color: #ddd;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        .progress-line-fill {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .progress-label {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+		color: var(--dark-text); /* Utilise la couleur de texte foncée définie dans les variables */
+    		font-weight: normal;
+    		text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.8); /* Ajoute une légère ombre pour améliorer la lisibilité */
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            white-space: nowrap;
+	    margin-top: 5px;
+        }
+	/* Style spécifique pour les étapes actives */
+	.progress-step.active .progress-label {
+    	color: var(--primary-color);
+    	font-weight: bold;
+	}
+
+	/* Style pour les étapes complétées */
+	.progress-step.completed .progress-label {
+    	color: var(--success-color);
+    	font-weight: bold;
+	}
+
+	/* Style pour les étapes non actives et non complétées */
+	.progress-step:not(.active):not(.completed) .progress-label {
+    	color: var(--dark-text);
+    	opacity: 0.8;
+	}
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .region-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .region-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .color-box {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            color: white;
+            max-width: 300px;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .summary-table th, .summary-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .summary-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .summary-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .summary-table td.reduction {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+	/* Style pour les labels des étapes complétées */
+		.progress-step.completed .progress-label {
+    		color: var(--success-color);
+    		font-weight: bold;
+	}
+        
+        .percent-reduction {
+            font-size: 0.8em;
+            display: block;
+            color: var(--success-color);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .upload-area {
+                height: 120px;
+            }
+            
+            .tools-row {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .view-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+       <div class="header">
+    <h1>Module de Mesure d'Angles de Cobb - Multi-Vues</h1>
+    <div class="tagline">Mesurez précisément les angles sur les radiographies AP et latérales: Face, Bending, et Profil pour cyphose</div>
+</div>
+        
+    <!-- Vue progress -->
+<div class="view-progress">
+    <div class="progress-line">
+        <div class="progress-line-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-step active" id="step-1">1
+        <div class="progress-label">Face</div>
+    </div>
+    <div class="progress-step" id="step-2">2
+        <div class="progress-label">Bending G</div>
+    </div>
+    <div class="progress-step" id="step-3">3
+        <div class="progress-label">Bending D</div>
+    </div>
+    <div class="progress-step" id="step-4">4
+        <div class="progress-label">Profil</div>
+    </div>
+     <div class="progress-step" id="step-5">5
+        <div class="progress-label">Modificateurs</div>
+    </div>
+    <div class="progress-step" id="step-6">6
+        <div class="progress-label">Résultats</div>
+    </div>
+</div>
+        
+        <!-- Upload Panel -->
+        <div class="panel" id="upload-panel">
+            <div class="panel-header">
+                <span>Chargement de radiographie</span>
+                <span id="current-view-label">Face</span>
+            </div>
+            <div class="panel-body">
+                <div class="upload-area" id="upload-area">
+                    <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                    </svg>
+                    <div class="upload-text">
+                        <strong>Cliquez pour charger</strong> ou glissez-déposez votre radiographie <span id="upload-view-type">AP face</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #666;">Formats acceptés: JPEG, PNG</div>
+                </div>
+                <input type="file" id="file-input" accept="image/*">
+                <div style="text-align: center;">
+                    <button class="btn" id="load-btn">Charger une radiographie</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Canvas Panel -->
+        <div class="panel" id="canvas-panel" style="display: none;">
+            <div class="panel-header">
+                <span>Marquage des points anatomiques</span>
+                <span id="canvas-view-label">Face</span>
+            </div>
+            <div class="panel-body">
+                <div class="region-legend">
+                    <div class="region-item">
+                        <div class="color-box" style="background-color: #f44336;"></div>
+                        <span>Proximale Thoracique (PT)</span>
+                    </div>
+                    <div class="region-item">
+                        <div class="color-box" style="background-color: #2196F3;"></div>
+                        <span>Thoracique Principale (MT)</span>
+                    </div>
+                    <div class="region-item">
+                        <div class="color-box" style="background-color: #4CAF50;"></div>
+                        <span>Thoraco-lombaire/Lombaire (TL/L)</span>
+                    </div>
+                </div>
+                
+                <div class="tools-container">
+                    <div class="tools-row">
+                        <button class="btn" id="zoom-in">Zoom +</button>
+                        <button class="btn" id="zoom-out">Zoom -</button>
+                        <button class="btn" id="pan-mode">Mode Déplacement</button>
+                        <button class="btn" id="reset-view">Réinitialiser</button>
+                    </div>
+                    <div class="tools-row">
+                        <button class="btn" id="undo-point">Annuler dernier point</button>
+                        <button class="btn" id="reset-btn">Effacer tous les points</button>
+                    </div>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="canvas"></canvas>
+                </div>
+                
+                <div class="instruction-panel" id="point-indicator">
+                    Marquez les points requis pour mesurer les angles de Cobb
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-success" id="calculate-btn">Calculer les angles</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Panel -->
+        <div class="panel results-container" id="results-panel">
+            <div class="panel-header">
+                <span>Résultats de l'analyse</span>
+                <span id="results-view-label">Face</span>
+            </div>
+            <div class="panel-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Région</th>
+                            <th>Angle de Cobb</th>
+                            <th>Vertèbres limites</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Proximal Thoracique (PT)</td>
+                            <td id="pt-angle">--</td>
+                            <td id="pt-vertebrae">--</td>
+                        </tr>
+                        <tr>
+                            <td>Thoracique Principal (MT)</td>
+                            <td id="mt-angle">--</td>
+                            <td id="mt-vertebrae">--</td>
+                        </tr>
+                        <tr>
+                            <td>Thoraco-lombaire/Lombaire (TL/L)</td>
+                            <td id="tl-angle">--</td>
+                            <td id="tl-vertebrae">--</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" id="back-btn">Revenir à la radiographie</button>
+                    <button class="btn btn-success" id="next-view-btn">Passer à la vue suivante</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Summary Panel -->
+        <div class="panel" id="summary-panel" style="display: none;">
+            <div class="panel-header">Tableau récapitulatif des mesures</div>
+            <div class="panel-body">
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Région</th>
+                            <th>Face</th>
+                            <th>Bending Gauche</th>
+                            <th>Bending Droit</th>
+                            <th>Réductibilité G</th>
+                            <th>Réductibilité D</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Proximal Thoracique (PT)</td>
+                            <td id="summary-pt-face">--</td>
+                            <td id="summary-pt-left">--</td>
+                            <td id="summary-pt-right">--</td>
+                            <td id="summary-pt-reduction-left">--</td>
+                            <td id="summary-pt-reduction-right">--</td>
+                        </tr>
+                        <tr>
+                            <td>Thoracique Principal (MT)</td>
+                            <td id="summary-mt-face">--</td>
+                            <td id="summary-mt-left">--</td>
+                            <td id="summary-mt-right">--</td>
+                            <td id="summary-mt-reduction-left">--</td>
+                            <td id="summary-mt-reduction-right">--</td>
+                        </tr>
+                        <tr>
+                            <td>Thoraco-lombaire/Lombaire (TL/L)</td>
+                            <td id="summary-tl-face">--</td>
+                            <td id="summary-tl-left">--</td>
+                            <td id="summary-tl-right">--</td>
+                            <td id="summary-tl-reduction-left">--</td>
+                            <td id="summary-tl-reduction-right">--</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+<div style="text-align: center; margin-top: 20px;">
+    <button class="btn" id="edit-measurements-btn">Modifier les mesures</button>
+    <button class="btn btn-success" id="save-summary-btn">Enregistrer le rapport complet</button>
+    <button class="btn" id="export-to-calculator-btn" style="background-color: #4285f4;">Exporter vers calculateur Lenke</button>
+    <button class="btn" id="new-patient-btn">Nouveau patient</button>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       // Constantes
+	const VIEWS = {
+    	FACE: { id: 'face', label: 'Face', index: 0 },
+    	LEFT: { id: 'left', label: 'Bending Gauche', index: 1 },
+    	RIGHT: { id: 'right', label: 'Bending Droit', index: 2 },
+    	PROFILE: { id: 'profile', label: 'Profil', index: 3 },
+    	MODIFIERS: { id: 'modifiers', label: 'Modificateurs Lombaires', index: 4 },
+    	SUMMARY: { id: 'summary', label: 'Résumé', index: 5 }
+	};
+        
+        const POINT_RADIUS = 4;
+       const REGIONS = [
+    { name: 'PT', color: '#f44336', label: 'Proximal Thoracique' },
+    { name: 'MT', color: '#2196F3', label: 'Thoracique Principal' },
+    { name: 'TL', color: '#4CAF50', label: 'Thoraco-lombaire/Lombaire' },
+    { name: 'CT', color: '#9C27B0', label: 'Cyphose Thoracique Supérieure' },
+    { name: 'CTL', color: '#FF9800', label: 'Cyphose Thoraco-lombaire' },
+    { name: 'LL', color: '#795548', label: 'Lordose Lombaire' },
+    { name: 'SACRUM', color: '#E91E63', label: 'Sacrum (CSVL)' },        // Index 6
+    { name: 'APEX', color: '#9C27B0', label: 'Apex Lombaire' }           // Index 7
+];
+        
+        // Points requis (4 points par région × 3 régions = 12 points)
+        const requiredPoints = [
+            // PT - Proximal Thoracique
+            { name: "T1 - Plateau supérieur - Bord gauche", region: 0 },
+            { name: "T1 - Plateau supérieur - Bord droit", region: 0 },
+            { name: "T4 - Plateau inférieur - Bord gauche", region: 0 },
+            { name: "T4 - Plateau inférieur - Bord droit", region: 0 },
+            
+            // MT - Thoracique Principal
+            { name: "T5 - Plateau supérieur - Bord gauche", region: 1 },
+            { name: "T5 - Plateau supérieur - Bord droit", region: 1 },
+            { name: "T12 - Plateau inférieur - Bord gauche", region: 1 },
+            { name: "T12 - Plateau inférieur - Bord droit", region: 1 },
+            
+            // TL/L - Thoraco-lombaire/Lombaire
+            { name: "L1 - Plateau supérieur - Bord gauche", region: 2 },
+            { name: "L1 - Plateau supérieur - Bord droit", region: 2 },
+            { name: "L5 - Plateau inférieur - Bord gauche", region: 2 },
+            { name: "L5 - Plateau inférieur - Bord droit", region: 2 }
+        ];
+
+	// Points supplémentaires pour la vue de profil (cyphose)
+	const requiredProfilePoints = [
+    	// D2
+    	{ name: "D2 - Bord antérieur", region: 3 },
+    	{ name: "D2 - Bord postérieur", region: 3 },
+    	// D5
+    	{ name: "D5 - Bord antérieur", region: 3 },
+    	{ name: "D5 - Bord postérieur", region: 3 },
+    	// D10
+    	{ name: "D10 - Bord antérieur", region: 4 },
+    	{ name: "D10 - Bord postérieur", region: 4 },
+    	// D12
+    	{ name: "D12 - Bord antérieur", region: 4 },
+    	{ name: "D12 - Bord postérieur", region: 4 },
+    	// L2
+    	{ name: "L2 - Bord antérieur", region: 5 },
+    	{ name: "L2 - Bord postérieur", region: 5 }
+	];
+        
+       // Variables globales
+	let currentView = VIEWS.FACE;
+	let images = {
+    	[VIEWS.FACE.id]: null,
+    	[VIEWS.LEFT.id]: null,
+    	[VIEWS.RIGHT.id]: null,
+    	[VIEWS.PROFILE.id]: null,
+	[VIEWS.MODIFIERS.id]: null
+	};
+        let currentPointIndex = 0;
+        let activeMode = 'normal'; // 'normal' ou 'pan'
+        
+        // Variables pour le zoom et déplacement
+        const canvasInteraction = {
+            scale: 1,
+            offsetX: 0,
+            offsetY: 0,
+            isPanning: false,
+            lastX: 0,
+            lastY: 0
+        };
+        
+    	// Points marqués pour chaque vue
+	const allPoints = {
+    	[VIEWS.FACE.id]: [],
+    	[VIEWS.LEFT.id]: [],
+    	[VIEWS.RIGHT.id]: [],
+    	[VIEWS.PROFILE.id]: [],
+	[VIEWS.MODIFIERS.id]: []
+	};
+   	
+	// Dans la section des points requis,
+	const requiredModifierPoints = [
+    	{ name: "Sacrum - Bord latéral gauche", region: 6 },
+    	{ name: "Sacrum - Bord latéral droit", region: 6 },
+    	{ name: "Apex lombaire - Pédicule gauche", region: 7 },
+    	{ name: "Apex lombaire - Pédicule droit", region: 7 }
+	];
+
+	// Ajouter les régions correspondantes :
+	const MODIFIER_REGIONS = [
+    	{ name: 'SACRUM', color: '#E91E63', label: 'Sacrum (CSVL)' },
+    	{ name: 'APEX', color: '#9C27B0', label: 'Apex Lombaire' }
+	];
+
+	// Résultats des mesures pour chaque vue
+	const allMeasurements = {
+    	[VIEWS.FACE.id]: { ptCobb: null, mtCobb: null, tlCobb: null },
+    	[VIEWS.LEFT.id]: { ptCobb: null, mtCobb: null, tlCobb: null },
+    	[VIEWS.RIGHT.id]: { ptCobb: null, mtCobb: null, tlCobb: null },
+    	[VIEWS.PROFILE.id]: { d2d5Cobb: null, d5d12Cobb: null, d10l2Cobb: null },
+	[VIEWS.MODIFIERS.id]: {}
+	};
+        
+        // Éléments DOM
+        const uploadPanel = document.getElementById('upload-panel');
+        const canvasPanel = document.getElementById('canvas-panel');
+        const resultsPanel = document.getElementById('results-panel');
+        const summaryPanel = document.getElementById('summary-panel');
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const loadBtn = document.getElementById('load-btn');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const pointIndicator = document.getElementById('point-indicator');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const backBtn = document.getElementById('back-btn');
+        const nextViewBtn = document.getElementById('next-view-btn');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        const panModeBtn = document.getElementById('pan-mode');
+        const resetViewBtn = document.getElementById('reset-view');
+        const undoPointBtn = document.getElementById('undo-point');
+        const saveSummaryBtn = document.getElementById('save-summary-btn');
+        const editMeasurementsBtn = document.getElementById('edit-measurements-btn');
+        const newPatientBtn = document.getElementById('new-patient-btn');
+        const currentViewLabel = document.getElementById('current-view-label');
+        const canvasViewLabel = document.getElementById('canvas-view-label');
+        const resultsViewLabel = document.getElementById('results-view-label');
+        const uploadViewType = document.getElementById('upload-view-type');
+        const progressFill = document.getElementById('progress-fill');
+        
+        // Fonction pour mettre à jour les étiquettes de vue
+function updateViewLabels() {
+    currentViewLabel.textContent = currentView.label;
+    canvasViewLabel.textContent = currentView.label;
+    resultsViewLabel.textContent = currentView.label;
+    
+    // Déterminer le texte approprié pour le type de vue dans la zone de téléchargement
+    if (currentView === VIEWS.PROFILE) {
+        uploadViewType.textContent = `profil latéral`;
+
+    } else if (currentView === VIEWS.MODIFIERS) {
+        uploadViewType.textContent = `face statique pour modificateurs lombaires`;
+    } else {
+        uploadViewType.textContent = `AP ${currentView.label.toLowerCase()}`;
+    }
+    
+    // Mettre à jour l'indicateur de progression
+    const progressSteps = document.querySelectorAll('.progress-step');
+    progressSteps.forEach(step => {
+        step.classList.remove('active', 'completed');
+    });
+    
+    // Vérifier si les vues sont complètes (tous les points ont été acquis)
+    const isViewComplete = (viewId) => {
+        if (viewId === VIEWS.PROFILE.id) {
+            return allPoints[viewId].length >= requiredProfilePoints.length;
+        } else if (viewId === VIEWS.MODIFIERS.id) {
+    return allPoints[viewId].length >= requiredModifierPoints.length;
+        } else {
+            return allPoints[viewId].length >= requiredPoints.length;
+        }
+    };
+    
+    // Marquer les étapes complétées
+    if (isViewComplete(VIEWS.FACE.id)) {
+        progressSteps[0].classList.add('completed');
+    }
+    if (isViewComplete(VIEWS.LEFT.id)) {
+        progressSteps[1].classList.add('completed');
+    }
+    if (isViewComplete(VIEWS.RIGHT.id)) {
+        progressSteps[2].classList.add('completed');
+    }
+    if (isViewComplete(VIEWS.PROFILE.id)) {
+        progressSteps[3].classList.add('completed');
+    }
+    if (isViewComplete(VIEWS.MODIFIERS.id)) {
+        progressSteps[4].classList.add('completed');
+    }
+    
+    // Définir l'étape active
+    if (currentView === VIEWS.FACE) {
+        progressSteps[0].classList.add('active');
+        progressPercentage = 0;
+    } else if (currentView === VIEWS.LEFT) {
+        progressSteps[0].classList.add('completed');
+        progressSteps[1].classList.add('active');
+        progressPercentage = 20;
+    } else if (currentView === VIEWS.RIGHT) {
+        progressSteps[0].classList.add('completed');
+        progressSteps[1].classList.add('completed');
+        progressSteps[2].classList.add('active');
+        progressPercentage = 40;
+    } else if (currentView === VIEWS.PROFILE) {
+        progressSteps[0].classList.add('completed');
+        progressSteps[1].classList.add('completed');
+        progressSteps[2].classList.add('completed');
+        progressSteps[3].classList.add('active');
+        progressPercentage = 60;
+    } else if (currentView === VIEWS.MODIFIERS) {
+        progressSteps[0].classList.add('completed');
+        progressSteps[1].classList.add('completed');
+        progressSteps[2].classList.add('completed');
+        progressSteps[3].classList.add('completed');
+        progressSteps[4].classList.add('active');
+        progressPercentage = 80;
+    } else if (currentView === VIEWS.SUMMARY) {
+        progressSteps[0].classList.add('completed');
+        progressSteps[1].classList.add('completed');
+        progressSteps[2].classList.add('completed');
+        progressSteps[3].classList.add('completed');
+        progressSteps[4].classList.add('completed');
+        progressSteps[5].classList.add('active');
+        progressPercentage = 100;
+    }
+    
+    progressFill.style.width = `${progressPercentage}%`;
+    
+    // Mettre à jour le texte du bouton suivant
+    if (currentView === VIEWS.MODIFIERS) {
+        nextViewBtn.textContent = 'Afficher le résumé';
+    } else if (currentView === VIEWS.PROFILE) {
+        nextViewBtn.textContent = 'Passer aux modificateurs lombaires';
+    } else if (currentView === VIEWS.RIGHT) {
+        nextViewBtn.textContent = 'Passer à la vue de profil';
+    } else {
+        nextViewBtn.textContent = 'Passer à la vue suivante';
+    }
+}
+        
+        // Événements
+        uploadArea.addEventListener('click', () => fileInput.click());
+        loadBtn.addEventListener('click', () => fileInput.click());
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = (event) => {
+                    const newImage = new Image();
+                    newImage.onload = () => {
+                        images[currentView.id] = newImage;
+                        showCanvasPanel();
+                        setupCanvas();
+                    };
+                    newImage.src = event.target.result;
+                };
+                
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+        
+        // Gestion du glisser-déposer
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = 'rgba(63, 81, 181, 0.2)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.backgroundColor = '';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '';
+            
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                fileInput.files = e.dataTransfer.files;
+                
+                const reader = new FileReader();
+                
+                reader.onload = (event) => {
+                    const newImage = new Image();
+                    newImage.onload = () => {
+                        images[currentView.id] = newImage;
+                        showCanvasPanel();
+                        setupCanvas();
+                    };
+                    newImage.src = event.target.result;
+                };
+                
+                reader.readAsDataURL(e.dataTransfer.files[0]);
+            }
+        });
+        
+        // Gestion du canvas
+       canvas.addEventListener('click', (e) => {
+    if (activeMode === 'normal') {
+        const rect = canvas.getBoundingClientRect();
+        
+        // Calculer la position réelle en tenant compte du zoom et de la translation
+        const canvasX = (e.clientX - rect.left);
+        const canvasY = (e.clientY - rect.top);
+        
+        // Positions par rapport au centre du canvas
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        
+        // Appliquer la transformation inverse pour obtenir les coordonnées dans l'espace original
+        const x = (canvasX - centerX - canvasInteraction.offsetX) / canvasInteraction.scale + centerX;
+        const y = (canvasY - centerY - canvasInteraction.offsetY) / canvasInteraction.scale + centerY;
+        
+        // Vérifier le mode et le nombre de points maximum en fonction de la vue
+if (currentView === VIEWS.PROFILE) {
+    if (currentPointIndex < requiredProfilePoints.length) {
+        addPoint(x, y);
+    }
+} else if (currentView === VIEWS.MODIFIERS) {
+    if (currentPointIndex < requiredModifierPoints.length) {
+        addPoint(x, y);
+    }
+} else {
+    if (currentPointIndex < requiredPoints.length) {
+        addPoint(x, y);
+    }
+}
+    }
+}); 
+        // Événement pour la molette de la souris (zoom)
+        canvas.addEventListener('wheel', function(event) {
+            event.preventDefault(); // Empêcher le défilement de la page
+            
+            if (event.deltaY < 0) {
+                zoomCanvas('in');
+            } else {
+                zoomCanvas('out');
+            }
+        });
+        
+        // Événements pour le déplacement (pan)
+        canvas.addEventListener('mousedown', function(event) {
+            if (activeMode === 'pan') {
+                canvasInteraction.isPanning = true;
+                canvasInteraction.lastX = event.clientX;
+                canvasInteraction.lastY = event.clientY;
+            }
+        });
+        
+        canvas.addEventListener('mousemove', function(event) {
+            if (canvasInteraction.isPanning) {
+                const deltaX = event.clientX - canvasInteraction.lastX;
+                const deltaY = event.clientY - canvasInteraction.lastY;
+                
+                canvasInteraction.offsetX += deltaX;
+                canvasInteraction.offsetY += deltaY;
+                
+                canvasInteraction.lastX = event.clientX;
+                canvasInteraction.lastY = event.clientY;
+                
+                // Redessiner le canvas avec le nouveau déplacement
+                redrawCanvas();
+            }
+        });
+        
+        canvas.addEventListener('mouseup', function() {
+            canvasInteraction.isPanning = false;
+        });
+        
+        canvas.addEventListener('mouseleave', function() {
+            canvasInteraction.isPanning = false;
+        });
+        
+        // Boutons
+        calculateBtn.addEventListener('click', calculateAngles);
+        resetBtn.addEventListener('click', resetPoints);
+        backBtn.addEventListener('click', () => {
+            resultsPanel.style.display = 'none';
+            canvasPanel.style.display = 'block';
+        });
+        nextViewBtn.addEventListener('click', goToNextView);
+        zoomInBtn.addEventListener('click', () => zoomCanvas('in'));
+        zoomOutBtn.addEventListener('click', () => zoomCanvas('out'));
+        panModeBtn.addEventListener('click', togglePanMode);
+        resetViewBtn.addEventListener('click', resetView);
+        undoPointBtn.addEventListener('click', undoPoint);
+        saveSummaryBtn.addEventListener('click', saveSummaryReport);
+        editMeasurementsBtn.addEventListener('click', editMeasurements);
+        newPatientBtn.addEventListener('click', resetAllData);
+        
+        // Fonctions
+        function showCanvasPanel() {
+            uploadPanel.style.display = 'none';
+            canvasPanel.style.display = 'block';
+            document.querySelector('.canvas-container').style.display = 'block';
+        }
+        
+    function setupCanvas() {
+  
+	 if (allPoints[currentView.id].length === 0) {
+        currentPointIndex = 0;
+    } else {
+        currentPointIndex = allPoints[currentView.id].length;
+    }
+            
+            // Ajuster les dimensions du canvas
+            const container = canvas.parentElement;
+            const containerWidth = container.clientWidth;
+            const containerHeight = Math.max(window.innerHeight * 0.5, 400);
+            
+            const image = images[currentView.id];
+            
+            // Original image ratio
+            const imageRatio = image.width / image.height;
+            const containerRatio = containerWidth / containerHeight;
+            
+            let canvasWidth, canvasHeight;
+            
+            if (imageRatio > containerRatio) {
+                canvasWidth = containerWidth;
+                canvasHeight = containerWidth / imageRatio;
+            } else {
+                canvasHeight = containerHeight;
+                canvasWidth = containerHeight * imageRatio;
+            }
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            // Réinitialiser les paramètres
+            canvasInteraction.scale = 1;
+            canvasInteraction.offsetX = 0;
+            canvasInteraction.offsetY = 0;
+            
+            // Dessiner l'image
+            redrawCanvas();
+            
+            // Mettre à jour les instructions
+            updatePointIndicator();
+        }
+        
+   function redrawCanvas() {
+    // Effacer le canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Sauvegarder l'état du contexte
+    ctx.save();
+    
+    const image = images[currentView.id];
+    if (!image) return;
+    
+    // Calculer la taille de l'image
+    const imgRatio = image.width / image.height;
+    const canvasRatio = canvas.width / canvas.height;
+    
+    let imgWidth, imgHeight;
+    
+    if (imgRatio > canvasRatio) {
+        imgWidth = canvas.width;
+        imgHeight = canvas.width / imgRatio;
+    } else {
+        imgHeight = canvas.height;
+        imgWidth = canvas.height * imgRatio;
+    }
+    
+    // Centrer l'image dans le canvas
+    const imgX = (canvas.width - imgWidth) / 2;
+    const imgY = (canvas.height - imgHeight) / 2;
+    
+    // Appliquer la translation et le zoom
+    ctx.translate(canvas.width/2 + canvasInteraction.offsetX, canvas.height/2 + canvasInteraction.offsetY);
+    ctx.scale(canvasInteraction.scale, canvasInteraction.scale);
+    ctx.translate(-canvas.width/2, -canvas.height/2);
+    
+    // Dessiner l'image
+    ctx.drawImage(image, imgX, imgY, imgWidth, imgHeight);
+    
+    // Dessiner les points et lignes
+    const points = allPoints[currentView.id];
+    let requiredPointsCount = currentView === VIEWS.PROFILE ? requiredProfilePoints.length : requiredPoints.length;
+    
+    // Ajouter cette boucle for qui manquait
+    for (let i = 0; i < points.length; i++) {
+        const point = points[i];
+        let regionIndex;
+        
+        // Déterminer la région en fonction de la vue
+        if (currentView === VIEWS.PROFILE) {
+    regionIndex = Math.min(Math.floor(i / 2) + 3, REGIONS.length - 1);
+} else if (currentView === VIEWS.MODIFIERS) {
+    // Pour les modificateurs : sacrum (0-1) et apex (2-3)
+    regionIndex = i < 2 ? 6 : 7; // Utiliser les indices des MODIFIER_REGIONS dans REGIONS
+} else {
+    regionIndex = Math.floor(i / 4);
+}
+        
+        const color = REGIONS[regionIndex].color;
+        
+        // Dessiner le point
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, POINT_RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        
+        // Ajouter le numéro du point
+        ctx.font = 'bold 10px Arial';
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.strokeText(`${i + 1}`, point.x + 8, point.y - 8);
+        ctx.fillText(`${i + 1}`, point.x + 8, point.y - 8);
+        
+        // Connecter les points
+        if (currentView === VIEWS.PROFILE) {
+            if (i % 2 === 1) { // Si c'est un indice impair (1, 3, 5...)
+                ctx.beginPath();
+                ctx.moveTo(points[i-1].x, points[i-1].y);
+                ctx.lineTo(point.x, point.y);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        } else {
+            // Code pour les vues AP
+            if (i % 2 === 1) { // Si c'est un indice impair
+                ctx.beginPath();
+                ctx.moveTo(points[i-1].x, points[i-1].y);
+                ctx.lineTo(point.x, point.y);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+    }
+    
+    // Dessiner les angles
+    if (currentView === VIEWS.PROFILE) {
+        // Dessiner les angles de cyphose pour 3 paires de lignes: D2-D5, D5-D12, D10-L2
+        if (points.length >= 4) { // D2-D5
+            drawCyphosisAngle(points, 0, 2);
+        }
+        if (points.length >= 8) { // D5-D12
+            drawCyphosisAngle(points, 2, 6);
+        }
+        if (points.length >= 10) { // D10-L2
+            drawCyphosisAngle(points, 4, 8);
+        }
+    } else {
+        
+    }
+            
+            // Dessiner les angles de Cobb pour chaque groupe de 4 points
+            for (let group = 0; group < Math.floor(points.length / 4); group++) {
+                if (points.length >= (group + 1) * 4) {
+                    // Points du premier plateau
+                    const p1 = points[group * 4];
+                    const p2 = points[group * 4 + 1];
+                    
+                    // Points du deuxième plateau
+                    const p3 = points[group * 4 + 2];
+                    const p4 = points[group * 4 + 3];
+                    
+                    // Calculer l'angle entre les deux lignes
+                    const angle = calculateAngleBetweenLines(p1, p2, p3, p4);
+                    
+                    // Point médian entre les deux plateaux
+                    const midX = (p1.x + p2.x + p3.x + p4.x) / 4;
+                    const midY = (p1.y + p2.y + p3.y + p4.y) / 4;
+                    
+                    // Dessiner un arc pour illustrer l'angle
+                    const radius = 30;
+                    ctx.beginPath();
+                    ctx.arc(midX, midY, radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = REGIONS[group].color;
+                    ctx.setLineDash([2, 2]);
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    
+                    // Afficher la valeur de l'angle
+                    ctx.font = 'bold 14px Arial';
+                    ctx.fillStyle = 'white';
+                    ctx.strokeStyle = 'black';
+                    ctx.lineWidth = 3;
+                    ctx.strokeText(`${angle.toFixed(1)}°`, midX - 15, midY + 5);
+                    ctx.fillText(`${angle.toFixed(1)}°`, midX - 15, midY + 5);
+                    
+                    // Identifier la région
+                    ctx.font = 'bold 12px Arial';
+                    ctx.strokeText(REGIONS[group].name, midX - 15, midY - 15);
+                    ctx.fillText(REGIONS[group].name, midX - 15, midY - 15);
+                }
+            }
+            
+            // Restaurer le contexte
+            ctx.restore();
+
+		if (currentView === VIEWS.MODIFIERS && points.length >= 4) {
+  	  ctx.save(); // Sauvegarder à nouveau pour les modificateurs
+   	 ctx.translate(canvas.width/2 + canvasInteraction.offsetX, canvas.height/2 + 			canvasInteraction.offsetY);
+  	  ctx.scale(canvasInteraction.scale, canvasInteraction.scale);
+  	  ctx.translate(-canvas.width/2, -canvas.height/2);
+    
+   	 drawModifierLines(points);
+    
+   	 ctx.restore();
+	}
+            
+            // Afficher des informations supplémentaires
+            ctx.font = '12px Arial';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(10, 10, 150, 70);
+            ctx.fillStyle = 'white';
+            ctx.fillText(`Vue: ${currentView.label}`, 20, 30);
+            let totalRequiredPoints;
+		if (currentView === VIEWS.PROFILE) {
+    		totalRequiredPoints = requiredProfilePoints.length;
+		} else if (currentView === VIEWS.MODIFIERS) {
+    		totalRequiredPoints = requiredModifierPoints.length;
+		} else {
+    		totalRequiredPoints = requiredPoints.length;
+		}
+		ctx.fillText(`Points: ${points.length}/${totalRequiredPoints}`, 20, 50);
+            	ctx.fillText(`Zoom: ${Math.round(canvasInteraction.scale * 100)}%`, 20, 70);
+        	}
+
+function drawCyphosisAngle(points, index1, index2) {
+    // Points de la première vertèbre
+    const p1 = points[index1]; // Bord antérieur
+    const p2 = points[index1 + 1]; // Bord postérieur
+    
+    // Points de la deuxième vertèbre
+    const p3 = points[index2]; // Bord antérieur
+    const p4 = points[index2 + 1]; // Bord postérieur
+    
+    // Calculer l'angle entre les deux lignes vertébrales
+    const angle = calculateCyphosisAngle(p1, p2, p3, p4);
+    
+    // Point médian entre les deux vertèbres
+    const midX = (p1.x + p2.x + p3.x + p4.x) / 4;
+    const midY = (p1.y + p2.y + p3.y + p4.y) / 4;
+    
+    // Dessiner un arc pour illustrer l'angle
+    const radius = 30;
+    ctx.beginPath();
+    ctx.arc(midX, midY, radius, 0, Math.PI * 2);
+    
+   // Déterminer la région pour la couleur
+let regionIndex;
+if (index1 === 0) { // D2-D5
+    regionIndex = 3; // Cyphose Thoracique Supérieure
+} else if (index1 === 2) { // D5-D12
+    regionIndex = 4; // Cyphose Thoraco-lombaire
+} else { // D10-L2 ou autres paires
+    regionIndex = 5; // Lordose Lombaire
+}
+
+// Vérifier que l'indice est valide
+regionIndex = Math.min(regionIndex, REGIONS.length - 1);
+    
+    ctx.strokeStyle = REGIONS[regionIndex].color;
+    ctx.setLineDash([2, 2]);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Afficher la valeur de l'angle
+    ctx.font = 'bold 14px Arial';
+    ctx.fillStyle = 'white';
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 3;
+    ctx.strokeText(`${angle.toFixed(1)}°`, midX - 15, midY + 5);
+    ctx.fillText(`${angle.toFixed(1)}°`, midX - 15, midY + 5);
+    
+    // Identifier la région
+    const regionName = index1 === 0 ? "D2-D5" : (index1 === 2 ? "D5-D12" : "D10-L2");
+    ctx.font = 'bold 12px Arial';
+    ctx.strokeText(regionName, midX - 20, midY - 15);
+    ctx.fillText(regionName, midX - 20, midY - 15);
+}
+     function drawModifierLines(points) {
+    if (points.length >= 4) {
+        const ctx = canvas.getContext('2d');
+        
+        // Dessiner la CSVL
+        const csvlX = (points[0].x + points[1].x) / 2;
+        ctx.beginPath();
+        ctx.moveTo(csvlX, 0);
+        ctx.lineTo(csvlX, canvas.height);
+        ctx.strokeStyle = '#E91E63';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Dessiner la ligne entre pédicules
+        ctx.beginPath();
+        ctx.moveTo(points[2].x, points[2].y);
+        ctx.lineTo(points[3].x, points[3].y);
+        ctx.strokeStyle = '#9C27B0';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Marquer le centre de l'apex
+        const apexCenterX = (points[2].x + points[3].x) / 2;
+        const apexCenterY = (points[2].y + points[3].y) / 2;
+        
+        ctx.beginPath();
+        ctx.arc(apexCenterX, apexCenterY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#9C27B0';
+        ctx.fill();
+        
+        // Dessiner la ligne de mesure
+        ctx.beginPath();
+        ctx.moveTo(csvlX, apexCenterY);
+        ctx.lineTo(apexCenterX, apexCenterY);
+        ctx.strokeStyle = '#FF5722';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+    }
+}   
+      function addPoint(x, y) {
+    let maxPoints;
+    if (currentView === VIEWS.PROFILE) {
+        maxPoints = requiredProfilePoints.length;
+    } else if (currentView === VIEWS.MODIFIERS) {
+        maxPoints = requiredModifierPoints.length;
+    } else {
+        maxPoints = requiredPoints.length;
+    }
+    
+    if (currentPointIndex < maxPoints) {
+        allPoints[currentView.id].push({ x, y });
+        
+        // Notification selon l'index du point
+        if (currentPointIndex % 2 === 0) {
+            showNotification("Premier point marqué. Marquez maintenant le point opposé du plateau.", 'info');
+        } else {
+            showNotification("Plateau complet! Ligne tracée entre les deux points.", 'success');
+        }
+        
+        currentPointIndex++;
+        redrawCanvas();
+        updatePointIndicator();
+        
+        // Vérifier si tous les points sont marqués
+        if (currentPointIndex === maxPoints) {
+            showNotification("Tous les points sont marqués! Vous pouvez maintenant calculer les angles.", 'success');
+            calculateBtn.style.backgroundColor = 'var(--success-color)';
+        }
+    }
+}
+        
+        function undoPoint() {
+            if (allPoints[currentView.id].length > 0) {
+                allPoints[currentView.id].pop();
+                currentPointIndex--;
+                redrawCanvas();
+                updatePointIndicator();
+                showNotification("Point supprimé", 'info');
+            } else {
+                showNotification("Aucun point à supprimer", 'warning');
+            }
+        }
+        
+ function updatePointIndicator() {
+    if (currentView === VIEWS.PROFILE) {
+        // Points pour la vue de profil
+        if (currentPointIndex < requiredProfilePoints.length) {
+            const point = requiredProfilePoints[currentPointIndex];
+            const region = REGIONS[point.region];
+            
+            let message = `<div>Prochain point à marquer (${currentPointIndex + 1}/${requiredProfilePoints.length}):</div>`;
+            message += `<div style="color: ${region.color}; font-size: 1.1em; margin: 5px 0;">${point.name}</div>`;
+            
+            // Instructions supplémentaires
+            if (currentPointIndex % 2 === 0) {
+                message += "<div style='font-style: italic; font-size: 0.9em; margin-top: 5px;'>Marquez le bord antérieur de la vertèbre</div>";
+            } else {
+                message += "<div style='font-style: italic; font-size: 0.9em; margin-top: 5px;'>Marquez le bord postérieur de la vertèbre</div>";
+            }
+            
+            pointIndicator.innerHTML = message;
+        } else {
+            pointIndicator.innerHTML = "Tous les points sont marqués! Calculez les angles de cyphose.";
+        }
+    } else if (currentView === VIEWS.MODIFIERS) {
+        // Points pour les modificateurs lombaires
+        if (currentPointIndex < requiredModifierPoints.length) {
+            const point = requiredModifierPoints[currentPointIndex];
+            const regionIndex = point.region === 6 ? 0 : 1; // Sacrum ou Apex
+            const region = MODIFIER_REGIONS[regionIndex];
+            
+            let message = `<div>Prochain point à marquer (${currentPointIndex + 1}/${requiredModifierPoints.length}):</div>`;
+            message += `<div style="color: ${region.color}; font-size: 1.1em; margin: 5px 0;">${point.name}</div>`;
+            
+            // Instructions spécifiques
+            if (currentPointIndex < 2) {
+                message += "<div style='font-style: italic; font-size: 0.9em; margin-top: 5px;'>Marquez les bords latéraux du sacrum pour définir la CSVL</div>";
+            } else {
+                message += "<div style='font-style: italic; font-size: 0.9em; margin-top: 5px;'>Marquez les pédicules de la vertèbre apex lombaire</div>";
+            }
+            
+            pointIndicator.innerHTML = message;
+        } else {
+            pointIndicator.innerHTML = "Tous les points sont marqués! Calculez le modificateur lombaire.";
+        }
+    } else {
+        // Points pour les vues AP (Face, Bending Gauche, Bending Droit)
+        if (currentPointIndex < requiredPoints.length) {
+            const point = requiredPoints[currentPointIndex];
+            const region = REGIONS[point.region];
+            
+            let message = `<div>Prochain point à marquer (${currentPointIndex + 1}/${requiredPoints.length}):</div>`;
+            message += `<div style="color: ${region.color}; font-size: 1.1em; margin: 5px 0;">${point.name}</div>`;
+            
+            // Instructions supplémentaires
+            if (currentPointIndex % 2 === 0) {
+                message += "<div style='font-style: italic; font-size: 0.9em; margin-top: 5px;'>Marquez le bord gauche du plateau vertébral</div>";
+            } else {
+                message += "<div style='font-style: italic; font-size: 0.9em; margin-top: 5px;'>Marquez le bord droit du plateau vertébral</div>";
+            }
+            
+            pointIndicator.innerHTML = message;
+        } else {
+            pointIndicator.innerHTML = "Tous les points sont marqués! Calculez les angles.";
+        }
+    }
+}        
+        function calculateAngleBetweenLines(p1, p2, p3, p4) {
+            // Calculer les vecteurs directeurs des deux lignes (plateaux vertébraux)
+            const v1 = { x: p2.x - p1.x, y: p2.y - p1.y };
+            const v2 = { x: p4.x - p3.x, y: p4.y - p3.y };
+            
+            // Pour l'angle de Cobb en scoliose, on mesure l'angle entre les perpendiculaires aux plateaux
+            // Calculer les perpendiculaires
+            const perp1 = { x: -v1.y, y: v1.x };
+            const perp2 = { x: -v2.y, y: v2.x };
+            
+            // Calculer les angles des perpendiculaires par rapport à la verticale
+            const angle1 = Math.atan2(perp1.x, perp1.y); // Inverser x et y pour référentiel vertical
+            const angle2 = Math.atan2(perp2.x, perp2.y);
+            
+            // Calculer la différence d'angle en radians, puis convertir en degrés
+            let angleDiff = angle2 - angle1;
+            
+            // Normaliser l'angle entre -π et π
+            while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+            while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+            
+            // Prendre la valeur absolue pour l'angle de Cobb
+            const angleDeg = Math.abs(angleDiff * 180 / Math.PI);
+            
+            // Dans le cas des angles de Cobb, nous nous intéressons à l'angle formé par les deux axes vertébraux
+            // On ne limite pas à 90° car les scolioses sévères peuvent avoir des angles supérieurs
+            return angleDeg;
+        }
+        
+    function calculateAngles() {
+    if (currentView === VIEWS.PROFILE) {
+        calculateCyphosisAngles();
+        return;
+    }
+	if (currentView === VIEWS.MODIFIERS) {
+        calculateModifiers();
+        return;
+    }
+    
+    // Code existant pour les vues AP
+    const points = allPoints[currentView.id];
+    if (points.length < requiredPoints.length) {
+        showNotification("Veuillez d'abord marquer tous les points requis", 'warning');
+        return;
+    }
+    
+    // Calculer l'angle de Cobb pour la région PT
+    allMeasurements[currentView.id].ptCobb = calculateAngleBetweenLines(
+        points[0], points[1], // T1 plateau supérieur
+        points[2], points[3]  // T4 plateau inférieur
+    );
+    
+    // Calculer l'angle de Cobb pour la région MT
+    allMeasurements[currentView.id].mtCobb = calculateAngleBetweenLines(
+        points[4], points[5], // T5 plateau supérieur
+        points[6], points[7]  // T12 plateau inférieur
+    );
+    
+    // Calculer l'angle de Cobb pour la région TL/L
+    allMeasurements[currentView.id].tlCobb = calculateAngleBetweenLines(
+        points[8], points[9],   // L1 plateau supérieur
+        points[10], points[11]  // L5 plateau inférieur
+    );
+    
+    // Afficher les résultats
+    displayResults();
+    
+    // Afficher le panneau des résultats
+    canvasPanel.style.display = 'none';
+    resultsPanel.style.display = 'block';
+    
+    showNotification("Angles calculés avec succès", 'success');
+}
+function calculateModifiers() {
+    const points = allPoints[VIEWS.MODIFIERS.id];
+    if (points.length < requiredModifierPoints.length) {
+        showNotification("Veuillez marquer tous les points requis", 'warning');
+        return;
+    }
+    
+    const lumbarModifier = calculateLumbarModifier(points);
+    
+    // Stocker les résultats
+    allMeasurements[VIEWS.MODIFIERS.id] = {
+        lumbarModifier: lumbarModifier
+    };
+    
+    // Afficher les résultats
+    displayModifierResults();
+    
+    // Passer au panneau des résultats
+    canvasPanel.style.display = 'none';
+    resultsPanel.style.display = 'block';
+}
+// À ajouter après la fonction calculateModifiers()
+function calculateLumbarModifier(points) {
+    // Points du sacrum pour calculer la CSVL
+    const sacrumLeft = points[0];
+    const sacrumRight = points[1];
+    
+    // Points des pédicules de l'apex lombaire
+    const apexLeft = points[2];
+    const apexRight = points[3];
+    
+    // 1. Calculer la ligne verticale sacrée centrale (CSVL)
+    const csvlX = (sacrumLeft.x + sacrumRight.x) / 2;
+    
+    // 2. Calculer le centre de l'apex lombaire
+    const apexCenterX = (apexLeft.x + apexRight.x) / 2;
+    
+    // 3. Calculer la largeur pédiculaire (distance entre pédicules)
+    const pedicleWidth = Math.abs(apexRight.x - apexLeft.x);
+    
+    // 4. Calculer la distance entre CSVL et centre de l'apex
+    const distanceToApex = Math.abs(csvlX - apexCenterX);
+    
+    // 5. Calculer le ratio distance/largeur pédiculaire
+    const ratio = distanceToApex / pedicleWidth;
+    
+    // 6. Déterminer le type de modificateur
+    let modifier = '';
+    let description = '';
+    
+    if (ratio <= 0.5) {
+        modifier = 'A';
+        description = 'CSVL passe entre les pédicules';
+    } else if (ratio <= 1.0) {
+        modifier = 'B';
+        description = 'CSVL touche le pédicule';
+    } else {
+        modifier = 'C';
+        description = 'CSVL ne touche pas l\'apex';
+    }
+    
+    return {
+        type: modifier,
+        description: description,
+        distance: distanceToApex.toFixed(1),
+        pedicleWidth: pedicleWidth.toFixed(1),
+        ratio: ratio.toFixed(2)
+    };
+}
+        
+        function displayResults() {
+            const measurements = allMeasurements[currentView.id];
+            
+            document.getElementById('pt-angle').textContent = `${measurements.ptCobb.toFixed(1)}°`;
+            document.getElementById('mt-angle').textContent = `${measurements.mtCobb.toFixed(1)}°`;
+            document.getElementById('tl-angle').textContent = `${measurements.tlCobb.toFixed(1)}°`;
+            
+            document.getElementById('pt-vertebrae').textContent = 'T1-T4';
+            document.getElementById('mt-vertebrae').textContent = 'T5-T12';
+            document.getElementById('tl-vertebrae').textContent = 'L1-L5';
+        }
+ 	     function displayModifierResults() {
+    const modifier = allMeasurements[VIEWS.MODIFIERS.id].lumbarModifier;
+    
+    // Restructurer complètement le tableau des résultats
+    document.querySelector('#results-panel table thead').innerHTML = `
+        <tr>
+            <th>Type de mesure</th>
+            <th>Valeur</th>
+            <th>Description</th>
+        </tr>
+    `;
+    
+    document.querySelector('#results-panel table tbody').innerHTML = `
+        <tr>
+            <td>Modificateur Lombaire</td>
+            <td style="font-weight: bold; font-size: 1.2em;">Type ${modifier.type}</td>
+            <td>${modifier.description}</td>
+        </tr>
+        <tr>
+            <td>Distance CSVL-Apex</td>
+            <td>${modifier.distance} mm</td>
+            <td>Distance entre la ligne verticale sacrée centrale et l'apex de la courbure lombaire</td>
+        </tr>
+        <tr>
+            <td>Largeur Pédiculaire</td>
+            <td>${modifier.pedicleWidth} mm</td>
+            <td>Largeur entre les pédicules au niveau de l'apex</td>
+        </tr>
+        <tr>
+            <td>Ratio Distance/Largeur</td>
+            <td>${modifier.ratio}</td>
+            <td>Rapport entre la distance CSVL-Apex et la largeur pédiculaire</td>
+        </tr>
+    `;
+}
+        function resetPoints() {
+            allPoints[currentView.id] = [];
+            currentPointIndex = 0;
+            redrawCanvas();
+            updatePointIndicator();
+            showNotification("Tous les points ont été effacés", 'info');
+        }
+        
+      function goToNextView() {
+    if (currentView === VIEWS.FACE) {
+        currentView = VIEWS.LEFT;
+        showUploadPanel();
+    } else if (currentView === VIEWS.LEFT) {
+        currentView = VIEWS.RIGHT;
+        showUploadPanel();
+    } else if (currentView === VIEWS.RIGHT) {
+        currentView = VIEWS.PROFILE;
+        showUploadPanel();
+    } else if (currentView === VIEWS.PROFILE) {
+        currentView = VIEWS.MODIFIERS;
+        showUploadPanel();
+    } else if (currentView === VIEWS.MODIFIERS) {
+        currentView = VIEWS.SUMMARY;
+        displaySummary();
+    }
+    
+    updateViewLabels();
+}
+function calculateCyphosisAngles() {
+    const points = allPoints[VIEWS.PROFILE.id];
+    if (points.length < requiredProfilePoints.length) {
+        showNotification("Veuillez d'abord marquer tous les points requis", 'warning');
+        return;
+    }
+    
+    // Calcul de l'angle de cyphose D2-D5
+    allMeasurements[VIEWS.PROFILE.id].d2d5Cobb = calculateCyphosisAngle(
+        points[0], points[1], // D2 
+        points[2], points[3]  // D5
+    );
+    
+    // Calcul de l'angle de cyphose D5-D12
+    allMeasurements[VIEWS.PROFILE.id].d5d12Cobb = calculateCyphosisAngle(
+        points[2], points[3], // D5
+        points[6], points[7]  // D12
+    );
+    
+    // Calcul de l'angle de cyphose D10-L2
+    allMeasurements[VIEWS.PROFILE.id].d10l2Cobb = calculateCyphosisAngle(
+        points[4], points[5], // D10
+        points[8], points[9]  // L2
+    );
+    
+    // Afficher les résultats
+    displayCyphosisResults();
+    
+    // Afficher le panneau des résultats
+    canvasPanel.style.display = 'none';
+    resultsPanel.style.display = 'block';
+    
+    showNotification("Angles de cyphose calculés avec succès", 'success');
+}
+
+function calculateCyphosisAngle(p1, p2, p3, p4) {
+    // Créer les vecteurs pour les deux vertèbres
+    const vertebra1 = { x: p2.x - p1.x, y: p2.y - p1.y }; // Ligne entre bord antérieur et postérieur de la vertèbre 1
+    const vertebra2 = { x: p4.x - p3.x, y: p4.y - p3.y }; // Ligne entre bord antérieur et postérieur de la vertèbre 2
+    
+    // Calculer l'angle entre ces deux lignes
+    let angle1 = Math.atan2(vertebra1.y, vertebra1.x);
+    let angle2 = Math.atan2(vertebra2.y, vertebra2.x);
+    
+    // Convertir les angles en degrés
+    angle1 = angle1 * 180 / Math.PI;
+    angle2 = angle2 * 180 / Math.PI;
+    
+    // Calculer l'angle entre les vertèbres
+    let angleDiff = Math.abs(angle2 - angle1);
+    
+    // Normaliser l'angle
+    if (angleDiff > 180) {
+        angleDiff = 360 - angleDiff;
+    }
+    
+    return angleDiff;
+}
+function displayCyphosisResults() {
+    const measurements = allMeasurements[VIEWS.PROFILE.id];
+    
+    // Modifie le tableau de résultats pour afficher les angles de cyphose
+    document.getElementById('pt-angle').textContent = `${measurements.d2d5Cobb.toFixed(1)}°`;
+    document.getElementById('mt-angle').textContent = `${measurements.d5d12Cobb.toFixed(1)}°`;
+    document.getElementById('tl-angle').textContent = `${measurements.d10l2Cobb.toFixed(1)}°`;
+    
+    document.getElementById('pt-vertebrae').textContent = 'D2-D5';
+    document.getElementById('mt-vertebrae').textContent = 'D5-D12';
+    document.getElementById('tl-vertebrae').textContent = 'D10-L2';
+    
+    // Calculer et afficher le modificateur thoracique
+    const d5d12Angle = measurements.d5d12Cobb;
+    let thoracicModifier = "";
+    let modifierColor = "";
+    
+    if (d5d12Angle < 10) {
+        thoracicModifier = "- (Hypo)";
+        modifierColor = "#f44336"; // Rouge
+    } else if (d5d12Angle >= 10 && d5d12Angle <= 40) {
+        thoracicModifier = "N (Normal)";
+        modifierColor = "#4CAF50"; // Vert
+    } else {
+        thoracicModifier = "+ (Hyper)";
+        modifierColor = "#FF9800"; // Orange
+    }
+    
+    // Ajouter une nouvelle ligne au tableau des résultats pour le modificateur
+    const resultsTable = document.querySelector('#results-panel table tbody');
+    
+    // Vérifier si la ligne du modificateur existe déjà
+    const existingModRow = document.getElementById('thoracic-modifier-row');
+    if (existingModRow) {
+        // Mettre à jour la cellule existante
+        document.getElementById('thoracic-modifier-cell').innerHTML = 
+            `<span style="font-weight: bold; color: ${modifierColor};">${thoracicModifier}</span>`;
+    } else {
+        // Créer une nouvelle ligne
+        const modRow = document.createElement('tr');
+        modRow.id = 'thoracic-modifier-row';
+        modRow.innerHTML = `
+            <td>Modificateur Thoracique Sagittal (D5-D12)</td>
+            <td id="thoracic-modifier-cell" colspan="2">
+                <span style="font-weight: bold; color: ${modifierColor};">${thoracicModifier}</span>
+            </td>
+        `;
+        resultsTable.appendChild(modRow);
+    }
+}
+      
+        function showUploadPanel() {
+            resultsPanel.style.display = 'none';
+            canvasPanel.style.display = 'none';
+            uploadPanel.style.display = 'block';
+            
+            updateViewLabels();
+        }
+        
+function displaySummary() {
+    // Masquer les autres panneaux
+    uploadPanel.style.display = 'none';
+    canvasPanel.style.display = 'none';
+    resultsPanel.style.display = 'none';
+    summaryPanel.style.display = 'block';
+    
+    // Mettre à jour le HTML du panneau de résumé pour ajouter une section cyphose et modificateurs
+    updateSummaryPanelHTML();
+    
+    // Remplir le tableau récapitulatif
+    // Face
+    document.getElementById('summary-pt-face').textContent = `${allMeasurements.face.ptCobb.toFixed(1)}°`;
+    document.getElementById('summary-mt-face').textContent = `${allMeasurements.face.mtCobb.toFixed(1)}°`;
+    document.getElementById('summary-tl-face').textContent = `${allMeasurements.face.tlCobb.toFixed(1)}°`;
+    
+    // Bending Gauche
+    document.getElementById('summary-pt-left').textContent = `${allMeasurements.left.ptCobb.toFixed(1)}°`;
+    document.getElementById('summary-mt-left').textContent = `${allMeasurements.left.mtCobb.toFixed(1)}°`;
+    document.getElementById('summary-tl-left').textContent = `${allMeasurements.left.tlCobb.toFixed(1)}°`;
+    
+    // Bending Droit
+    document.getElementById('summary-pt-right').textContent = `${allMeasurements.right.ptCobb.toFixed(1)}°`;
+    document.getElementById('summary-mt-right').textContent = `${allMeasurements.right.mtCobb.toFixed(1)}°`;
+    document.getElementById('summary-tl-right').textContent = `${allMeasurements.right.tlCobb.toFixed(1)}°`;
+    
+    // Cyphose
+    document.getElementById('summary-d2d5').textContent = `${allMeasurements.profile.d2d5Cobb.toFixed(1)}°`;
+    document.getElementById('summary-d5d12').textContent = `${allMeasurements.profile.d5d12Cobb.toFixed(1)}°`;
+    document.getElementById('summary-d10l2').textContent = `${allMeasurements.profile.d10l2Cobb.toFixed(1)}°`;
+    
+    // Calcul des réductibilités
+    calculateReduction('pt', 'left');
+    calculateReduction('mt', 'left');
+    calculateReduction('tl', 'left');
+    
+    calculateReduction('pt', 'right');
+    calculateReduction('mt', 'right');
+    calculateReduction('tl', 'right');
+    
+    // Déterminer la structuralité des courbures
+    determineStructural('pt');
+    determineStructural('mt');
+    determineStructural('tl');
+
+    // Déterminer le modificateur thoracique (D5-D12)
+    const d5d12Angle = allMeasurements.profile.d5d12Cobb;
+    let thoracicModifier = "";
+    let modifierColor = "";
+    
+    if (d5d12Angle < 10) {
+        thoracicModifier = "- (Hypo)";
+        modifierColor = "#f44336"; // Rouge
+    } else if (d5d12Angle >= 10 && d5d12Angle <= 40) {
+        thoracicModifier = "N (Normal)";
+        modifierColor = "#4CAF50"; // Vert
+    } else {
+        thoracicModifier = "+ (Hyper)";
+        modifierColor = "#FF9800"; // Orange
+    }
+    
+    // Ajouter le modificateur thoracique sagittal au résumé
+    document.getElementById('summary-thoracic-modifier').textContent = thoracicModifier;
+    document.getElementById('summary-thoracic-modifier').style.color = modifierColor;
+    
+    // Ajouter le modificateur lombaire au résumé (s'il existe)
+    if (allMeasurements[VIEWS.MODIFIERS.id] && 
+        allMeasurements[VIEWS.MODIFIERS.id].lumbarModifier) {
+        document.getElementById('summary-lumbar-modifier').textContent = 
+            allMeasurements[VIEWS.MODIFIERS.id].lumbarModifier.type;
+    } else {
+        document.getElementById('summary-lumbar-modifier').textContent = "Non mesuré";
+    }
+}
+
+function determineStructural(region) {
+    // Obtenez les angles
+    const faceAngle = allMeasurements.face[`${region}Cobb`];
+    const leftAngle = allMeasurements.left[`${region}Cobb`];
+    const rightAngle = allMeasurements.right[`${region}Cobb`];
+    
+    // Critères de Lenke pour la structuralité:
+    // 1. Angle en inflexion ≥ 25°, OU
+    // 2. Cyphose locale ≥ 20° pour les régions thoraciques
+    
+    // Déterminer l'angle en inflexion pertinent (côté de la concavité)
+    let bendingAngle;
+    if (faceAngle > 0) {  // Convexité à droite
+        bendingAngle = leftAngle;  // Bending côté concave
+    } else {              // Convexité à gauche
+        bendingAngle = rightAngle; // Bending côté concave
+    }
+    
+    // Une courbe est structurelle si:
+    // 1. L'angle en inflexion concave reste ≥ 25°, OU
+    // 2. Pour les régions thoraciques, la cyphose locale est ≥ 20°
+    let isStructural = false; // Par défaut, non structurelle
+    
+    // Critère 1: Angle en inflexion ≥ 25°
+    if (Math.abs(bendingAngle) >= 25) {
+        isStructural = true;
+    }
+    
+    // Critère 2: Cyphose locale pour régions thoraciques
+    if (region === 'pt' && allMeasurements.profile.d2d5Cobb >= 20) {
+        isStructural = true;
+    }
+    if (region === 'mt' && allMeasurements.profile.d5d12Cobb >= 20) {
+        isStructural = true;
+    }
+    
+    // Pour la courbe principale (majeure), toujours structurelle
+    const mainCurve = findMainCurve();
+    if (region === mainCurve) {
+        isStructural = true;
+    }
+    
+    // Mettre à jour le tableau de résumé
+    const cell = document.getElementById(`summary-${region}-structural`);
+    if (cell) {
+        cell.textContent = isStructural ? "Structurelle" : "Non structurelle";
+        cell.style.color = isStructural ? "#f44336" : "#4CAF50";
+        cell.style.fontWeight = "bold";
+    }
+    
+    return isStructural;
+}
+
+// Fonction auxiliaire pour déterminer la courbe principale (plus grand angle)
+function findMainCurve() {
+    const ptAngle = Math.abs(allMeasurements.face.ptCobb);
+    const mtAngle = Math.abs(allMeasurements.face.mtCobb);
+    const tlAngle = Math.abs(allMeasurements.face.tlCobb);
+    
+    if (ptAngle > mtAngle && ptAngle > tlAngle) return 'pt';
+    if (mtAngle > ptAngle && mtAngle > tlAngle) return 'mt';
+    return 'tl';
+}
+
+ function updateSummaryPanelHTML() {
+    // Mise à jour du tableau principal pour ajouter la colonne structurelle
+    const mainTable = document.querySelector('#summary-panel .summary-table');
+    
+    // Vérifier si l'en-tête existe déjà
+    if (!document.getElementById('structural-header')) {
+        const headerRow = mainTable.querySelector('thead tr');
+        const structuralHeader = document.createElement('th');
+        structuralHeader.id = 'structural-header';
+        structuralHeader.textContent = 'Structurelle';
+        headerRow.appendChild(structuralHeader);
+        
+        // Ajouter des cellules vides pour la colonne structurelle
+        const rows = mainTable.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const region = row.cells[0].textContent.includes('Proximal') ? 'pt' : 
+                          (row.cells[0].textContent.includes('Principal') ? 'mt' : 'tl');
+            const cell = document.createElement('td');
+            cell.id = `summary-${region}-structural`;
+            row.appendChild(cell);
+        });
+    }
+    
+    // Ajouter un tableau pour les modificateurs s'il n'existe pas déjà
+    if (!document.getElementById('modifiers-table')) {
+        // Créer un titre de section pour les modificateurs
+        const modifiersHeader = document.createElement('h3');
+        modifiersHeader.textContent = 'Modificateurs de classification de Lenke';
+        modifiersHeader.style.marginTop = '20px';
+        
+        // Créer le tableau des modificateurs
+        const modifiersTable = document.createElement('table');
+        modifiersTable.className = 'summary-table';
+        modifiersTable.id = 'modifiers-table';
+        modifiersTable.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Type de modificateur</th>
+                    <th>Valeur</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Modificateur Lombaire</td>
+                    <td id="summary-lumbar-modifier">--</td>
+                </tr>
+                <tr>
+                    <td>Modificateur Thoracique Sagittal (D5-D12)</td>
+                    <td id="summary-thoracic-modifier">--</td>
+                </tr>
+            </tbody>
+        `;
+        
+        // Ajouter un tableau pour les résultats de cyphose
+        const cyphosisHeader = document.createElement('h3');
+        cyphosisHeader.textContent = 'Mesures de Cyphose (Vue de Profil)';
+        cyphosisHeader.style.marginTop = '20px';
+        
+        const cyphosisTable = document.createElement('table');
+        cyphosisTable.className = 'summary-table';
+        cyphosisTable.id = 'cyphosis-table';
+        cyphosisTable.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Région</th>
+                    <th>Angle de Cobb</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cyphose Thoracique Supérieure (D2-D5)</td>
+                    <td id="summary-d2d5">--</td>
+                </tr>
+                <tr>
+                    <td>Cyphose Thoraco-lombaire (D5-D12)</td>
+                    <td id="summary-d5d12">--</td>
+                </tr>
+                <tr>
+                    <td>Jonction Thoraco-lombaire (D10-L2)</td>
+                    <td id="summary-d10l2">--</td>
+                </tr>
+            </tbody>
+        `;
+        
+        // Insérer les éléments dans le bon ordre
+        mainTable.insertAdjacentElement('afterend', modifiersHeader);
+        modifiersHeader.insertAdjacentElement('afterend', modifiersTable);
+        modifiersTable.insertAdjacentElement('afterend', cyphosisHeader);
+        cyphosisHeader.insertAdjacentElement('afterend', cyphosisTable);
+    }
+}
+       
+        function calculateReduction(region, side) {
+            const faceAngle = allMeasurements.face[`${region}Cobb`];
+            const bendingAngle = allMeasurements[side][`${region}Cobb`];
+            
+            // Calculer la réduction absolue
+            const reduction = faceAngle - bendingAngle;
+            
+            // Calculer le pourcentage de réduction
+            const percentReduction = faceAngle > 0 ? (reduction / faceAngle * 100) : 0;
+            
+            // Afficher les résultats
+            const cell = document.getElementById(`summary-${region}-reduction-${side}`);
+            if (reduction > 0) {
+                cell.innerHTML = `<span class="reduction">${reduction.toFixed(1)}°</span> <span class="percent-reduction">(${percentReduction.toFixed(0)}%)</span>`;
+                cell.classList.add('reduction');
+            } else {
+                cell.textContent = `${reduction.toFixed(1)}°`;
+                cell.classList.remove('reduction');
+            }
+        }
+        
+    function saveSummaryReport() {
+    // Récupérer les données nécessaires
+    const d5d12Angle = allMeasurements.profile.d5d12Cobb;
+    
+    // Déterminer le modificateur thoracique
+    let thoracicModifier = "";
+    if (d5d12Angle < 10) {
+        thoracicModifier = "- (Hypo)";
+    } else if (d5d12Angle >= 10 && d5d12Angle <= 40) {
+        thoracicModifier = "N (Normal)";
+    } else {
+        thoracicModifier = "+ (Hyper)";
+    }
+    
+    // Déterminer le modificateur lombaire (s'il existe)
+    let lumbarModifier = "Non mesuré";
+    let lumbarModifierDescription = "";
+    if (allMeasurements[VIEWS.MODIFIERS.id] && 
+        allMeasurements[VIEWS.MODIFIERS.id].lumbarModifier) {
+        lumbarModifier = allMeasurements[VIEWS.MODIFIERS.id].lumbarModifier.type;
+        lumbarModifierDescription = allMeasurements[VIEWS.MODIFIERS.id].lumbarModifier.description;
+    }
+    
+    // Déterminer la structuralité de chaque courbure
+    const ptStructural = isStructural('pt');
+    const mtStructural = isStructural('mt');
+    const tlStructural = isStructural('tl');
+    
+    // Calculer les réductions pour chaque région
+    const ptReducLeft = allMeasurements.face.ptCobb - allMeasurements.left.ptCobb;
+    const ptReducRight = allMeasurements.face.ptCobb - allMeasurements.right.ptCobb;
+    const mtReducLeft = allMeasurements.face.mtCobb - allMeasurements.left.mtCobb;
+    const mtReducRight = allMeasurements.face.mtCobb - allMeasurements.right.mtCobb;
+    const tlReducLeft = allMeasurements.face.tlCobb - allMeasurements.left.tlCobb;
+    const tlReducRight = allMeasurements.face.tlCobb - allMeasurements.right.tlCobb;
+    
+    // Calculer les pourcentages de réduction
+    const ptPercentLeft = allMeasurements.face.ptCobb !== 0 ? Math.round((ptReducLeft / Math.abs(allMeasurements.face.ptCobb)) * 100) : 0;
+    const ptPercentRight = allMeasurements.face.ptCobb !== 0 ? Math.round((ptReducRight / Math.abs(allMeasurements.face.ptCobb)) * 100) : 0;
+    const mtPercentLeft = allMeasurements.face.mtCobb !== 0 ? Math.round((mtReducLeft / Math.abs(allMeasurements.face.mtCobb)) * 100) : 0;
+    const mtPercentRight = allMeasurements.face.mtCobb !== 0 ? Math.round((mtReducRight / Math.abs(allMeasurements.face.mtCobb)) * 100) : 0;
+    const tlPercentLeft = allMeasurements.face.tlCobb !== 0 ? Math.round((tlReducLeft / Math.abs(allMeasurements.face.tlCobb)) * 100) : 0;
+    const tlPercentRight = allMeasurements.face.tlCobb !== 0 ? Math.round((tlReducRight / Math.abs(allMeasurements.face.tlCobb)) * 100) : 0;
+    
+    // Déterminer les caractéristiques principales pour l'interprétation
+    let mainCurveRegion = "thoracique principale";
+    let mainCurveValue = allMeasurements.face.mtCobb;
+    let mainCurveReduction = mtPercentRight > mtPercentLeft ? `${mtPercentRight}% à droite` : `${mtPercentLeft}% à gauche`;
+    
+    if (Math.abs(allMeasurements.face.tlCobb) > Math.abs(allMeasurements.face.mtCobb) &&
+        Math.abs(allMeasurements.face.tlCobb) > Math.abs(allMeasurements.face.ptCobb)) {
+        mainCurveRegion = "thoraco-lombaire/lombaire";
+        mainCurveValue = allMeasurements.face.tlCobb;
+        mainCurveReduction = tlPercentRight > tlPercentLeft ? `${tlPercentRight}% à droite` : `${tlPercentLeft}% à gauche`;
+    } else if (Math.abs(allMeasurements.face.ptCobb) > Math.abs(allMeasurements.face.mtCobb) &&
+              Math.abs(allMeasurements.face.ptCobb) > Math.abs(allMeasurements.face.tlCobb)) {
+        mainCurveRegion = "proximale thoracique";
+        mainCurveValue = allMeasurements.face.ptCobb;
+        mainCurveReduction = ptPercentRight > ptPercentLeft ? `${ptPercentRight}% à droite` : `${ptPercentLeft}% à gauche`;
+    }
+    
+    // Déterminer le type Lenke (simplifié)
+    let lenkeType = "Non déterminé";
+    if (mtStructural && !ptStructural && !tlStructural) {
+        lenkeType = "1";
+    } else if (mtStructural && ptStructural && !tlStructural) {
+        lenkeType = "2";
+    } else if (mtStructural && !ptStructural && tlStructural) {
+        lenkeType = "3";
+    } else if (mtStructural && ptStructural && tlStructural) {
+        lenkeType = "4";
+    } else if (!mtStructural && !ptStructural && tlStructural) {
+        lenkeType = "5";
+    } else if (!mtStructural && ptStructural && tlStructural) {
+        lenkeType = "6";
+    }
+    
+    // Créer un rapport complet au format HTML
+    const reportHTML = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport d'analyse radiologique de scoliose</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 30px;
+            color: #333;
+        }
+        h1 {
+            color: #2e5984;
+            border-bottom: 2px solid #2e5984;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #2e5984;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #2e5984;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            font-size: 0.9em;
+            font-style: italic;
+            color: #666;
+        }
+        .structural-yes {
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .structural-no {
+            color: #5cb85c;
+            font-weight: bold;
+        }
+        .positive-reduction {
+            color: #5cb85c;
+        }
+        .negative-reduction {
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <h1>RAPPORT D'ANALYSE RADIOLOGIQUE DE SCOLIOSE</h1>
+    <p><strong>Date d'examen :</strong> ${new Date().toLocaleDateString()}<br>
+    <strong>Type d'examen :</strong> Radiographies multi-vues (Face, Bending G/D, Profil)<br>
+    <strong>Référence :</strong> Méthode de mesure des angles de Cobb</p>
+
+    <h2>INDICATION CLINIQUE</h2>
+    <p>Évaluation de scoliose avec mesure des angles de Cobb sur radiographies multi-vues pour planification thérapeutique et évaluation de la réductibilité.</p>
+
+    <h2>RÉSULTATS DE L'ANALYSE</h2>
+
+    <h3>Tableau de synthèse des mesures</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Région</th>
+                <th>Face</th>
+                <th>Bending G</th>
+                <th>Bending D</th>
+                <th>Réductibilité G</th>
+                <th>Réductibilité D</th>
+                <th>Structurelle</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Proximale Thoracique (PT)</strong></td>
+                <td>${allMeasurements.face.ptCobb.toFixed(1)}°</td>
+                <td>${allMeasurements.left.ptCobb.toFixed(1)}°</td>
+                <td>${allMeasurements.right.ptCobb.toFixed(1)}°</td>
+                <td class="${ptReducLeft > 0 ? 'positive-reduction' : 'negative-reduction'}">${ptReducLeft.toFixed(1)}° (${ptPercentLeft}%)</td>
+                <td class="${ptReducRight > 0 ? 'positive-reduction' : 'negative-reduction'}">${ptReducRight.toFixed(1)}° (${ptPercentRight}%)</td>
+                <td class="${ptStructural ? 'structural-yes' : 'structural-no'}">${ptStructural ? 'Oui' : 'Non'}</td>
+            </tr>
+            <tr>
+                <td><strong>Thoracique Principale (MT)</strong></td>
+                <td>${allMeasurements.face.mtCobb.toFixed(1)}°</td>
+                <td>${allMeasurements.left.mtCobb.toFixed(1)}°</td>
+                <td>${allMeasurements.right.mtCobb.toFixed(1)}°</td>
+                <td class="${mtReducLeft > 0 ? 'positive-reduction' : 'negative-reduction'}">${mtReducLeft.toFixed(1)}° (${mtPercentLeft}%)</td>
+                <td class="${mtReducRight > 0 ? 'positive-reduction' : 'negative-reduction'}">${mtReducRight.toFixed(1)}° (${mtPercentRight}%)</td>
+                <td class="${mtStructural ? 'structural-yes' : 'structural-no'}">${mtStructural ? 'Oui' : 'Non'}</td>
+            </tr>
+            <tr>
+                <td><strong>Thoraco-lombaire/Lombaire (TL/L)</strong></td>
+                <td>${allMeasurements.face.tlCobb.toFixed(1)}°</td>
+                <td>${allMeasurements.left.tlCobb.toFixed(1)}°</td>
+                <td>${allMeasurements.right.tlCobb.toFixed(1)}°</td>
+                <td class="${tlReducLeft > 0 ? 'positive-reduction' : 'negative-reduction'}">${tlReducLeft.toFixed(1)}° (${tlPercentLeft}%)</td>
+                <td class="${tlReducRight > 0 ? 'positive-reduction' : 'negative-reduction'}">${tlReducRight.toFixed(1)}° (${tlReducRight}%)</td>
+                <td class="${tlStructural ? 'structural-yes' : 'structural-no'}">${tlStructural ? 'Oui' : 'Non'}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Mesures sagittales (profil)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Région</th>
+                <th>Angle de Cobb</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Cyphose Thoracique Supérieure (D2-D5)</strong></td>
+                <td>${allMeasurements.profile.d2d5Cobb.toFixed(1)}°</td>
+            </tr>
+            <tr>
+                <td><strong>Cyphose Thoraco-lombaire (D5-D12)</strong></td>
+                <td>${allMeasurements.profile.d5d12Cobb.toFixed(1)}°</td>
+            </tr>
+            <tr>
+                <td><strong>Jonction Thoraco-lombaire (D10-L2)</strong></td>
+                <td>${allMeasurements.profile.d10l2Cobb.toFixed(1)}°</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Modificateurs de Lenke</h3>
+    <ul>
+        <li><strong>Modificateur Thoracique Sagittal :</strong> ${thoracicModifier}</li>
+        <li><strong>Modificateur Lombaire :</strong> Type ${lumbarModifier} (${lumbarModifierDescription})</li>
+    </ul>
+
+    <h2>INTERPRÉTATION</h2>
+    <p>L'analyse radiologique multi-vues met en évidence :</p>
+    <ol>
+        <li><strong>Courbure thoracique principale (MT) :</strong> Angle de Cobb à ${allMeasurements.face.mtCobb.toFixed(1)}° en position debout avec une ${mtStructural ? 'faible' : 'bonne'} réductibilité sur les clichés en bending (${mtPercentRight > mtPercentLeft ? mtPercentRight+'% à droite' : mtPercentLeft+'% à gauche'}). Cette courbure présente des caractéristiques ${mtStructural ? 'structurelles' : 'non structurelles'}.</li>
+        
+        <li><strong>Courbure thoraco-lombaire/lombaire (TL/L) :</strong> Angle de Cobb à ${allMeasurements.face.tlCobb.toFixed(1)}° en position debout avec une ${tlStructural ? 'faible' : 'bonne'} réductibilité sur les clichés en bending (${tlPercentRight > tlPercentLeft ? tlPercentRight+'% à droite' : tlPercentLeft+'% à gauche'}). Cette courbure est ${tlStructural ? 'structurelle' : 'non structurelle'}.</li>
+        
+        <li><strong>Courbure proximale thoracique (PT) :</strong> ${Math.abs(allMeasurements.face.ptCobb) < 15 ? 'Légère courbure' : 'Courbure significative'} de ${allMeasurements.face.ptCobb.toFixed(1)}° avec une ${ptStructural ? 'faible' : 'bonne'} réductibilité (${ptPercentRight > ptPercentLeft ? ptPercentRight+'% à droite' : ptPercentLeft+'% à gauche'}), indiquant une courbure ${ptStructural ? 'structurelle' : 'compensatoire non structurelle'}.</li>
+        
+        <li><strong>Profil sagittal :</strong> ${
+            d5d12Angle < 10 ? 'Hypocyphose thoracique' : 
+            (d5d12Angle > 40 ? 'Hypercyphose thoracique' : 'Cyphose thoracique normale')
+        } (D5-D12) à ${allMeasurements.profile.d5d12Cobb.toFixed(1)}°, concordante avec un modificateur thoracique sagittal de type "${thoracicModifier.split(' ')[0]}" (${
+            d5d12Angle < 10 ? 'hypocyphosant' : 
+            (d5d12Angle > 40 ? 'hypercyphosant' : 'normal')
+        }).</li>
+    </ol>
+
+    <h2>CONCLUSION</h2>
+    <p>Le tableau clinique radiologique est compatible avec une scoliose ${determineMainCurveDescription()} avec ${determineSecondaryCurveDescription()}, ${
+        d5d12Angle < 10 ? 'hypocyphose' : 
+        (d5d12Angle > 40 ? 'hypercyphose' : 'cyphose normale')
+    } thoracique associée.</p>
+    
+    <p>La classification selon Lenke suggère un type ${lenkeType} avec modificateur lombaire ${lumbarModifier} et thoracique sagittal ${thoracicModifier.split(' ')[0]}.</p>
+    
+    <p>${
+        mainCurveValue > 40 ? 'L\'importance de la courbure principale et ' : ''
+    }${
+        d5d12Angle < 10 || d5d12Angle > 40 ? 'L\'anomalie du profil sagittal est un ' : 'Les anomalies du profil sagittal sont des '
+    }élément${
+        d5d12Angle < 10 || d5d12Angle > 40 ? '' : 's'
+    } important${
+        d5d12Angle < 10 || d5d12Angle > 40 ? '' : 's'
+    } à considérer dans la planification thérapeutique.</p>
+
+    <div class="footer">
+        <p>Ce rapport a été généré automatiquement par le module d'analyse des angles de Cobb multi-vues. Les mesures et classifications sont fournies à titre informatif et doivent être interprétées dans le contexte clinique global du patient.</p>
+    </div>
+</body>
+</html>
+    `;
+    
+    // Créer un objet Blob avec le rapport HTML
+    const blob = new Blob([reportHTML], { type: 'text/html' });
+    
+    // Créer un lien pour le téléchargement
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Rapport_Scoliose_${new Date().toISOString().slice(0, 10)}.html`;
+    
+    // Simuler un clic pour déclencher le téléchargement
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showNotification("Rapport médical complet enregistré", 'success');
+    
+    // Fonctions auxiliaires pour l'analyse
+    function isStructural(region) {
+        // Une courbure est généralement considérée comme structurelle 
+        // si elle ne se réduit pas de plus de 25° ou de 50% sur les clichés en bending
+        const faceAngle = allMeasurements.face[`${region}Cobb`];
+        const leftAngle = allMeasurements.left[`${region}Cobb`];
+        const rightAngle = allMeasurements.right[`${region}Cobb`];
+        
+        // Pour une courbure gauche (convexe à droite), vérifiez le bending droit
+        // Pour une courbure droite (convexe à gauche), vérifiez le bending gauche
+        if (faceAngle < 0) {
+            // Courbure convexe à gauche
+            const reduction = faceAngle - rightAngle;
+            const percentReduction = (reduction / Math.abs(faceAngle)) * 100;
+            
+            if (Math.abs(reduction) > 25 || percentReduction > 50) {
+                return false;
+            }
+        } else {
+            // Courbure convexe à droite
+            const reduction = faceAngle - leftAngle;
+            const percentReduction = (reduction / Math.abs(faceAngle)) * 100;
+            
+            if (Math.abs(reduction) > 25 || percentReduction > 50) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    function determineMainCurveDescription() {
+        let description = "";
+        
+        if (Math.abs(allMeasurements.face.mtCobb) > Math.abs(allMeasurements.face.tlCobb) &&
+            Math.abs(allMeasurements.face.mtCobb) > Math.abs(allMeasurements.face.ptCobb)) {
+            // Courbure thoracique principale dominante
+            description = `thoracique ${allMeasurements.face.mtCobb > 0 ? 'droite' : 'gauche'} ${mtStructural ? 'structurelle' : 'non structurelle'} (${Math.abs(allMeasurements.face.mtCobb).toFixed(1)}°)`;
+        } else if (Math.abs(allMeasurements.face.tlCobb) > Math.abs(allMeasurements.face.mtCobb) &&
+                  Math.abs(allMeasurements.face.tlCobb) > Math.abs(allMeasurements.face.ptCobb)) {
+            // Courbure lombaire dominante
+            description = `lombaire ${allMeasurements.face.tlCobb > 0 ? 'droite' : 'gauche'} ${tlStructural ? 'structurelle' : 'non structurelle'} (${Math.abs(allMeasurements.face.tlCobb).toFixed(1)}°)`;
+        } else if (Math.abs(allMeasurements.face.ptCobb) > Math.abs(allMeasurements.face.mtCobb) &&
+                  Math.abs(allMeasurements.face.ptCobb) > Math.abs(allMeasurements.face.tlCobb)) {
+            // Courbure proximale thoracique dominante
+            description = `proximale thoracique ${allMeasurements.face.ptCobb > 0 ? 'droite' : 'gauche'} ${ptStructural ? 'structurelle' : 'non structurelle'} (${Math.abs(allMeasurements.face.ptCobb).toFixed(1)}°)`;
+        } else {
+            // Cas de courbures d'amplitude similaire (double courbure)
+            description = "double courbure d'amplitude similaire";
+        }
+        
+        return description;
+    }
+    
+    function determineSecondaryCurveDescription() {
+        let description = "";
+        
+        if (Math.abs(allMeasurements.face.mtCobb) > Math.abs(allMeasurements.face.tlCobb) &&
+            Math.abs(allMeasurements.face.mtCobb) > Math.abs(allMeasurements.face.ptCobb)) {
+            // Si thoracique principale dominante, regarder si lombaire ou PT est significative
+            if (Math.abs(allMeasurements.face.tlCobb) > 15) {
+                description = `contre-courbure lombaire ${allMeasurements.face.tlCobb > 0 ? 'droite' : 'gauche'} ${tlStructural ? 'structurelle' : 'non structurelle'} (${Math.abs(allMeasurements.face.tlCobb).toFixed(1)}°)`;
+            } else if (Math.abs(allMeasurements.face.ptCobb) > 15) {
+                description = `contre-courbure proximale thoracique ${allMeasurements.face.ptCobb > 0 ? 'droite' : 'gauche'} ${ptStructural ? 'structurelle' : 'non structurelle'} (${Math.abs(allMeasurements.face.ptCobb).toFixed(1)}°)`;
+            } else {
+                description = "courbures compensatoires minimes";
+            }
+        } else if (Math.abs(allMeasurements.face.tlCobb) > Math.abs(allMeasurements.face.mtCobb) &&
+                  Math.abs(allMeasurements.face.tlCobb) > Math.abs(allMeasurements.face.ptCobb)) {
+            // Si lombaire dominante, regarder si thoracique ou PT est significative
+            if (Math.abs(allMeasurements.face.mtCobb) > 15) {
+                description = `contre-courbure thoracique ${allMeasurements.face.mtCobb > 0 ? 'droite' : 'gauche'} ${mtStructural ? 'structurelle' : 'non structurelle'} (${Math.abs(allMeasurements.face.mtCobb).toFixed(1)}°)`;
+            } else if (Math.abs(allMeasurements.face.ptCobb) > 15) {
+                description = `contre-courbure proximale thoracique ${allMeasurements.face.ptCobb > 0 ? 'droite' : 'gauche'} ${ptStructural ? 'structurelle' : 'non structurelle'} (${Math.abs(allMeasurements.face.ptCobb).toFixed(1)}°)`;
+            } else {
+                description = "courbures compensatoires minimes";
+            }
+        } else if (Math.abs(allMeasurements.face.ptCobb) > Math.abs(allMeasurements.face.mtCobb) &&
+                  Math.abs(allMeasurements.face.ptCobb) > Math.abs(allMeasurements.face.tlCobb)) {
+            // Si PT dominante, regarder si thoracique ou lombaire est significative
+            if (Math.abs(allMeasurements.face.mtCobb) > 15) {
+                description = `contre-courbure thoracique ${allMeasurements.face.mtCobb > 0 ? 'droite' : 'gauche'} ${mtStructural ? 'structurelle' : 'non structurelle'} (${Math.abs(allMeasurements.face.mtCobb).toFixed(1)}°)`;
+            } else if (Math.abs(allMeasurements.face.tlCobb) > 15) {
+                description = `contre-courbure lombaire ${allMeasurements.face.tlCobb > 0 ? 'droite' : 'gauche'} ${tlStructural ? 'structurelle' : 'non structurelle'} (${Math.abs(allMeasurements.face.tlCobb).toFixed(1)}°)`;
+            } else {
+                description = "courbures compensatoires minimes";
+            }
+        } else {
+            description = "multiples courbures";
+        }
+        
+        return description;
+    }
+}
+        
+        function editMeasurements() {
+            // Retourner à la vue face pour permettre de modifier les mesures
+            currentView = VIEWS.FACE;
+            showUploadPanel();
+            updateViewLabels();
+            showNotification("Vous pouvez maintenant modifier les mesures", 'info');
+        }
+        
+function resetAllData() {
+    // Réinitialiser toutes les données
+    images = {
+        [VIEWS.FACE.id]: null,
+        [VIEWS.LEFT.id]: null,
+        [VIEWS.RIGHT.id]: null,
+        [VIEWS.PROFILE.id]: null,
+        [VIEWS.MODIFIERS.id]: null
+    };
+    
+    allPoints = {
+        [VIEWS.FACE.id]: [],
+        [VIEWS.LEFT.id]: [],
+        [VIEWS.RIGHT.id]: [],
+        [VIEWS.PROFILE.id]: [],
+        [VIEWS.MODIFIERS.id]: []
+    };
+    
+    allMeasurements = {
+        [VIEWS.FACE.id]: { ptCobb: null, mtCobb: null, tlCobb: null },
+        [VIEWS.LEFT.id]: { ptCobb: null, mtCobb: null, tlCobb: null },
+        [VIEWS.RIGHT.id]: { ptCobb: null, mtCobb: null, tlCobb: null },
+        [VIEWS.PROFILE.id]: { d2d5Cobb: null, d5d12Cobb: null, d10l2Cobb: null },
+        [VIEWS.MODIFIERS.id]: { /* sera défini plus tard */ }
+    };
+    
+    currentView = VIEWS.FACE;
+    currentPointIndex = 0;
+    
+    // Afficher le panneau d'upload
+    showUploadPanel();
+    updateViewLabels();
+    
+    showNotification("Toutes les données ont été réinitialisées", 'info');
+}
+        
+        function zoomCanvas(direction) {
+            // Facteur de zoom
+            const zoomFactor = 0.2;
+            
+            if (direction === 'in') {
+                canvasInteraction.scale *= (1 + zoomFactor);
+                // Limiter le zoom maximum
+                if (canvasInteraction.scale > 5) {
+                    canvasInteraction.scale = 5;
+                }
+            } else {
+                canvasInteraction.scale *= (1 - zoomFactor);
+                // Limiter le zoom minimum
+                if (canvasInteraction.scale < 0.3) {
+                    canvasInteraction.scale = 0.3;
+                }
+            }
+            
+            redrawCanvas();
+            showNotification(`Zoom: ${Math.round(canvasInteraction.scale * 100)}%`, 'info');
+        }
+        
+        function togglePanMode() {
+            if (activeMode === 'normal') {
+                activeMode = 'pan';
+                panModeBtn.textContent = 'Mode Marquage';
+                panModeBtn.style.backgroundColor = '#303f9f';
+                canvas.style.cursor = 'move';
+                showNotification("Mode déplacement activé", 'info');
+            } else {
+                activeMode = 'normal';
+                panModeBtn.textContent = 'Mode Déplacement';
+                panModeBtn.style.backgroundColor = '';
+                canvas.style.cursor = 'crosshair';
+                showNotification("Mode marquage activé", 'info');
+            }
+        }
+        
+        function resetView() {
+            canvasInteraction.scale = 1;
+            canvasInteraction.offsetX = 0;
+            canvasInteraction.offsetY = 0;
+            redrawCanvas();
+            showNotification("Vue réinitialisée", 'info');
+        }
+        
+       function showNotification(message, type = 'info') {
+    // Supprimer toute notification existante
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        document.body.removeChild(existingNotification);
+    }
+    
+    // Créer un nouvel élément de notification
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    
+    // Définir la couleur selon le type
+    if (type === 'success') {
+        notification.style.backgroundColor = 'var(--success-color)';
+    } else if (type === 'warning') {
+        notification.style.backgroundColor = 'var(--warning-color)';
+    } else if (type === 'error') {
+        notification.style.backgroundColor = 'var(--error-color)';
+    } else {
+        notification.style.backgroundColor = 'var(--primary-color)';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Afficher la notification
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Masquer la notification après 3 secondes
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        
+        // Supprimer l'élément après la transition
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+        
+        // Initialisation de l'application
+        updateViewLabels();
+// Fonction pour exporter les données vers le calculateur de scoliose Lenke
+function exportToScoliosisCalculator() {
+    // Vérifier que toutes les mesures nécessaires sont disponibles
+    if (!allMeasurements.face.ptCobb || !allMeasurements.face.mtCobb || !allMeasurements.face.tlCobb ||
+        !allMeasurements.left.ptCobb || !allMeasurements.left.mtCobb || !allMeasurements.left.tlCobb ||
+        !allMeasurements.right.ptCobb || !allMeasurements.right.mtCobb || !allMeasurements.right.tlCobb) {
+        showNotification("Les mesures de base ne sont pas toutes disponibles", 'warning');
+        return;
+    }
+    
+    // Récupérer les données des mesures
+    const ptCobb = allMeasurements.face.ptCobb.toFixed(1);
+    const mtCobb = allMeasurements.face.mtCobb.toFixed(1);
+    const tlCobb = allMeasurements.face.tlCobb.toFixed(1);
+    
+    // Récupérer les valeurs minimales des bendings (pour représenter la réductibilité maximale)
+    const ptBending = Math.min(allMeasurements.left.ptCobb, allMeasurements.right.ptCobb).toFixed(1);
+    const mtBending = Math.min(allMeasurements.left.mtCobb, allMeasurements.right.mtCobb).toFixed(1);
+    const tlBending = Math.min(allMeasurements.left.tlCobb, allMeasurements.right.tlCobb).toFixed(1);
+    
+    // Créer les paramètres d'URL
+    const params = new URLSearchParams();
+    params.append('ptCobb', ptCobb);
+    params.append('mtCobb', mtCobb);
+    params.append('tlCobb', tlCobb);
+    params.append('ptBending', ptBending);
+    params.append('mtBending', mtBending);
+    params.append('tlBending', tlBending);
+    
+    // Récupérer les mesures de cyphose ou utiliser des valeurs par défaut
+    if (allMeasurements.profile.d2d5Cobb) {
+        params.append('t2t5Kyphosis', allMeasurements.profile.d2d5Cobb.toFixed(1));
+    } else {
+        showNotification("Mesure de cyphose T2-T5 manquante, une valeur par défaut sera utilisée", 'info');
+        params.append('t2t5Kyphosis', '10'); // Valeur par défaut
+    }
+    
+    if (allMeasurements.profile.d5d12Cobb) {
+        params.append('t5t12Kyphosis', allMeasurements.profile.d5d12Cobb.toFixed(1));
+    } else {
+        showNotification("Mesure de cyphose T5-T12 manquante, une valeur par défaut sera utilisée", 'info');
+        params.append('t5t12Kyphosis', '20'); // Valeur par défaut normale
+    }
+    
+    if (allMeasurements.profile.d10l2Cobb) {
+        params.append('t10l2Kyphosis', allMeasurements.profile.d10l2Cobb.toFixed(1));
+    } else {
+        showNotification("Mesure de cyphose T10-L2 manquante, une valeur par défaut sera utilisée", 'info');
+        params.append('t10l2Kyphosis', '5'); // Valeur par défaut
+    }
+    
+    // Récupérer le modificateur lombaire (s'il existe)
+    let lumbarModifier = "";
+    if (allMeasurements[VIEWS.MODIFIERS.id] && 
+        allMeasurements[VIEWS.MODIFIERS.id].lumbarModifier) {
+        lumbarModifier = allMeasurements[VIEWS.MODIFIERS.id].lumbarModifier.type;
+        params.append('lumbarModifier', lumbarModifier);
+    } else {
+        showNotification("Modificateur lombaire non défini, vous devrez le sélectionner manuellement", 'warning');
+    }
+    
+    // Construire l'URL du calculateur avec les paramètres
+    const calculatorUrl = 'scoliosis-calculator.html?' + params.toString();
+    
+    // Ouvrir le calculateur dans un nouvel onglet
+    window.open(calculatorUrl, '_blank');
+    
+    showNotification("Données exportées vers le calculateur Lenke", 'success');
+}
+
+// Ajouter l'écouteur d'événement pour le bouton d'exportation
+document.getElementById('export-to-calculator-btn').addEventListener('click', exportToScoliosisCalculator);
+document.addEventListener('DOMContentLoaded', function() {
+    // S'assurer que le bouton d'exportation a bien son écouteur d'événements
+    const exportBtn = document.getElementById('export-to-calculator-btn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportToScoliosisCalculator);
+    }
+});
+
+    </script>
+</body>
+</html>

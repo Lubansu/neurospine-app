@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyseur de Troubles Hydroélectrolytiques et Gaz Sanguins</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.4;
+            margin: 0;
+            padding: 16px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 1.6rem;
+        }
+        
+        /* Language selector */
+        .language-selector {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+        .lang-select {
+            padding: 6px 10px;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        .lang-select:hover {
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 8px 16px;
+            background-color: #eee;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .input-section {
+            margin-bottom: 16px;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 0 4px 4px 4px;
+        }
+        .parameter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        .parameter-item {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result-section {
+            margin-top: 24px;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            display: none;
+        }
+        .result-section.visible {
+            display: block;
+        }
+        .diagnosis {
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 12px;
+        }
+        .normal-ranges {
+            font-size: 0.7rem;
+            color: #777;
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+        .etiology-list, .treatment-list {
+            padding-left: 16px;
+        }
+        .etiology-list li, .treatment-list li {
+            margin-bottom: 6px;
+        }
+        .flow-chart {
+            margin: 16px 0;
+            padding: 12px;
+            background-color: #eef7ee;
+            border-left: 4px solid #4CAF50;
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        #errorMessage {
+            color: #e74c3c;
+            margin: 8px 0;
+            font-weight: bold;
+        }
+        .reference-values {
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+        .reference-values table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 0.75rem;
+        }
+        .reference-values th, .reference-values td {
+            border: 1px solid #ddd;
+            padding: 4px 6px;
+            text-align: left;
+        }
+        .reference-values th {
+            background-color: #f2f2f2;
+        }
+        .hidden {
+            display: none;
+        }
+        .compact-table {
+            font-size: 0.7rem;
+        }
+        .compact-table td {
+            padding: 2px 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sélecteur de langue -->
+        <div class="language-selector">
+            <select id="lang-select" class="lang-select">
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="nl">Nederlands</option>
+            </select>
+        </div>
+        
+        <h1 id="app-title">Analyseur de Troubles Hydroélectrolytiques et Gaz Sanguins</h1>
+        
+        <div class="tab-container">
+            <button id="tabParameters" class="tab active" data-translate="parameters-tab">Analyse par Paramètres</button>
+            <button id="tabDisorder" class="tab" data-translate="disorder-tab">Analyse par Trouble</button>
+        </div>
+        
+        <div id="parameterInput" class="input-section">
+            <h2 data-translate="parameters-heading">Entrez les paramètres du patient</h2>
+            <div class="parameter-grid">
+                <div class="parameter-item">
+                    <label for="na" data-translate="sodium-label">Sodium (mEq/L):</label>
+                    <input type="number" id="na" step="0.1">
+                    <div class="normal-ranges" data-translate="sodium-range">Normal: 135-145 mEq/L</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="k" data-translate="potassium-label">Potassium (mEq/L):</label>
+                    <input type="number" id="k" step="0.1">
+                    <div class="normal-ranges" data-translate="potassium-range">Normal: 3.5-5.0 mEq/L</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="cl" data-translate="chloride-label">Chlore (mEq/L):</label>
+                    <input type="number" id="cl" step="0.1">
+                    <div class="normal-ranges" data-translate="chloride-range">Normal: 98-107 mEq/L</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="hco3" data-translate="bicarbonate-label">Bicarbonate (mEq/L):</label>
+                    <input type="number" id="hco3" step="0.1">
+                    <div class="normal-ranges" data-translate="bicarbonate-range">Normal: 22-29 mEq/L</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="ph" data-translate="ph-label">pH sanguin:</label>
+                    <input type="number" id="ph" step="0.01">
+                    <div class="normal-ranges" data-translate="ph-range">Normal: 7.35-7.45</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="paco2" data-translate="paco2-label">PaCO2 (mmHg):</label>
+                    <input type="number" id="paco2" step="0.1">
+                    <div class="normal-ranges" data-translate="paco2-range">Normal: 35-45 mmHg</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="ca" data-translate="calcium-label">Calcium total (mg/dL):</label>
+                    <input type="number" id="ca" step="0.1">
+                    <div class="normal-ranges" data-translate="calcium-range">Normal: 8.5-10.5 mg/dL</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="caIon" data-translate="calcium-ion-label">Calcium ionisé (mmol/L):</label>
+                    <input type="number" id="caIon" step="0.01">
+                    <div class="normal-ranges" data-translate="calcium-ion-range">Normal: 1.1-1.3 mmol/L</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="p" data-translate="phosphorus-label">Phosphore (mg/dL):</label>
+                    <input type="number" id="p" step="0.1">
+                    <div class="normal-ranges" data-translate="phosphorus-range">Normal: 2.5-4.5 mg/dL</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="mg" data-translate="magnesium-label">Magnésium (mEq/L):</label>
+                    <input type="number" id="mg" step="0.1">
+                    <div class="normal-ranges" data-translate="magnesium-range">Normal: 1.5-2.0 mEq/L</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="albumin" data-translate="albumin-label">Albumine (g/dL):</label>
+                    <input type="number" id="albumin" step="0.1">
+                    <div class="normal-ranges" data-translate="albumin-range">Normal: 3.5-5.0 g/dL</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="glucose" data-translate="glucose-label">Glucose (mg/dL):</label>
+                    <input type="number" id="glucose" step="1">
+                    <div class="normal-ranges" data-translate="glucose-range">Normal: 70-100 mg/dL</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="urea" data-translate="urea-label">Urée (mg/dL):</label>
+                    <input type="number" id="urea" step="1">
+                    <div class="normal-ranges" data-translate="urea-range">Normal: 15-45 mg/dL</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="urineNa" data-translate="urine-sodium-label">Sodium urinaire (mEq/L):</label>
+                    <input type="number" id="urineNa" step="1">
+                </div>
+                <div class="parameter-item">
+                    <label for="urineOsm" data-translate="urine-osm-label">Osmolarité urinaire (mOsm/kg):</label>
+                    <input type="number" id="urineOsm" step="1">
+                </div>
+                <div class="parameter-item">
+                    <label for="calcOsm" data-translate="calc-osm-label">Osmolarité calculée:</label>
+                    <div id="calcOsm">-</div>
+                    <div class="normal-ranges" data-translate="calc-osm-range">Normal: 275-295 mOsm/kg</div>
+                </div>
+                <div class="parameter-item">
+                    <label for="anionGap" data-translate="anion-gap-label">Trou anionique:</label>
+                    <div id="anionGap">-</div>
+                    <div class="normal-ranges" data-translate="anion-gap-range">Normal: 8-16 mEq/L</div>
+                </div>
+            </div>
+            
+            <div id="errorMessage" class="hidden"></div>
+            <button id="analyzeParameters" data-translate="analyze-btn">Analyser</button>
+        </div>
+        
+        <div id="disorderInput" class="input-section hidden">
+            <h2 data-translate="select-disorder-heading">Sélectionnez un trouble</h2>
+            <div class="parameter-item">
+                <label for="disorderSelect" data-translate="disorder-type-label">Type de trouble:</label>
+                <select id="disorderSelect">
+                    <option value="" data-translate="select-disorder-option">-- Sélectionnez un trouble --</option>
+                    <optgroup label="Troubles du sodium" data-translate="sodium-disorders-group">
+                        <option value="hyponatremia" data-translate="hyponatremia-option">Hyponatrémie (Na < 135 mEq/L)</option>
+                        <option value="hypernatremia" data-translate="hypernatremia-option">Hypernatrémie (Na > 145 mEq/L)</option>
+                    </optgroup>
+                    <optgroup label="Troubles du potassium" data-translate="potassium-disorders-group">
+                        <option value="hypokalemia" data-translate="hypokalemia-option">Hypokaliémie (K < 3.5 mEq/L)</option>
+                        <option value="hyperkalemia" data-translate="hyperkalemia-option">Hyperkaliémie (K > 5.0 mEq/L)</option>
+                    </optgroup>
+                    <optgroup label="Troubles du calcium" data-translate="calcium-disorders-group">
+                        <option value="hypocalcemia" data-translate="hypocalcemia-option">Hypocalcémie (Ca < 8.5 mg/dL)</option>
+                        <option value="hypercalcemia" data-translate="hypercalcemia-option">Hypercalcémie (Ca > 10.5 mg/dL)</option>
+                    </optgroup>
+                    <optgroup label="Troubles du phosphore" data-translate="phosphorus-disorders-group">
+                        <option value="hypophosphatemia" data-translate="hypophosphatemia-option">Hypophosphorémie (P < 2.5 mg/dL)</option>
+                        <option value="hyperphosphatemia" data-translate="hyperphosphatemia-option">Hyperphosphorémie (P > 4.5 mg/dL)</option>
+                    </optgroup>
+                    <optgroup label="Troubles du magnésium" data-translate="magnesium-disorders-group">
+                        <option value="hypomagnesemia" data-translate="hypomagnesemia-option">Hypomagnésémie (Mg < 1.5 mEq/L)</option>
+                        <option value="hypermagnesemia" data-translate="hypermagnesemia-option">Hypermagnésémie (Mg > 2.0 mEq/L)</option>
+                    </optgroup>
+                    <optgroup label="Troubles acido-basiques" data-translate="acid-base-disorders-group">
+                        <option value="metabolicAcidosis" data-translate="metabolic-acidosis-option">Acidose métabolique</option>
+                        <option value="metabolicAlkalosis" data-translate="metabolic-alkalosis-option">Alcalose métabolique</option>
+                        <option value="respiratoryAcidosis" data-translate="respiratory-acidosis-option">Acidose respiratoire</option>
+                        <option value="respiratoryAlkalosis" data-translate="respiratory-alkalosis-option">Alcalose respiratoire</option>
+                    </optgroup>
+                </select>
+            </div>
+            <button id="analyzeDisorder" data-translate="analyze-btn">Analyser</button>
+        </div>
+        
+        <div id="resultSection" class="result-section">
+            <h2 data-translate="analysis-results">Résultat de l'analyse</h2>
+            <div id="diagnosis" class="diagnosis"></div>
+            
+            <div id="flowChart" class="flow-chart"></div>
+            
+            <h3 data-translate="possible-etiologies">Étiologies possibles:</h3>
+            <ul id="etiologyList" class="etiology-list"></ul>
+            
+            <h3 data-translate="recommended-treatments">Traitements recommandés:</h3>
+            <ul id="treatmentList" class="treatment-list"></ul>
+        </div>
+
+        <div class="reference-values">
+            <h3 data-translate="reference-values">Valeurs de référence</h3>
+            <table class="compact-table">
+                <tr>
+                    <th data-translate="parameter">Paramètre</th>
+                    <th data-translate="normal-values">Valeurs normales</th>
+                    <th data-translate="parameter">Paramètre</th>
+                    <th data-translate="normal-values">Valeurs normales</th>
+                </tr>
+                <tr>
+                    <td data-translate="sodium">Sodium (Na)</td>
+                    <td>135-145 mEq/L</td>
+                    <td data-translate="calcium">Calcium total</td>
+                    <td>8.5-10.5 mg/dL</td>
+                </tr>
+                <tr>
+                    <td data-translate="potassium">Potassium (K)</td>
+                    <td>3.5-5.0 mEq/L</td>
+                    <td data-translate="calcium-ion">Calcium ionisé</td>
+                    <td>1.1-1.3 mmol/L</td>
+                </tr>
+                <tr>
+                    <td data-translate="chloride">Chlore (Cl)</td>
+                    <td>98-107 mEq/L</td>
+                    <td data-translate="phosphorus">Phosphore</td>
+                    <td>2.5-4.5 mg/dL</td>
+                </tr>
+                <tr>
+                    <td data-translate="bicarbonate">Bicarbonate (HCO3)</td>
+                    <td>22-29 mEq/L</td>
+                    <td data-translate="magnesium">Magnésium</td>
+                    <td>1.5-2.0 mEq/L</td>
+                </tr>
+                <tr>
+                    <td data-translate="ph">pH</td>
+                    <td>7.35-7.45</td>
+                    <td data-translate="anion-gap">Trou anionique</td>
+                    <td>8-16 mEq/L</td>
+                </tr>
+                <tr>
+                    <td data-translate="paco2">PaCO2</td>
+                    <td>35-45 mmHg</td>
+                    <td data-translate="osmolarity">Osmolarité</td>
+                    <td>275-295 mOsm/kg</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Définitions des traductions
+        const translations = {
+            // Français
+            fr: {
+                "app-title": "Analyseur de Troubles Hydroélectrolytiques et Gaz Sanguins",
+                "parameters-tab": "Analyse par Paramètres",
+                "disorder-tab": "Analyse par Trouble",
+                "parameters-heading": "Entrez les paramètres du patient",
+                "select-disorder-heading": "Sélectionnez un trouble",
+                "disorder-type-label": "Type de trouble:",
+                "select-disorder-option": "-- Sélectionnez un trouble --",
+                "sodium-disorders-group": "Troubles du sodium",
+                "hyponatremia-option": "Hyponatrémie (Na < 135 mEq/L)",
+                "hypernatremia-option": "Hypernatrémie (Na > 145 mEq/L)",
+                "potassium-disorders-group": "Troubles du potassium",
+                "hypokalemia-option": "Hypokaliémie (K < 3.5 mEq/L)",
+                "hyperkalemia-option": "Hyperkaliémie (K > 5.0 mEq/L)",
+                "calcium-disorders-group": "Troubles du calcium",
+                "hypocalcemia-option": "Hypocalcémie (Ca < 8.5 mg/dL)",
+                "hypercalcemia-option": "Hypercalcémie (Ca > 10.5 mg/dL)",
+                "phosphorus-disorders-group": "Troubles du phosphore",
+                "hypophosphatemia-option": "Hypophosphorémie (P < 2.5 mg/dL)",
+                "hyperphosphatemia-option": "Hyperphosphorémie (P > 4.5 mg/dL)",
+                "magnesium-disorders-group": "Troubles du magnésium",
+                "hypomagnesemia-option": "Hypomagnésémie (Mg < 1.5 mEq/L)",
+                "hypermagnesemia-option": "Hypermagnésémie (Mg > 2.0 mEq/L)",
+                "acid-base-disorders-group": "Troubles acido-basiques",
+                "metabolic-acidosis-option": "Acidose métabolique",
+                "metabolic-alkalosis-option": "Alcalose métabolique",
+                "respiratory-acidosis-option": "Acidose respiratoire",
+                "respiratory-alkalosis-option": "Alcalose respiratoire",
+                "analyze-btn": "Analyser",
+                "analysis-results": "Résultat de l'analyse",
+                "possible-etiologies": "Étiologies possibles:",
+                "recommended-treatments": "Traitements recommandés:",
+                "reference-values": "Valeurs de référence",
+                "parameter": "Paramètre",
+                "normal-values": "Valeurs normales",
+                "sodium": "Sodium (Na)",
+                "potassium": "Potassium (K)",
+                "chloride": "Chlore (Cl)",
+                "bicarbonate": "Bicarbonate (HCO3)",
+                "ph": "pH",
+                "paco2": "PaCO2",
+                "calcium": "Calcium total",
+                "calcium-ion": "Calcium ionisé",
+                "phosphorus": "Phosphore",
+                "magnesium": "Magnésium",
+                "anion-gap": "Trou anionique",
+                "osmolarity": "Osmolarité",
+                "error-message": "Veuillez entrer au moins quelques paramètres essentiels (Na, K, pH, PaCO2).",
+                "no-disorders": "Aucun trouble hydroélectrolytique ou acido-basique significatif identifié avec les paramètres fournis.",
+                "sodium-label": "Sodium (mEq/L):",
+                "potassium-label": "Potassium (mEq/L):",
+                "chloride-label": "Chlore (mEq/L):",
+                "bicarbonate-label": "Bicarbonate (mEq/L):",
+                "ph-label": "pH sanguin:",
+                "paco2-label": "PaCO2 (mmHg):",
+                "calcium-label": "Calcium total (mg/dL):",
+                "calcium-ion-label": "Calcium ionisé (mmol/L):",
+                "phosphorus-label": "Phosphore (mg/dL):",
+                "magnesium-label": "Magnésium (mEq/L):",
+                "albumin-label": "Albumine (g/dL):",
+                "glucose-label": "Glucose (mg/dL):",
+                "urea-label": "Urée (mg/dL):",
+                "urine-sodium-label": "Sodium urinaire (mEq/L):",
+                "urine-osm-label": "Osmolarité urinaire (mOsm/kg):",
+                "calc-osm-label": "Osmolarité calculée:",
+                "anion-gap-label": "Trou anionique:",
+                "sodium-range": "Normal: 135-145 mEq/L",
+                "potassium-range": "Normal: 3.5-5.0 mEq/L",
+                "chloride-range": "Normal: 98-107 mEq/L",
+                "bicarbonate-range": "Normal: 22-29 mEq/L",
+                "ph-range": "Normal: 7.35-7.45",
+                "paco2-range": "Normal: 35-45 mmHg",
+                "calcium-range": "Normal: 8.5-10.5 mg/dL",
+                "calcium-ion-range": "Normal: 1.1-1.3 mmol/L",
+                "phosphorus-range": "Normal: 2.5-4.5 mg/dL",
+                "magnesium-range": "Normal: 1.5-2.0 mEq/L",
+                "albumin-range": "Normal: 3.5-5.0 g/dL",
+                "glucose-range": "Normal: 70-100 mg/dL",
+                "urea-range": "Normal: 15-45 mg/dL",
+                "calc-osm-range": "Normal: 275-295 mOsm/kg",
+                "anion-gap-range": "Normal: 8-16 mEq/L"
+            },
+            
+            // English
+            en: {
+                "app-title": "Electrolyte Disorders and Blood Gas Analyzer",
+                "parameters-tab": "Analysis by Parameters",
+                "disorder-tab": "Analysis by Disorder",
+                "parameters-heading": "Enter patient parameters",
+                "select-disorder-heading": "Select a disorder",
+                "disorder-type-label": "Disorder type:",
+                "select-disorder-option": "-- Select a disorder --",
+                "sodium-disorders-group": "Sodium disorders",
+                "hyponatremia-option": "Hyponatremia (Na < 135 mEq/L)",
+                "hypernatremia-option": "Hypernatremia (Na > 145 mEq/L)",
+                "potassium-disorders-group": "Potassium disorders",
+                "hypokalemia-option": "Hypokalemia (K < 3.5 mEq/L)",
+                "hyperkalemia-option": "Hyperkalemia (K > 5.0 mEq/L)",
+                "calcium-disorders-group": "Calcium disorders",
+                "hypocalcemia-option": "Hypocalcemia (Ca < 8.5 mg/dL)",
+                "hypercalcemia-option": "Hypercalcemia (Ca > 10.5 mg/dL)",
+                "phosphorus-disorders-group": "Phosphorus disorders",
+                "hypophosphatemia-option": "Hypophosphatemia (P < 2.5 mg/dL)",
+                "hyperphosphatemia-option": "Hyperphosphatemia (P > 4.5 mg/dL)",
+                "magnesium-disorders-group": "Magnesium disorders",
+                "hypomagnesemia-option": "Hypomagnesemia (Mg < 1.5 mEq/L)",
+                "hypermagnesemia-option": "Hypermagnesemia (Mg > 2.0 mEq/L)",
+                "acid-base-disorders-group": "Acid-base disorders",
+                "metabolic-acidosis-option": "Metabolic acidosis",
+                "metabolic-alkalosis-option": "Metabolic alkalosis",
+                "respiratory-acidosis-option": "Respiratory acidosis",
+                "respiratory-alkalosis-option": "Respiratory alkalosis",
+                "analyze-btn": "Analyze",
+                "analysis-results": "Analysis Results",
+                "possible-etiologies": "Possible etiologies:",
+                "recommended-treatments": "Recommended treatments:",
+                "reference-values": "Reference Values",
+                "parameter": "Parameter",
+                "normal-values": "Normal values",
+                "sodium": "Sodium (Na)",
+                "potassium": "Potassium (K)",
+                "chloride": "Chloride (Cl)",
+                "bicarbonate": "Bicarbonate (HCO3)",
+                "ph": "pH",
+                "paco2": "PaCO2",
+                "calcium": "Total calcium",
+                "calcium-ion": "Ionized calcium",
+                "phosphorus": "Phosphorus",
+                "magnesium": "Magnesium",
+                "anion-gap": "Anion gap",
+                "osmolarity": "Osmolarity",
+                "error-message": "Please enter at least some essential parameters (Na, K, pH, PaCO2).",
+                "no-disorders": "No significant electrolyte or acid-base disorder identified with the provided parameters.",
+                "sodium-label": "Sodium (mEq/L):",
+                "potassium-label": "Potassium (mEq/L):",
+                "chloride-label": "Chloride (mEq/L):",
+                "bicarbonate-label": "Bicarbonate (mEq/L):",
+                "ph-label": "Blood pH:",
+                "paco2-label": "PaCO2 (mmHg):",
+                "calcium-label": "Total calcium (mg/dL):",
+                "calcium-ion-label": "Ionized calcium (mmol/L):",
+                "phosphorus-label": "Phosphorus (mg/dL):",
+                "magnesium-label": "Magnesium (mEq/L):",
+                "albumin-label": "Albumin (g/dL):",
+                "glucose-label": "Glucose (mg/dL):",
+                "urea-label": "Urea (mg/dL):",
+                "urine-sodium-label": "Urinary sodium (mEq/L):",
+                "urine-osm-label": "Urinary osmolarity (mOsm/kg):",
+                "calc-osm-label": "Calculated osmolarity:",
+                "anion-gap-label": "Anion gap:",
+                "sodium-range": "Normal: 135-145 mEq/L",
+                "potassium-range": "Normal: 3.5-5.0 mEq/L",
+                "chloride-range": "Normal: 98-107 mEq/L",
+                "bicarbonate-range": "Normal: 22-29 mEq/L",
+                "ph-range": "Normal: 7.35-7.45",
+                "paco2-range": "Normal: 35-45 mmHg",
+                "calcium-range": "Normal: 8.5-10.5 mg/dL",
+                "calcium-ion-range": "Normal: 1.1-1.3 mmol/L",
+                "phosphorus-range": "Normal: 2.5-4.5 mg/dL",
+                "magnesium-range": "Normal: 1.5-2.0 mEq/L",
+                "albumin-range": "Normal: 3.5-5.0 g/dL",
+                "glucose-range": "Normal: 70-100 mg/dL",
+                "urea-range": "Normal: 15-45 mg/dL",
+                "calc-osm-range": "Normal: 275-295 mOsm/kg",
+                "anion-gap-range": "Normal: 8-16 mEq/L"
+            },
+            
+            // Español
+            es: {
+                "app-title": "Analizador de Trastornos Hidroelectrolíticos y Gases Sanguíneos",
+                "parameters-tab": "Análisis por Parámetros",
+                "disorder-tab": "Análisis por Trastorno",
+                "parameters-heading": "Introduzca los parámetros del paciente",
+                "select-disorder-heading": "Seleccione un trastorno",
+                "disorder-type-label": "Tipo de trastorno:",
+                "select-disorder-option": "-- Seleccione un trastorno --",
+                "sodium-disorders-group": "Trastornos del sodio",
+                "hyponatremia-option": "Hiponatremia (Na < 135 mEq/L)",
+                "hypernatremia-option": "Hipernatremia (Na > 145 mEq/L)",
+                "potassium-disorders-group": "Trastornos del potasio",
+                "hypokalemia-option": "Hipopotasemia (K < 3.5 mEq/L)",
+                "hyperkalemia-option": "Hiperpotasemia (K > 5.0 mEq/L)",
+                "calcium-disorders-group": "Trastornos del calcio",
+                "hypocalcemia-option": "Hipocalcemia (Ca < 8.5 mg/dL)",
+                "hypercalcemia-option": "Hipercalcemia (Ca > 10.5 mg/dL)",
+                "phosphorus-disorders-group": "Trastornos del fósforo",
+                "hypophosphatemia-option": "Hipofosfatemia (P < 2.5 mg/dL)",
+                "hyperphosphatemia-option": "Hiperfosfatemia (P > 4.5 mg/dL)",
+                "magnesium-disorders-group": "Trastornos del magnesio",
+                "hypomagnesemia-option": "Hipomagnesemia (Mg < 1.5 mEq/L)",
+                "hypermagnesemia-option": "Hipermagnesemia (Mg > 2.0 mEq/L)",
+                "acid-base-disorders-group": "Trastornos ácido-base",
+                "metabolic-acidosis-option": "Acidosis metabólica",
+                "metabolic-alkalosis-option": "Alcalosis metabólica",
+                "respiratory-acidosis-option": "Acidosis respiratoria",
+                "respiratory-alkalosis-option": "Alcalosis respiratoria",
+                "analyze-btn": "Analizar",
+                "analysis-results": "Resultado del análisis",
+                "possible-etiologies": "Etiologías posibles:",
+                "recommended-treatments": "Tratamientos recomendados:",
+                "reference-values": "Valores de referencia",
+                "parameter": "Parámetro",
+                "normal-values": "Valores normales",
+                "sodium": "Sodio (Na)",
+                "potassium": "Potasio (K)",
+                "chloride": "Cloro (Cl)",
+                "bicarbonate": "Bicarbonato (HCO3)",
+                "ph": "pH",
+                "paco2": "PaCO2",
+                "calcium": "Calcio total",
+                "calcium-ion": "Calcio ionizado",
+                "phosphorus": "Fósforo",
+                "magnesium": "Magnesio",
+                "anion-gap": "Anión gap",
+                "osmolarity": "Osmolaridad",
+                "error-message": "Por favor, introduzca al menos algunos parámetros esenciales (Na, K, pH, PaCO2).",
+                "no-disorders": "No se ha identificado ningún trastorno hidroelectrolítico o ácido-base significativo con los parámetros proporcionados.",
+                "sodium-label": "Sodio (mEq/L):",
+                "potassium-label": "Potasio (mEq/L):",
+                "chloride-label": "Cloro (mEq/L):",
+                "bicarbonate-label": "Bicarbonato (mEq/L):",
+                "ph-label": "pH sanguíneo:",
+                "paco2-label": "PaCO2 (mmHg):",
+                "calcium-label": "Calcio total (mg/dL):",
+                "calcium-ion-label": "Calcio ionizado (mmol/L):",
+                "phosphorus-label": "Fósforo (mg/dL):",
+                "magnesium-label": "Magnesio (mEq/L):",
+                "albumin-label": "Albúmina (g/dL):",
+                "glucose-label": "Glucosa (mg/dL):",
+                "urea-label": "Urea (mg/dL):",
+                "urine-sodium-label": "Sodio urinario (mEq/L):",
+                "urine-osm-label": "Osmolaridad urinaria (mOsm/kg):",
+                "calc-osm-label": "Osmolaridad calculada:",
+                "anion-gap-label": "Anión gap:",
+                "sodium-range": "Normal: 135-145 mEq/L",
+                "potassium-range": "Normal: 3.5-5.0 mEq/L",
+                "chloride-range": "Normal: 98-107 mEq/L",
+                "bicarbonate-range": "Normal: 22-29 mEq/L",
+                "ph-range": "Normal: 7.35-7.45",
+                "paco2-range": "Normal: 35-45 mmHg",
+                "calcium-range": "Normal: 8.5-10.5 mg/dL",
+                "calcium-ion-range": "Normal: 1.1-1.3 mmol/L",
+                "phosphorus-range": "Normal: 2.5-4.5 mg/dL",
+                "magnesium-range": "Normal: 1.5-2.0 mEq/L",
+                "albumin-range": "Normal: 3.5-5.0 g/dL",
+                "glucose-range": "Normal: 70-100 mg/dL",
+                "urea-range": "Normal: 15-45 mg/dL",
+                "calc-osm-range": "Normal: 275-295 mOsm/kg",
+                "anion-gap-range": "Normal: 8-16 mEq/L"
+            },
+            
+            // Nederlands
+            nl: {
+                "app-title": "Analysator voor Elektrolytenstoornissen en Bloedgassen",
+                "parameters-tab": "Analyse op Parameters",
+                "disorder-tab": "Analyse op Stoornis",
+                "parameters-heading": "Voer patiëntparameters in",
+                "select-disorder-heading": "Selecteer een stoornis",
+                "disorder-type-label": "Type stoornis:",
+                "select-disorder-option": "-- Selecteer een stoornis --",
+                "sodium-disorders-group": "Natriumstoornissen",
+                "hyponatremia-option": "Hyponatriëmie (Na < 135 mEq/L)",
+                "hypernatremia-option": "Hypernatriëmie (Na > 145 mEq/L)",
+                "potassium-disorders-group": "Kaliumstoornissen",
+                "hypokalemia-option": "Hypokaliëmie (K < 3.5 mEq/L)",
+                "hyperkalemia-option": "Hyperkaliëmie (K > 5.0 mEq/L)",
+                "calcium-disorders-group": "Calciumstoornissen",
+                "hypocalcemia-option": "Hypocalciëmie (Ca < 8.5 mg/dL)",
+                "hypercalcemia-option": "Hypercalciëmie (Ca > 10.5 mg/dL)",
+                "phosphorus-disorders-group": "Fosforstoornissen",
+                "hypophosphatemia-option": "Hypofosfatemie (P < 2.5 mg/dL)",
+                "hyperphosphatemia-option": "Hyperfosfatemie (P > 4.5 mg/dL)",
+                "magnesium-disorders-group": "Magnesiumstoornissen",
+                "hypomagnesemia-option": "Hypomagnesiëmie (Mg < 1.5 mEq/L)",
+                "hypermagnesemia-option": "Hypermagnesiëmie (Mg > 2.0 mEq/L)",
+                "acid-base-disorders-group": "Zuur-base stoornissen",
+                "metabolic-acidosis-option": "Metabole acidose",
+                "metabolic-alkalosis-option": "Metabole alkalose",
+                "respiratory-acidosis-option": "Respiratoire acidose",
+                "respiratory-alkalosis-option": "Respiratoire alkalose",
+                "analyze-btn": "Analyseren",
+                "analysis-results": "Analyseresultaat",
+                "possible-etiologies": "Mogelijke oorzaken:",
+                "recommended-treatments": "Aanbevolen behandelingen:",
+                "reference-values": "Referentiewaarden",
+                "parameter": "Parameter",
+                "normal-values": "Normale waarden",
+                "sodium": "Natrium (Na)",
+                "potassium": "Kalium (K)",
+                "chloride": "Chloride (Cl)",
+                "bicarbonate": "Bicarbonaat (HCO3)",
+                "ph": "pH",
+                "paco2": "PaCO2",
+                "calcium": "Totaal calcium",
+                "calcium-ion": "Geïoniseerd calcium",
+                "phosphorus": "Fosfor",
+                "magnesium": "Magnesium",
+                "anion-gap": "Anion gap",
+                "osmolarity": "Osmolariteit",
+                "error-message": "Voer ten minste enkele essentiële parameters in (Na, K, pH, PaCO2).",
+                "no-disorders": "Geen significante elektrolyt- of zuur-base stoornis geïdentificeerd met de opgegeven parameters.",
+                "sodium-label": "Natrium (mEq/L):",
+                "potassium-label": "Kalium (mEq/L):",
+                "chloride-label": "Chloride (mEq/L):",
+                "bicarbonate-label": "Bicarbonaat (mEq/L):",
+                "ph-label": "Bloed pH:",
+                "paco2-label": "PaCO2 (mmHg):",
+                "calcium-label": "Totaal calcium (mg/dL):",
+                "calcium-ion-label": "Geïoniseerd calcium (mmol/L):",
+                "phosphorus-label": "Fosfor (mg/dL):",
+                "magnesium-label": "Magnesium (mEq/L):",
+                "albumin-label": "Albumine (g/dL):",
+                "glucose-label": "Glucose (mg/dL):",
+                "urea-label": "Ureum (mg/dL):",
+                "urine-sodium-label": "Urine natrium (mEq/L):",
+                "urine-osm-label": "Urine osmolariteit (mOsm/kg):",
+                "calc-osm-label": "Berekende osmolariteit:",
+                "anion-gap-label": "Anion gap:",
+                "sodium-range": "Normaal: 135-145 mEq/L",
+                "potassium-range": "Normaal: 3.5-5.0 mEq/L",
+                "chloride-range": "Normaal: 98-107 mEq/L",
+                "bicarbonate-range": "Normaal: 22-29 mEq/L",
+                "ph-range": "Normaal: 7.35-7.45",
+                "paco2-range": "Normaal: 35-45 mmHg",
+                "calcium-range": "Normaal: 8.5-10.5 mg/dL",
+                "calcium-ion-range": "Normaal: 1.1-1.3 mmol/L",
+                "phosphorus-range": "Normaal: 2.5-4.5 mg/dL",
+                "magnesium-range": "Normaal: 1.5-2.0 mEq/L",
+                "albumin-range": "Normaal: 3.5-5.0 g/dL",
+                "glucose-range": "Normaal: 70-100 mg/dL",
+                "urea-range": "Normaal: 15-45 mg/dL",
+                "calc-osm-range": "Normaal: 275-295 mOsm/kg",
+                "anion-gap-range": "Normaal: 8-16 mEq/L"
+            }
+        };
+
+        // Données des troubles
+        const disorderData = {
+            // Troubles du sodium
+            hyponatremia: {
+                name: {
+                    fr: "Hyponatrémie",
+                    en: "Hyponatremia",
+                    es: "Hiponatremia",
+                    nl: "Hyponatriëmie"
+                },
+                description: {
+                    fr: "Sodium sérique inférieur à 135 mEq/L",
+                    en: "Serum sodium below 135 mEq/L",
+                    es: "Sodio sérico inferior a 135 mEq/L",
+                    nl: "Serum natrium lager dan 135 mEq/L"
+                },
+                flowChart: {
+                    fr: `
+Hyponatrémie (Na < 135 mEq/L)
+├── Évaluer l'osmolarité
+│   ├── Hypoosmolaire (<275 mOsm/kg) - Hyponatrémie vraie
+│   │   └── Évaluer le contenu total en eau et NaCl
+│   │       ├── Diminué: Déficit en eau
+│   │       │   ├── Pertes rénales (Na urinaire > 30 mEq/L)
+│   │       │   └── Pertes extra-rénales (Na urinaire < 15 mEq/L)
+│   │       ├── Normal: Syndrome inapproprié d'hormone antidiurétique (SIADH)
+│   │       └── Augmenté: Insuffisance cardiaque, cirrhose, syndrome néphrotique
+│   ├── Osmolarité normale - Pseudo-hyponatrémie
+│   └── Hyperosmolaire (>295 mOsm/kg) - Présence d'autres osmoles
+└── Vérifier Na urinaire et osmolarité urinaire`,
+                    en: `
+Hyponatremia (Na < 135 mEq/L)
+├── Evaluate osmolarity
+│   ├── Hypo-osmolar (<275 mOsm/kg) - True hyponatremia
+│   │   └── Evaluate total water and NaCl content
+│   │       ├── Decreased: Water deficit
+│   │       │   ├── Renal losses (Urinary Na > 30 mEq/L)
+│   │       │   └── Extra-renal losses (Urinary Na < 15 mEq/L)
+│   │       ├── Normal: Syndrome of inappropriate antidiuretic hormone secretion (SIADH)
+│   │       └── Increased: Heart failure, cirrhosis, nephrotic syndrome
+│   ├── Normal osmolarity - Pseudo-hyponatremia
+│   └── Hyperosmolar (>295 mOsm/kg) - Presence of other osmoles
+└── Check urinary Na and urinary osmolarity`,
+                    es: `
+Hiponatremia (Na < 135 mEq/L)
+├── Evaluar osmolaridad
+│   ├── Hipoosmolar (<275 mOsm/kg) - Hiponatremia verdadera
+│   │   └── Evaluar contenido total de agua y NaCl
+│   │       ├── Disminuido: Déficit de agua
+│   │       │   ├── Pérdidas renales (Na urinario > 30 mEq/L)
+│   │       │   └── Pérdidas extrarrenales (Na urinario < 15 mEq/L)
+│   │       ├── Normal: Síndrome de secreción inadecuada de hormona antidiurética (SIADH)
+│   │       └── Aumentado: Insuficiencia cardíaca, cirrosis, síndrome nefrótico
+│   ├── Osmolaridad normal - Pseudohiponatremia
+│   └── Hiperosmolar (>295 mOsm/kg) - Presencia de otros osmoles
+└── Verificar Na urinario y osmolaridad urinaria`,
+                    nl: `
+Hyponatriëmie (Na < 135 mEq/L)
+├── Beoordeel osmolariteit
+│   ├── Hypo-osmolair (<275 mOsm/kg) - Echte hyponatriëmie
+│   │   └── Beoordeel totale water- en NaCl-inhoud
+│   │       ├── Verlaagd: Watertekort
+│   │       │   ├── Renale verliezen (Urine Na > 30 mEq/L)
+│   │       │   └── Extra-renale verliezen (Urine Na < 15 mEq/L)
+│   │       ├── Normaal: Syndroom van inadequate secretie van antidiuretisch hormoon (SIADH)
+│   │       └── Verhoogd: Hartfalen, cirrose, nefrotisch syndroom
+│   ├── Normale osmolariteit - Pseudo-hyponatriëmie
+│   └── Hyperosmolaire (>295 mOsm/kg) - Aanwezigheid van andere osmolen
+└── Controleer urine Na en urine osmolariteit`
+                },
+                etiologies: {
+                    fr: [
+                        "Déficit en eau (pertes rénales: diurétiques, insuffisance surrénalienne; pertes extra-rénales: digestives, cutanées)",
+                        "Eau totale augmentée avec œdèmes/ascite (insuffisance cardiaque, cirrhose, syndrome néphrotique, insuffisance rénale)",
+                        "Eau totale normale ou légèrement augmentée (SIADH, polydipsie psychogénique, hypothyroïdie)",
+                        "Pseudo-hyponatrémie (hyperlipémie, hyperprotéinémie)",
+                        "Présence d'autres osmoles (hyperglycémie, mannitol, glycols)"
+                    ],
+                    en: [
+                        "Water deficit (renal losses: diuretics, adrenal insufficiency; extra-renal losses: digestive, cutaneous)",
+                        "Increased total water with edema/ascites (heart failure, cirrhosis, nephrotic syndrome, renal failure)",
+                        "Normal or slightly increased total water (SIADH, psychogenic polydipsia, hypothyroidism)",
+                        "Pseudo-hyponatremia (hyperlipemia, hyperproteinemia)",
+                        "Presence of other osmoles (hyperglycemia, mannitol, glycols)"
+                    ],
+                    es: [
+                        "Déficit de agua (pérdidas renales: diuréticos, insuficiencia suprarrenal; pérdidas extrarrenales: digestivas, cutáneas)",
+                        "Agua total aumentada con edema/ascitis (insuficiencia cardíaca, cirrosis, síndrome nefrótico, insuficiencia renal)",
+                        "Agua total normal o ligeramente aumentada (SIADH, polidipsia psicogénica, hipotiroidismo)",
+                        "Pseudohiponatremia (hiperlipemia, hiperproteinemia)",
+                        "Presencia de otros osmoles (hiperglucemia, manitol, glicoles)"
+                    ],
+                    nl: [
+                        "Watertekort (renale verliezen: diuretica, bijnierschorsinsufficiëntie; extra-renale verliezen: spijsvertering, huid)",
+                        "Verhoogd totaal water met oedeem/ascites (hartfalen, cirrose, nefrotisch syndroom, nierfalen)",
+                        "Normaal of licht verhoogd totaal water (SIADH, psychogene polydipsie, hypothyroïdie)",
+                        "Pseudo-hyponatriëmie (hyperlipidemie, hyperproteïnemie)",
+                        "Aanwezigheid van andere osmolen (hyperglykemie, mannitol, glycolen)"
+                    ]
+                },
+                treatments: {
+                    fr: [
+                        "Traiter la cause sous-jacente",
+                        "Déficit en eau: Perfusions salées",
+                        "Eau totale augmentée: Restriction hydrique, diurétiques",
+                        "SIADH: Restriction hydrique, apports en sel augmentés, diurétiques, urée, inhibiteurs des récepteurs de la vasopressine",
+                        "Hyponatrémie sévère: Correction progressive (risque de démyélinisation osmotique)"
+                    ],
+                    en: [
+                        "Treat the underlying cause",
+                        "Water deficit: Saline infusions",
+                        "Increased total water: Fluid restriction, diuretics",
+                        "SIADH: Fluid restriction, increased salt intake, diuretics, urea, vasopressin receptor inhibitors",
+                        "Severe hyponatremia: Gradual correction (risk of osmotic demyelination)"
+                    ],
+                    es: [
+                        "Tratar la causa subyacente",
+                        "Déficit de agua: Infusiones salinas",
+                        "Agua total aumentada: Restricción de líquidos, diuréticos",
+                        "SIADH: Restricción de líquidos, aumento de la ingesta de sal, diuréticos, urea, inhibidores de los receptores de vasopresina",
+                        "Hiponatremia grave: Corrección gradual (riesgo de desmielinización osmótica)"
+                    ],
+                    nl: [
+                        "Behandel de onderliggende oorzaak",
+                        "Watertekort: Zoutinfusies",
+                        "Verhoogd totaal water: Vochtbeperking, diuretica",
+                        "SIADH: Vochtbeperking, verhoogde zoutinname, diuretica, ureum, vasopressine-receptorantagonisten",
+                        "Ernstige hyponatriëmie: Geleidelijke correctie (risico op osmotische demyelinisatie)"
+                    ]
+                }
+            },
+            
+            // Ajouter d'autres troubles de la même façon...
+            hypernatremia: {
+                name: {
+                    fr: "Hypernatrémie",
+                    en: "Hypernatremia",
+                    es: "Hipernatremia",
+                    nl: "Hypernatriëmie"
+                },
+                description: {
+                    fr: "Sodium sérique supérieur à 145 mEq/L",
+                    en: "Serum sodium above 145 mEq/L",
+                    es: "Sodio sérico superior a 145 mEq/L",
+                    nl: "Serum natrium hoger dan 145 mEq/L"
+                },
+                flowChart: {
+                    fr: `
+Hypernatrémie (Na > 145 mEq/L)
+├── Évaluer l'osmolarité urinaire
+│   ├── >600 mOsm/kg: Manque d'apports en eau, pertes extrarénales
+│   ├── 300-600 mOsm/kg: Diurèse osmotique, récupération d'insuffisance rénale
+│   └── <300 mOsm/kg: Diabète insipide
+└── Causes possibles
+    ├── Pertes excessives d'eau (insuffisamment compensées)
+    │   ├── Pertes non urinaires (diarrhées, sudation)
+    │   └── Pertes urinaires (diurèse osmotique, diabète insipide)
+    └── Apports excessifs en Na (rare)`,
+                    en: `
+Hypernatremia (Na > 145 mEq/L)
+├── Evaluate urinary osmolarity
+│   ├── >600 mOsm/kg: Lack of water intake, extrarenal losses
+│   ├── 300-600 mOsm/kg: Osmotic diuresis, recovery from renal failure
+│   └── <300 mOsm/kg: Diabetes insipidus
+└── Possible causes
+    ├── Excessive water losses (insufficiently compensated)
+    │   ├── Non-urinary losses (diarrhea, sweating)
+    │   └── Urinary losses (osmotic diuresis, diabetes insipidus)
+    └── Excessive Na intake (rare)`,
+                    es: `
+Hipernatremia (Na > 145 mEq/L)
+├── Evaluar osmolaridad urinaria
+│   ├── >600 mOsm/kg: Falta de ingesta de agua, pérdidas extrarrenales
+│   ├── 300-600 mOsm/kg: Diuresis osmótica, recuperación de insuficiencia renal
+│   └── <300 mOsm/kg: Diabetes insípida
+└── Causas posibles
+    ├── Pérdidas excesivas de agua (insuficientemente compensadas)
+    │   ├── Pérdidas no urinarias (diarrea, sudoración)
+    │   └── Pérdidas urinarias (diuresis osmótica, diabetes insípida)
+    └── Ingesta excesiva de Na (raro)`,
+                    nl: `
+Hypernatriëmie (Na > 145 mEq/L)
+├── Beoordeel urine-osmolariteit
+│   ├── >600 mOsm/kg: Gebrek aan waterinname, extrarenale verliezen
+│   ├── 300-600 mOsm/kg: Osmotische diurese, herstel van nierfalen
+│   └── <300 mOsm/kg: Diabetes insipidus
+└── Mogelijke oorzaken
+    ├── Overmatig waterverlies (onvoldoende gecompenseerd)
+    │   ├── Niet-urinaire verliezen (diarree, zweten)
+    │   └── Urinaire verliezen (osmotische diurese, diabetes insipidus)
+    └── Overmatige Na-inname (zeldzaam)`
+                },
+                etiologies: {
+                    fr: [
+                        "Pertes excessives d'eau (insuffisamment compensées)",
+                        "Pertes non urinaires: diarrhées, vomissements, sudations",
+                        "Pertes urinaires: diurèse osmotique (hyperglycémie, mannitol), diabète insipide",
+                        "Apports excessifs en sodium (rare, souvent iatrogène)",
+                        "Altération de l'état de conscience empêchant le patient d'assouvir sa soif",
+                        "Lésion hypothalamique altérant la sensation de soif (rare)"
+                    ],
+                    en: [
+                        "Excessive water losses (insufficiently compensated)",
+                        "Non-urinary losses: diarrhea, vomiting, sweating",
+                        "Urinary losses: osmotic diuresis (hyperglycemia, mannitol), diabetes insipidus",
+                        "Excessive sodium intake (rare, often iatrogenic)",
+                        "Altered consciousness preventing the patient from quenching thirst",
+                        "Hypothalamic lesion altering the sensation of thirst (rare)"
+                    ],
+                    es: [
+                        "Pérdidas excesivas de agua (insuficientemente compensadas)",
+                        "Pérdidas no urinarias: diarrea, vómitos, sudoración",
+                        "Pérdidas urinarias: diuresis osmótica (hiperglucemia, manitol), diabetes insípida",
+                        "Ingesta excesiva de sodio (raro, a menudo iatrogénica)",
+                        "Alteración del estado de conciencia que impide al paciente saciar su sed",
+                        "Lesión hipotalámica que altera la sensación de sed (raro)"
+                    ],
+                    nl: [
+                        "Overmatig waterverlies (onvoldoende gecompenseerd)",
+                        "Niet-urinaire verliezen: diarree, braken, zweten",
+                        "Urinaire verliezen: osmotische diurese (hyperglykemie, mannitol), diabetes insipidus",
+                        "Overmatige natriuminname (zeldzaam, vaak iatrogeen)",
+                        "Veranderd bewustzijn dat verhindert dat de patiënt zijn dorst lest",
+                        "Hypothalamische laesie die het dorstgevoel verandert (zeldzaam)"
+                    ]
+                },
+                treatments: {
+                    fr: [
+                        "Administration de plus d'eau que de sel (perfusions hypotoniques)",
+                        "Glucosé en eau ou en NaCl 0,45% si état hémodynamique stable",
+                        "Administration d'eau par sonde gastrique",
+                        "NaCl 0,9% initialement si hypovolémie sévère ou hyperglycémie",
+                        "Correction progressive pour éviter l'œdème cérébral",
+                        "Desmopressine en cas de diabète insipide"
+                    ],
+                    en: [
+                        "Administration of more water than salt (hypotonic infusions)",
+                        "Dextrose in water or in 0.45% NaCl if hemodynamically stable",
+                        "Water administration by gastric tube",
+                        "0.9% NaCl initially if severe hypovolemia or hyperglycemia",
+                        "Gradual correction to avoid cerebral edema",
+                        "Desmopressin in case of diabetes insipidus"
+                    ],
+                    es: [
+                        "Administración de más agua que sal (infusiones hipotónicas)",
+                        "Glucosado en agua o en NaCl 0,45% si estado hemodinámico estable",
+                        "Administración de agua por sonda gástrica",
+                        "NaCl 0,9% inicialmente si hipovolemia severa o hiperglucemia",
+                        "Corrección progresiva para evitar el edema cerebral",
+                        "Desmopresina en caso de diabetes insípida"
+                    ],
+                    nl: [
+                        "Toediening van meer water dan zout (hypotone infusies)",
+                        "Glucose in water of in 0,45% NaCl als hemodynamisch stabiel",
+                        "Watertoediening via maagsonde",
+                        "0,9% NaCl aanvankelijk bij ernstige hypovolemie of hyperglykemie",
+                        "Geleidelijke correctie om hersenoedeem te voorkomen",
+                        "Desmopressine bij diabetes insipidus"
+                    ]
+                }
+            },
+            
+            // Troubles du potassium
+            hypokalemia: {
+                name: {
+                    fr: "Hypokaliémie",
+                    en: "Hypokalemia",
+                    es: "Hipopotasemia",
+                    nl: "Hypokaliëmie"
+                },
+                description: {
+                    fr: "Potassium sérique inférieur à 3.5 mEq/L",
+                    en: "Serum potassium below 3.5 mEq/L",
+                    es: "Potasio sérico inferior a 3.5 mEq/L",
+                    nl: "Serum kalium lager dan 3.5 mEq/L"
+                },
+                flowChart: {
+                    fr: `
+Hypokaliémie (K < 3.5 mEq/L)
+├── Évaluer les mécanismes possibles
+│   ├── Manque d'apports
+│   ├── Changements de distribution extra/intracellulaire
+│   │   └── Alcalose, insuline, agents β-adrénergiques
+│   └── Pertes accrues de K+
+│       ├── Urinaires: diurétiques, alcalose, hypomagnésémie
+│       └── Digestives: diarrhée, vomissements
+└── Vérifier K+ urinaire et présence d'autres troubles électrolytiques`,
+                    en: `
+Hypokalemia (K < 3.5 mEq/L)
+├── Evaluate possible mechanisms
+│   ├── Lack of intake
+│   ├── Changes in extra/intracellular distribution
+│   │   └── Alkalosis, insulin, β-adrenergic agents
+│   └── Increased K+ losses
+│       ├── Urinary: diuretics, alkalosis, hypomagnesemia
+│       └── Digestive: diarrhea, vomiting
+└── Check urinary K+ and presence of other electrolyte disorders`,
+                    es: `
+Hipopotasemia (K < 3.5 mEq/L)
+├── Evaluar mecanismos posibles
+│   ├── Falta de ingesta
+│   ├── Cambios en la distribución extra/intracelular
+│   │   └── Alcalosis, insulina, agentes β-adrenérgicos
+│   └── Pérdidas aumentadas de K+
+│       ├── Urinarias: diuréticos, alcalosis, hipomagnesemia
+│       └── Digestivas: diarrea, vómitos
+└── Verificar K+ urinario y presencia de otros trastornos electrolíticos`,
+                    nl: `
+Hypokaliëmie (K < 3.5 mEq/L)
+├── Beoordeel mogelijke mechanismen
+│   ├── Gebrek aan inname
+│   ├── Veranderingen in extra/intracellulaire verdeling
+│   │   └── Alkalose, insuline, β-adrenerge middelen
+│   └── Verhoogde K+ verliezen
+│       ├── Urinair: diuretica, alkalose, hypomagnesiëmie
+│       └── Spijsvertering: diarree, braken
+└── Controleer urine K+ en aanwezigheid van andere elektrolytstoornissen`
+                },
+                etiologies: {
+                    fr: [
+                        "Manque d'apports (perfusions sans suppléments potassiques)",
+                        "Changements de distribution (alcalose, traitement de l'hyperglycémie, agents β-adrénergiques)",
+                        "Pertes urinaires (diurétiques, alcalose, diurèse osmotique, hypomagnésémie, corticoïdes)",
+                        "Pertes digestives (diarrhée, vomissements, obstruction intestinale)",
+                        "Hypomagnésémie associée (peut rendre impossible la correction de l'hypokaliémie)"
+                    ],
+                    en: [
+                        "Lack of intake (infusions without potassium supplements)",
+                        "Distribution changes (alkalosis, treatment of hyperglycemia, β-adrenergic agents)",
+                        "Urinary losses (diuretics, alkalosis, osmotic diuresis, hypomagnesemia, corticosteroids)",
+                        "Digestive losses (diarrhea, vomiting, intestinal obstruction)",
+                        "Associated hypomagnesemia (may make hypokalemia correction impossible)"
+                    ],
+                    es: [
+                        "Falta de ingesta (infusiones sin suplementos de potasio)",
+                        "Cambios de distribución (alcalosis, tratamiento de la hiperglucemia, agentes β-adrenérgicos)",
+                        "Pérdidas urinarias (diuréticos, alcalosis, diuresis osmótica, hipomagnesemia, corticoides)",
+                        "Pérdidas digestivas (diarrea, vómitos, obstrucción intestinal)",
+                        "Hipomagnesemia asociada (puede hacer imposible la corrección de la hipopotasemia)"
+                    ],
+                    nl: [
+                        "Gebrek aan inname (infusies zonder kaliumsupplementen)",
+                        "Distributieveranderingen (alkalose, behandeling van hyperglykemie, β-adrenerge middelen)",
+                        "Urinaire verliezen (diuretica, alkalose, osmotische diurese, hypomagnesiëmie, corticosteroïden)",
+                        "Spijsverteringsverliezen (diarree, braken, darmobstructie)",
+                        "Geassocieerde hypomagnesiëmie (kan correctie van hypokaliëmie onmogelijk maken)"
+                    ]
+                },
+                treatments: {
+                    fr: [
+                        "Suppléments de potassium (oraux de préférence si possible)",
+                        "Perfusion de KCl: max 100 mEq/L, préférer mini-perfusion de 20 mEq/100 mL en 1h",
+                        "Correction d'une hypomagnésémie associée",
+                        "Arrêt des médicaments favorisants si possible",
+                        "Traitement de la cause sous-jacente"
+                    ],
+                    en: [
+                        "Potassium supplements (oral preferred if possible)",
+                        "KCl infusion: max 100 mEq/L, prefer mini-infusion of 20 mEq/100 mL over 1h",
+                        "Correction of associated hypomagnesemia",
+                        "Discontinuation of contributing medications if possible",
+                        "Treatment of the underlying cause"
+                    ],
+                    es: [
+                        "Suplementos de potasio (oral preferentemente si es posible)",
+                        "Infusión de KCl: máx 100 mEq/L, preferir mini-infusión de 20 mEq/100 mL en 1h",
+                        "Corrección de la hipomagnesemia asociada",
+                        "Suspensión de medicamentos contribuyentes si es posible",
+                        "Tratamiento de la causa subyacente"
+                    ],
+                    nl: [
+                        "Kaliumsupplementen (oraal bij voorkeur indien mogelijk)",
+                        "KCl-infusie: max 100 mEq/L, bij voorkeur mini-infusie van 20 mEq/100 mL over 1u",
+                        "Correctie van geassocieerde hypomagnesiëmie",
+                        "Stopzetting van bijdragende medicatie indien mogelijk",
+                        "Behandeling van de onderliggende oorzaak"
+                    ]
+                }
+            },
+            
+            hyperkalemia: {
+                name: {
+                    fr: "Hyperkaliémie",
+                    en: "Hyperkalemia",
+                    es: "Hiperpotasemia",
+                    nl: "Hyperkaliëmie"
+                },
+                description: {
+                    fr: "Potassium sérique supérieur à 5.0 mEq/L",
+                    en: "Serum potassium above 5.0 mEq/L",
+                    es: "Potasio sérico superior a 5.0 mEq/L",
+                    nl: "Serum kalium hoger dan 5.0 mEq/L"
+                },
+                flowChart: {
+                    fr: `
+Hyperkaliémie (K > 5.0 mEq/L)
+├── Vérifier la pseudo-hyperkaliémie
+│   └── Hémolyse du prélèvement, thrombocytose ou hyperleucocytose
+└── Causes vraies
+    ├── Défaut d'élimination rénale
+    │   └── Insuffisance rénale, médicaments, insuffisance surrénalienne
+    ├── Apports excessifs (oraux ou IV)
+    └── Altérations de distribution
+        └── Acidose, hyperglycémie, rhabdomyolyse`,
+                    en: `
+Hyperkalemia (K > 5.0 mEq/L)
+├── Check for pseudo-hyperkalemia
+│   └── Sample hemolysis, thrombocytosis or hyperleukocytosis
+└── True causes
+    ├── Impaired renal elimination
+    │   └── Renal failure, medications, adrenal insufficiency
+    ├── Excessive intake (oral or IV)
+    └── Distribution alterations
+        └── Acidosis, hyperglycemia, rhabdomyolysis`,
+                    es: `
+Hiperpotasemia (K > 5.0 mEq/L)
+├── Verificar pseudo-hiperpotasemia
+│   └── Hemólisis de la muestra, trombocitosis o hiperleucocitosis
+└── Causas verdaderas
+    ├── Deterioro de la eliminación renal
+    │   └── Insuficiencia renal, medicamentos, insuficiencia suprarrenal
+    ├── Ingesta excesiva (oral o IV)
+    └── Alteraciones de distribución
+        └── Acidosis, hiperglucemia, rabdomiólisis`,
+                    nl: `
+Hyperkaliëmie (K > 5.0 mEq/L)
+├── Controleer op pseudo-hyperkaliëmie
+│   └── Monsteralyse, trombocytose of hyperleukocytose
+└── Echte oorzaken
+    ├── Verminderde renale eliminatie
+    │   └── Nierfalen, medicatie, bijnierschorsinsufficiëntie
+    ├── Overmatige inname (oraal of IV)
+    └── Distributieveranderingen
+        └── Acidose, hyperglykemie, rabdomyolyse`
+                },
+                etiologies: {
+                    fr: [
+                        "Pseudo-hyperkaliémie (hémolyse, thrombocytose, hyperleucocytose)",
+                        "Insuffisance rénale (cause la plus fréquente)",
+                        "Causes médicamenteuses (diurétiques épargnant le potassium, IEC, ciclosporine, β-bloquants)",
+                        "Apports potassiques excessifs",
+                        "Rhabdomyolyse",
+                        "Acidose sévère",
+                        "Insuffisance surrénalienne",
+                        "Hémolyse ou syndrome de lyse tumorale"
+                    ],
+                    en: [
+                        "Pseudo-hyperkalemia (hemolysis, thrombocytosis, hyperleukocytosis)",
+                        "Renal failure (most common cause)",
+                        "Medication causes (potassium-sparing diuretics, ACE inhibitors, cyclosporine, β-blockers)",
+                        "Excessive potassium intake",
+                        "Rhabdomyolysis",
+                        "Severe acidosis",
+                        "Adrenal insufficiency",
+                        "Hemolysis or tumor lysis syndrome"
+                    ],
+                    es: [
+                        "Pseudo-hiperpotasemia (hemólisis, trombocitosis, hiperleucocitosis)",
+                        "Insuficiencia renal (causa más común)",
+                        "Causas medicamentosas (diuréticos ahorradores de potasio, IECA, ciclosporina, β-bloqueantes)",
+                        "Ingesta excesiva de potasio",
+                        "Rabdomiólisis",
+                        "Acidosis severa",
+                        "Insuficiencia suprarrenal",
+                        "Hemólisis o síndrome de lisis tumoral"
+                    ],
+                    nl: [
+                        "Pseudo-hyperkaliëmie (hemolyse, trombocytose, hyperleukocytose)",
+                        "Nierfalen (meest voorkomende oorzaak)",
+                        "Medicatie-oorzaken (kaliumsparende diuretica, ACE-remmers, cyclosporine, β-blokkers)",
+                        "Overmatige kaliuminname",
+                        "Rabdomyolyse",
+                        "Ernstige acidose",
+                        "Bijnierschorsinsufficiëntie",
+                        "Hemolyse of tumorlysissyndroom"
+                    ]
+                },
+                treatments: {
+                    fr: [
+                        "Arrêt des apports potassiques et des médicaments favorisants",
+                        "Stabilisation des membranes cellulaires: chlorure de calcium IV",
+                        "Entrée du potassium dans les cellules: insuline/glucose, bicarbonate, β-adrénergiques",
+                        "Élimination du potassium: Kayexalate (résine échangeuse d'ions), dialyse si besoin",
+                        "Diurétiques et perfusions abondantes si fonction rénale préservée"
+                    ],
+                    en: [
+                        "Stop potassium intake and contributing medications",
+                        "Cell membrane stabilization: calcium chloride IV",
+                        "Potassium entry into cells: insulin/glucose, bicarbonate, β-adrenergics",
+                        "Potassium elimination: Kayexalate (ion exchange resin), dialysis if needed",
+                        "Diuretics and abundant infusions if renal function preserved"
+                    ],
+                    es: [
+                        "Suspender la ingesta de potasio y medicamentos contribuyentes",
+                        "Estabilización de la membrana celular: cloruro de calcio IV",
+                        "Entrada de potasio en las células: insulina/glucosa, bicarbonato, β-adrenérgicos",
+                        "Eliminación de potasio: Kayexalato (resina de intercambio iónico), diálisis si es necesario",
+                        "Diuréticos e infusiones abundantes si la función renal está preservada"
+                    ],
+                    nl: [
+                        "Stop kaliuminname en bijdragende medicatie",
+                        "Celmembraanstabilisatie: calciumchloride IV",
+                        "Kaliumopname in cellen: insuline/glucose, bicarbonaat, β-adrenerge middelen",
+                        "Kaliumeliminatie: Kayexalate (ionenwisselaarshars), dialyse indien nodig",
+                        "Diuretica en overvloedige infusies indien nierfunctie behouden is"
+                    ]
+                }
+            },
+            
+            // Autres troubles...
+            metabolicAcidosis: {
+                name: {
+                    fr: "Acidose métabolique",
+                    en: "Metabolic acidosis",
+                    es: "Acidosis metabólica",
+                    nl: "Metabole acidose"
+                },
+                description: {
+                    fr: "pH < 7.35 avec bicarbonates diminués",
+                    en: "pH < 7.35 with decreased bicarbonate",
+                    es: "pH < 7.35 con bicarbonato disminuido",
+                    nl: "pH < 7.35 met verlaagd bicarbonaat"
+                },
+                flowChart: {
+                    fr: `
+Acidose métabolique (pH < 7.35, HCO3 < 22 mEq/L)
+├── Calculer le trou anionique (TA = [Na+] - [Cl-] - [HCO3-])
+│   ├── TA augmenté (>16 mEq/L)
+│   │   ├── Acidose lactique
+│   │   ├── Insuffisance rénale
+│   │   ├── Acidocétose diabétique
+│   │   └── Intoxications (aspirine, éthylène glycol, méthanol)
+│   └── TA normal (8-16 mEq/L) - Acidose hyperchlorémique
+│       ├── Pertes de bicarbonate digestives
+│       ├── Pertes de bicarbonate rénales
+│       └── Excès d'apports chlorés
+└── Évaluer la compensation respiratoire`,
+                    en: `
+Metabolic acidosis (pH < 7.35, HCO3 < 22 mEq/L)
+├── Calculate anion gap (AG = [Na+] - [Cl-] - [HCO3-])
+│   ├── Increased AG (>16 mEq/L)
+│   │   ├── Lactic acidosis
+│   │   ├── Renal failure
+│   │   ├── Diabetic ketoacidosis
+│   │   └── Intoxications (aspirin, ethylene glycol, methanol)
+│   └── Normal AG (8-16 mEq/L) - Hyperchloremic acidosis
+│       ├── Digestive bicarbonate losses
+│       ├── Renal bicarbonate losses
+│       └── Excess chloride intake
+└── Evaluate respiratory compensation`,
+                    es: `
+Acidosis metabólica (pH < 7.35, HCO3 < 22 mEq/L)
+├── Calcular anión gap (AG = [Na+] - [Cl-] - [HCO3-])
+│   ├── AG aumentado (>16 mEq/L)
+│   │   ├── Acidosis láctica
+│   │   ├── Insuficiencia renal
+│   │   ├── Cetoacidosis diabética
+│   │   └── Intoxicaciones (aspirina, etilenglicol, metanol)
+│   └── AG normal (8-16 mEq/L) - Acidosis hiperclorémica
+│       ├── Pérdidas digestivas de bicarbonato
+│       ├── Pérdidas renales de bicarbonato
+│       └── Exceso de ingesta de cloruro
+└── Evaluar compensación respiratoria`,
+                    nl: `
+Metabole acidose (pH < 7.35, HCO3 < 22 mEq/L)
+├── Bereken anion gap (AG = [Na+] - [Cl-] - [HCO3-])
+│   ├── Verhoogde AG (>16 mEq/L)
+│   │   ├── Lactaatacidose
+│   │   ├── Nierfalen
+│   │   ├── Diabetische ketoacidose
+│   │   └── Intoxicaties (aspirine, ethyleenglycol, methanol)
+│   └── Normale AG (8-16 mEq/L) - Hyperchloremische acidose
+│       ├── Spijsverteringsverlies van bicarbonaat
+│       ├── Renaal verlies van bicarbonaat
+│       └── Overmatige chloride-inname
+└── Beoordeel respiratoire compensatie`
+                },
+                etiologies: {
+                    fr: [
+                        "Trou anionique augmenté: acidose lactique, insuffisance rénale, acidocétose diabétique, intoxications",
+                        "Trou anionique normal (acidose hyperchlorémique): pertes digestives de bicarbonate (diarrhée), pertes rénales (acidose tubulaire), excès d'apports chlorés",
+                        "Compensation d'alcalose respiratoire prolongée"
+                    ],
+                    en: [
+                        "Increased anion gap: lactic acidosis, renal failure, diabetic ketoacidosis, intoxications",
+                        "Normal anion gap (hyperchloremic acidosis): digestive bicarbonate losses (diarrhea), renal losses (tubular acidosis), excess chloride intake",
+                        "Compensation for prolonged respiratory alkalosis"
+                    ],
+                    es: [
+                        "Anión gap aumentado: acidosis láctica, insuficiencia renal, cetoacidosis diabética, intoxicaciones",
+                        "Anión gap normal (acidosis hiperclorémica): pérdidas digestivas de bicarbonato (diarrea), pérdidas renales (acidosis tubular), exceso de ingesta de cloruro",
+                        "Compensación de alcalosis respiratoria prolongada"
+                    ],
+                    nl: [
+                        "Verhoogde anion gap: lactaatacidose, nierfalen, diabetische ketoacidose, intoxicaties",
+                        "Normale anion gap (hyperchloremische acidose): spijsverteringsverlies van bicarbonaat (diarree), renaal verlies (tubulaire acidose), overmatige chloride-inname",
+                        "Compensatie voor langdurige respiratoire alkalose"
+                    ]
+                },
+                treatments: {
+                    fr: [
+                        "Traitement de la cause sous-jacente (prioritaire)",
+                        "Bicarbonate de sodium dans les cas sélectionnés (pH < 7.20, acidose à trou anionique normal)",
+                        "Ventilation mécanique si l'hyperventilation compensatoire est trop coûteuse",
+                        "Hémodialyse si acidose sévère avec insuffisance rénale",
+                        "Éviter la correction trop rapide"
+                    ],
+                    en: [
+                        "Treatment of the underlying cause (priority)",
+                        "Sodium bicarbonate in selected cases (pH < 7.20, normal anion gap acidosis)",
+                        "Mechanical ventilation if compensatory hyperventilation is too costly",
+                        "Hemodialysis for severe acidosis with renal failure",
+                        "Avoid too rapid correction"
+                    ],
+                    es: [
+                        "Tratamiento de la causa subyacente (prioridad)",
+                        "Bicarbonato de sodio en casos seleccionados (pH < 7.20, acidosis con anión gap normal)",
+                        "Ventilación mecánica si la hiperventilación compensatoria es demasiado costosa",
+                        "Hemodiálisis para acidosis severa con insuficiencia renal",
+                        "Evitar la corrección demasiado rápida"
+                    ],
+                    nl: [
+                        "Behandeling van de onderliggende oorzaak (prioriteit)",
+                        "Natriumbicarbonaat in geselecteerde gevallen (pH < 7.20, normale anion gap acidose)",
+                        "Mechanische ventilatie als compensatoire hyperventilatie te belastend is",
+                        "Hemodialyse voor ernstige acidose met nierfalen",
+                        "Vermijd te snelle correctie"
+                    ]
+                }
+            }
+        };
+
+        // Variables globales
+        let currentLang = 'fr'; // Langue par défaut
+
+        // Fonction pour mettre à jour la langue
+        function updateLanguage(lang) {
+            currentLang = lang;
+            
+            // Mettre à jour le titre
+            document.getElementById('app-title').textContent = translations[lang]["app-title"];
+            
+            // Mettre à jour tous les éléments avec attribut data-translate
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            // Mettre à jour les options du select
+            updateSelectOptions(lang);
+        }
+        
+        // Mettre à jour les options du select
+        function updateSelectOptions(lang) {
+            const disorderSelect = document.getElementById('disorderSelect');
+            const options = disorderSelect.querySelectorAll('option');
+            const optgroups = disorderSelect.querySelectorAll('optgroup');
+            
+            // Mettre à jour les options
+            options.forEach(option => {
+                const key = option.getAttribute('data-translate');
+                if (key && translations[lang][key]) {
+                    option.textContent = translations[lang][key];
+                }
+            });
+            
+            // Mettre à jour les groupes d'options
+            optgroups.forEach(optgroup => {
+                const key = optgroup.getAttribute('data-translate');
+                if (key && translations[lang][key]) {
+                    optgroup.label = translations[lang][key];
+                }
+            });
+        }
+        
+        // Fonction pour calculer l'osmolarité sérique
+        function calculateOsmolarity(na, glucose, urea) {
+            if (!na || !glucose || !urea) return null;
+            return (2 * parseFloat(na)) + (parseFloat(glucose) / 18) + (parseFloat(urea) / 6);
+        }
+
+        // Fonction pour calculer le trou anionique
+        function calculateAnionGap(na, k, cl, hco3) {
+            if (!na || !cl || !hco3) return null;
+            let kValue = k ? parseFloat(k) : 4; // Valeur par défaut si non fournie
+            return (parseFloat(na) + kValue) - (parseFloat(cl) + parseFloat(hco3));
+        }
+        
+        // Fonction pour analyser les paramètres
+        function analyzeParameters() {
+            // Récupérer les valeurs des paramètres
+            const na = document.getElementById('na').value;
+            const k = document.getElementById('k').value;
+            const cl = document.getElementById('cl').value;
+            const hco3 = document.getElementById('hco3').value;
+            const ph = document.getElementById('ph').value;
+            const paco2 = document.getElementById('paco2').value;
+            const ca = document.getElementById('ca').value;
+            const caIon = document.getElementById('caIon').value;
+            const p = document.getElementById('p').value;
+            const mg = document.getElementById('mg').value;
+            const glucose = document.getElementById('glucose').value;
+            const urea = document.getElementById('urea').value;
+            const urineNa = document.getElementById('urineNa').value;
+            const urineOsm = document.getElementById('urineOsm').value;
+            
+            // Vérifier qu'au moins les paramètres essentiels sont fournis
+            if (!na && !k && !ph && !paco2) {
+                document.getElementById('errorMessage').textContent = translations[currentLang]["error-message"];
+                document.getElementById('errorMessage').classList.remove('hidden');
+                return;
+            }
+            
+            document.getElementById('errorMessage').classList.add('hidden');
+            
+            // Calculer l'osmolarité et le trou anionique si possible
+            if (na && glucose && urea) {
+                const osm = calculateOsmolarity(na, glucose, urea);
+                document.getElementById('calcOsm').textContent = osm ? osm.toFixed(1) + " mOsm/kg" : "-";
+            }
+            
+            if (na && cl && hco3) {
+                const anionGap = calculateAnionGap(na, k, cl, hco3);
+                document.getElementById('anionGap').textContent = anionGap ? anionGap.toFixed(1) + " mEq/L" : "-";
+            }
+            
+            // Identifier les troubles
+            const disorders = [];
+            
+            // Analyse du sodium
+            if (na) {
+                if (parseFloat(na) < 135) disorders.push("hyponatremia");
+                else if (parseFloat(na) > 145) disorders.push("hypernatremia");
+            }
+            
+            // Analyse du potassium
+            if (k) {
+                if (parseFloat(k) < 3.5) disorders.push("hypokalemia");
+                else if (parseFloat(k) > 5.0) disorders.push("hyperkalemia");
+            }
+            
+            // Analyse du calcium
+            if (ca || caIon) {
+                if ((ca && parseFloat(ca) < 8.5) || (caIon && parseFloat(caIon) < 1.1)) disorders.push("hypocalcemia");
+                else if ((ca && parseFloat(ca) > 10.5) || (caIon && parseFloat(caIon) > 1.3)) disorders.push("hypercalcemia");
+            }
+            
+            // Analyse du phosphore
+            if (p) {
+                if (parseFloat(p) < 2.5) disorders.push("hypophosphatemia");
+                else if (parseFloat(p) > 4.5) disorders.push("hyperphosphatemia");
+            }
+            
+            // Analyse du magnésium
+            if (mg) {
+                if (parseFloat(mg) < 1.5) disorders.push("hypomagnesemia");
+                else if (parseFloat(mg) > 2.0) disorders.push("hypermagnesemia");
+            }
+            
+            // Analyse de l'équilibre acido-basique
+            if (ph && paco2) {
+                const phValue = parseFloat(ph);
+                const paco2Value = parseFloat(paco2);
+                
+                // Acidémie ou alcalémie
+                const isAcidemia = phValue < 7.35;
+                const isAlkalemia = phValue > 7.45;
+                
+                // Acidose ou alcalose respiratoire
+                const isRespAcidosis = paco2Value > 45;
+                const isRespAlkalosis = paco2Value < 35;
+                
+                // Évaluation des troubles acido-basiques
+                if (isAcidemia) {
+                    if (isRespAcidosis) {
+                        // Acidémie et hypercapnie = acidose respiratoire
+                        disorders.push("respiratoryAcidosis");
+                        
+                        // Vérifier s'il y a aussi une acidose métabolique
+                        if (hco3 && parseFloat(hco3) < 22) {
+                            disorders.push("metabolicAcidosis");
+                        }
+                    } else {
+                        // Acidémie sans hypercapnie = acidose métabolique
+                        disorders.push("metabolicAcidosis");
+                        
+                        // Si hypocapnie, il y a compensation respiratoire
+                        if (isRespAlkalosis) {
+                            // Ne pas ajouter comme trouble distinct
+                        }
+                    }
+                } else if (isAlkalemia) {
+                    if (isRespAlkalosis) {
+                        // Alcalémie et hypocapnie = alcalose respiratoire
+                        disorders.push("respiratoryAlkalosis");
+                        
+                        // Vérifier s'il y a aussi une alcalose métabolique
+                        if (hco3 && parseFloat(hco3) > 29) {
+                            disorders.push("metabolicAlkalosis");
+                        }
+                    } else {
+                        // Alcalémie sans hypocapnie = alcalose métabolique
+                        disorders.push("metabolicAlkalosis");
+                        
+                        // Si hypercapnie, il y a compensation respiratoire
+                        if (isRespAcidosis) {
+                            // Ne pas ajouter comme trouble distinct
+                        }
+                    }
+                } else {
+                    // pH normal
+                    if (isRespAcidosis && hco3 && parseFloat(hco3) > 29) {
+                        // Trouble mixte compensé: acidose respiratoire + alcalose métabolique
+                        disorders.push("respiratoryAcidosis");
+                        disorders.push("metabolicAlkalosis");
+                    } else if (isRespAlkalosis && hco3 && parseFloat(hco3) < 22) {
+                        // Trouble mixte compensé: alcalose respiratoire + acidose métabolique
+                        disorders.push("respiratoryAlkalosis");
+                        disorders.push("metabolicAcidosis");
+                    }
+                }
+            }
+            
+            // Si aucun trouble identifié
+            if (disorders.length === 0) {
+                document.getElementById('diagnosis').textContent = translations[currentLang]["no-disorders"];
+                document.getElementById('flowChart').innerHTML = "";
+                document.getElementById('etiologyList').innerHTML = "";
+                document.getElementById('treatmentList').innerHTML = "";
+            } else {
+                // Afficher les résultats pour tous les troubles identifiés
+                showDisorderResults(disorders);
+            }
+            
+            // Afficher la section de résultats
+            document.getElementById('resultSection').classList.add('visible');
+        }
+        
+        // Fonction pour analyser un trouble sélectionné
+        function analyzeDisorder() {
+            const disorderId = document.getElementById('disorderSelect').value;
+            
+            if (!disorderId) {
+                document.getElementById('diagnosis').textContent = translations[currentLang]["no-disorders"];
+                document.getElementById('flowChart').innerHTML = "";
+                document.getElementById('etiologyList').innerHTML = "";
+                document.getElementById('treatmentList').innerHTML = "";
+                return;
+            }
+            
+            showDisorderResults([disorderId]);
+            
+            // Afficher la section de résultats
+            document.getElementById('resultSection').classList.add('visible');
+        }
+        
+        // Fonction pour afficher les résultats d'un ou plusieurs troubles
+        function showDisorderResults(disorderIds) {
+            let diagnosisText = "";
+            let flowChartHTML = "";
+            let etiologyListHTML = "";
+            let treatmentListHTML = "";
+            
+            disorderIds.forEach((disorderId, index) => {
+                const disorder = disorderData[disorderId];
+                
+                if (!disorder) return;
+                
+                // Ajouter le diagnostic
+                diagnosisText += (index > 0 ? " + " : "") + disorder.name[currentLang];
+                
+                // Ajouter l'arbre décisionnel
+                if (index === 0) { // Afficher seulement le premier arbre décisionnel
+                    flowChartHTML = disorder.flowChart[currentLang];
+                }
+                
+                // Ajouter les étiologies
+                disorder.etiologies[currentLang].forEach(etiology => {
+                    etiologyListHTML += `<li>${etiology}</li>`;
+                });
+                
+                // Ajouter les traitements
+                disorder.treatments[currentLang].forEach(treatment => {
+                    treatmentListHTML += `<li>${treatment}</li>`;
+                });
+            });
+            
+            // Mettre à jour l'interface
+            document.getElementById('diagnosis').textContent = diagnosisText;
+            document.getElementById('flowChart').innerHTML = flowChartHTML;
+            document.getElementById('etiologyList').innerHTML = etiologyListHTML;
+            document.getElementById('treatmentList').innerHTML = treatmentListHTML;
+        }
+        
+        // Gestionnaires d'événements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser les événements
+            document.getElementById('tabParameters').addEventListener('click', function() {
+                document.getElementById('tabParameters').classList.add('active');
+                document.getElementById('tabDisorder').classList.remove('active');
+                document.getElementById('parameterInput').classList.remove('hidden');
+                document.getElementById('disorderInput').classList.add('hidden');
+            });
+            
+            document.getElementById('tabDisorder').addEventListener('click', function() {
+                document.getElementById('tabDisorder').classList.add('active');
+                document.getElementById('tabParameters').classList.remove('active');
+                document.getElementById('disorderInput').classList.remove('hidden');
+                document.getElementById('parameterInput').classList.add('hidden');
+            });
+            
+            // Gestionnaire d'événements pour le sélecteur de langue
+            document.getElementById('lang-select').addEventListener('change', function() {
+                updateLanguage(this.value);
+            });
+            
+            // Gestionnaires d'événements pour les boutons d'analyse
+            document.getElementById('analyzeParameters').addEventListener('click', analyzeParameters);
+            document.getElementById('analyzeDisorder').addEventListener('click', analyzeDisorder);
+            
+            // Calculs en temps réel
+            const paramInputs = ['na', 'k', 'cl', 'hco3', 'glucose', 'urea'];
+            paramInputs.forEach(paramId => {
+                const element = document.getElementById(paramId);
+                if (element) {
+                    element.addEventListener('input', function() {
+                        // Mettre à jour l'osmolarité
+                        const na = document.getElementById('na').value;
+                        const glucose = document.getElementById('glucose').value;
+                        const urea = document.getElementById('urea').value;
+                        if (na && glucose && urea) {
+                            const osm = calculateOsmolarity(na, glucose, urea);
+                            document.getElementById('calcOsm').textContent = osm ? osm.toFixed(1) + " mOsm/kg" : "-";
+                        }
+                        
+                        // Mettre à jour le trou anionique
+                        const cl = document.getElementById('cl').value;
+                        const hco3 = document.getElementById('hco3').value;
+                        const k = document.getElementById('k').value;
+                        if (na && cl && hco3) {
+                            const anionGap = calculateAnionGap(na, k, cl, hco3);
+                            document.getElementById('anionGap').textContent = anionGap ? anionGap.toFixed(1) + " mEq/L" : "-";
+                        }
+                    });
+                }
+            });
+            
+            // Initialisation de la langue
+            updateLanguage(currentLang);
+        });
+    </script>
+</body>
+</html>

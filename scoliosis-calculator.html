@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Classification de Scoliose Idiopathique</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #3f51b5;
+        }
+        .panel {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .panel-header {
+            background-color: #3f51b5;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        .panel-body {
+            padding: 20px;
+        }
+        .input-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        #calculate {
+            background-color: #4285f4;
+            color: white;
+        }
+        #reset {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        #import {
+            background-color: #4caf50;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        .warning {
+            color: #e53935;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .info-box {
+            background-color: #f1f8e9;
+            border-left: 4px solid #8bc34a;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .alert-box {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .danger-box {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        .reference {
+            font-size: 0.8em;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            color: #666;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+            cursor: help;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        #export-code-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 100;
+        }
+        #export-code-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+            overflow: auto;
+        }
+        .code-block {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-x: auto;
+            font-family: monospace;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .curve-visualization {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .curve-image {
+            width: 300px;
+            height: 500px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            position: relative;
+        }
+        .curve-line {
+            position: absolute;
+            border: 2px solid #3f51b5;
+            width: 20px;
+            transform-origin: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculateur de Classification de Scoliose Idiopathique</h1>
+    
+    <div class="panel">
+        <div class="panel-header">Paramètres des courbes scoliotiques</div>
+        <div class="panel-body">
+            <div class="section-title">Radiographies debout (PA/AP)</div>
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="pt-cobb">
+                        <span class="tooltip">Angle de Cobb Proximal Thoracique (PT) en degrés
+                            <span class="tooltiptext">Angle de Cobb de la courbe thoracique proximale (généralement de T2 à T5)</span>
+                        </span>
+                    </label>
+                    <input type="number" id="pt-cobb" step="0.1" placeholder="Entrez la valeur de l'angle PT">
+                </div>
+                
+                <div class="input-group">
+                    <label for="mt-cobb">
+                        <span class="tooltip">Angle de Cobb Thoracique Principal (MT) en degrés
+                            <span class="tooltiptext">Angle de Cobb de la courbe thoracique principale (apex jusqu'à T11/T12)</span>
+                        </span>
+                    </label>
+                    <input type="number" id="mt-cobb" step="0.1" placeholder="Entrez la valeur de l'angle MT">
+                </div>
+                
+                <div class="input-group">
+                    <label for="tl-cobb">
+                        <span class="tooltip">Angle de Cobb Thoracolombaire/Lombaire (TL/L) en degrés
+                            <span class="tooltiptext">Angle de Cobb de la courbe thoracolombaire/lombaire</span>
+                        </span>
+                    </label>
+                    <input type="number" id="tl-cobb" step="0.1" placeholder="Entrez la valeur de l'angle TL/L">
+                </div>
+            </div>
+            
+            <div class="section-title">Radiographies en inflexion latérale (bending)</div>
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="pt-bending">
+                        <span class="tooltip">Angle de Cobb PT en inflexion latérale (degrés)
+                            <span class="tooltiptext">Angle de Cobb de la courbe PT sur radiographie en inflexion latérale</span>
+                        </span>
+                    </label>
+                    <input type="number" id="pt-bending" step="0.1" placeholder="Entrez la valeur PT en inflexion">
+                </div>
+                
+                <div class="input-group">
+                    <label for="mt-bending">
+                        <span class="tooltip">Angle de Cobb MT en inflexion latérale (degrés)
+                            <span class="tooltiptext">Angle de Cobb de la courbe MT sur radiographie en inflexion latérale</span>
+                        </span>
+                    </label>
+                    <input type="number" id="mt-bending" step="0.1" placeholder="Entrez la valeur MT en inflexion">
+                </div>
+                
+                <div class="input-group">
+                    <label for="tl-bending">
+                        <span class="tooltip">Angle de Cobb TL/L en inflexion latérale (degrés)
+                            <span class="tooltiptext">Angle de Cobb de la courbe TL/L sur radiographie en inflexion latérale</span>
+                        </span>
+                    </label>
+                    <input type="number" id="tl-bending" step="0.1" placeholder="Entrez la valeur TL/L en inflexion">
+                </div>
+            </div>
+            
+            <div class="section-title">Paramètres sagittaux</div>
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="t2-t5-kyphosis">
+                        <span class="tooltip">Cyphose T2-T5 (degrés)
+                            <span class="tooltiptext">Angle de cyphose de T2 à T5 (pour critère de structuralité PT)</span>
+                        </span>
+                    </label>
+                    <input type="number" id="t2-t5-kyphosis" step="0.1" placeholder="Entrez la valeur de cyphose T2-T5">
+                </div>
+                
+                <div class="input-group">
+                    <label for="t5-t12-kyphosis">
+                        <span class="tooltip">Cyphose T5-T12 (degrés)
+                            <span class="tooltiptext">Angle de cyphose de T5 à T12 (pour modificateur sagittal)</span>
+                        </span>
+                    </label>
+                    <input type="number" id="t5-t12-kyphosis" step="0.1" placeholder="Entrez la valeur de cyphose T5-T12">
+                </div>
+                
+                <div class="input-group">
+                    <label for="t10-l2-kyphosis">
+                        <span class="tooltip">Cyphose T10-L2 (degrés)
+                            <span class="tooltiptext">Angle de cyphose de T10 à L2 (pour critère de structuralité TL/L)</span>
+                        </span>
+                    </label>
+                    <input type="number" id="t10-l2-kyphosis" step="0.1" placeholder="Entrez la valeur de cyphose T10-L2">
+                </div>
+            </div>
+            
+            <div class="section-title">Modificateur lombaire</div>
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="lumbar-modifier">
+                        <span class="tooltip">Position de la CSVL par rapport à l'apex lombaire
+                            <span class="tooltiptext">CSVL = Centre Sacral Vertical Line (ligne verticale passant par le centre du sacrum)</span>
+                        </span>
+                    </label>
+                    <select id="lumbar-modifier">
+                        <option value="">Sélectionnez...</option>
+                        <option value="A">A - CSVL entre les pédicules de l'apex lombaire</option>
+                        <option value="B">B - CSVL touche le corps apical</option>
+                        <option value="C">C - CSVL complètement médiale (courbe déviée)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button id="import">Importer depuis l'analyseur</button>
+                <button id="calculate">Calculer</button>
+                <button id="reset">Réinitialiser</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="results" class="results">
+        <div id="warning" class="warning"></div>
+        
+        <div class="section-title">Classification de Lenke</div>
+        <div class="info-box" id="lenke-classification">
+            <!-- Contenu dynamique -->
+        </div>
+        
+        <div class="section-title">Paramètres d'entrée</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Paramètre</th>
+                    <th>Valeur</th>
+                    <th>Critère de structuralité</th>
+                </tr>
+            </thead>
+            <tbody id="input-params">
+                <!-- Données dynamiques -->
+            </tbody>
+        </table>
+        
+        <div class="section-title">Détails de la classification</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type de courbe</th>
+                    <th>Modificateur lombaire</th>
+                    <th>Modificateur sagittal</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody id="classification-details">
+                <!-- Données dynamiques -->
+            </tbody>
+        </table>
+        
+        <div class="section-title">Recommandations chirurgicales</div>
+        <div id="surgical-recommendations" class="info-box">
+            <!-- Données dynamiques -->
+        </div>
+        
+        <div class="section-title">Niveaux de fusion recommandés</div>
+        <div id="fusion-levels" class="alert-box">
+            <!-- Données dynamiques -->
+        </div>
+        
+        <div class="reference">
+            <p><strong>Références:</strong></p>
+            <p>1. Lenke LG, Betz RR, Harms J, et al. Adolescent idiopathic scoliosis: a new classification to determine extent of spinal arthrodesis. J Bone Joint Surg Am. 2001;83-A(8):1169-81.</p>
+            <p>2. Rose PS, Lenke LG. Classification of operative adolescent idiopathic scoliosis: treatment guidelines. Orthop Clin North Am. 2007;38(4):521-9.</p>
+            <p>3. van Royen BJ. Understanding the Lenke Classification for Adolescent Idiopathic Scoliosis (AIS). Current Problems in Diagnostic Radiology. 2023;52:233-236.</p>
+        </div>
+    </div>
+    
+    <!-- Panneau de code d'exportation -->
+    <div id="export-code-panel">
+        <div id="export-code-content">
+            <span class="close-button" id="close-export-code">&times;</span>
+            <h2>Code d'exportation pour l'Analyseur de Scoliose</h2>
+            <p>Copiez ce code JavaScript et ajoutez-le à la fin du script de votre fichier d'analyse de scoliose, juste avant la balise de fermeture &lt;/script&gt;:</p>
+            <div class="code-block" id="export-js-code">
+// Fonction pour exporter les données vers le calculateur de scoliose
+function exportToScoliosisCalculator() {
+    // Récupérer les résultats
+    const ptCobbValue = document.getElementById('result-pt-cobb').textContent.replace('°', '').trim();
+    const mtCobbValue = document.getElementById('result-mt-cobb').textContent.replace('°', '').trim();
+    const tlCobbValue = document.getElementById('result-tl-cobb').textContent.replace('°', '').trim();
+    const ptBendingValue = document.getElementById('result-pt-bending').textContent.replace('°', '').trim();
+    const mtBendingValue = document.getElementById('result-mt-bending').textContent.replace('°', '').trim();
+    const tlBendingValue = document.getElementById('result-tl-bending').textContent.replace('°', '').trim();
+    const t2t5KyphosisValue = document.getElementById('result-t2-t5-kyphosis').textContent.replace('°', '').trim();
+    const t5t12KyphosisValue = document.getElementById('result-t5-t12-kyphosis').textContent.replace('°', '').trim();
+    const t10l2KyphosisValue = document.getElementById('result-t10-l2-kyphosis').textContent.replace('°', '').trim();
+    const lumbarModifierValue = document.getElementById('result-lumbar-modifier').textContent.trim();
+    
+    // Créer un objet avec les données
+    const data = {
+        ptCobb: ptCobbValue !== '--' ? ptCobbValue : '',
+        mtCobb: mtCobbValue !== '--' ? mtCobbValue : '',
+        tlCobb: tlCobbValue !== '--' ? tlCobbValue : '',
+        ptBending: ptBendingValue !== '--' ? ptBendingValue : '',
+        mtBending: mtBendingValue !== '--' ? mtBendingValue : '',
+        tlBending: tlBendingValue !== '--' ? tlBendingValue : '',
+        t2t5Kyphosis: t2t5KyphosisValue !== '--' ? t2t5KyphosisValue : '',
+        t5t12Kyphosis: t5t12KyphosisValue !== '--' ? t5t12KyphosisValue : '',
+        t10l2Kyphosis: t10l2KyphosisValue !== '--' ? t10l2KyphosisValue : '',
+        lumbarModifier: lumbarModifierValue.charAt(0) || ''
+    };
+    
+    // Créer l'URL avec les paramètres
+    const queryParams = new URLSearchParams();
+    Object.keys(data).forEach(key => {
+        if (data[key]) {
+            queryParams.append(key, data[key]);
+        }
+    });
+    
+    // Construire l'URL complète vers le calculateur (ajuster le chemin selon votre configuration)
+    const calculatorUrl = 'scoliosis-calculator.html?' + queryParams.toString();
+    
+    // Ouvrir le calculateur dans un nouvel onglet avec les données
+    window.open(calculatorUrl, '_blank');
+}
+
+// Ajouter un bouton d'exportation à la page des résultats
+function addExportButton() {
+    // Vérifier si le bouton n'existe pas déjà
+    if (!document.getElementById('export-to-calculator')) {
+        const resultsPanel = document.getElementById('results-panel');
+        const actionButtons = resultsPanel.querySelector('.action-buttons');
+        
+        // Créer le bouton d'exportation
+        const exportButton = document.createElement('button');
+        exportButton.id = 'export-to-calculator';
+        exportButton.className = 'action-btn';
+        exportButton.style.backgroundColor = '#3f51b5';
+        exportButton.textContent = 'Exporter vers Calculateur Lenke';
+        exportButton.addEventListener('click', exportToScoliosisCalculator);
+        
+        // Ajouter le bouton aux boutons d'action
+        actionButtons.appendChild(exportButton);
+    }
+}
+
+// Ajouter le bouton lorsque les résultats sont affichés
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('results-panel') && 
+        document.getElementById('results-panel').style.display !== 'none') {
+        setTimeout(addExportButton, 500);
+    }
+});
+</div>
+            <p>Assurez-vous d'ajuster le chemin du fichier <code>scoliosis-calculator.html</code> dans le code si nécessaire.</p>
+            <button id="copy-code" style="background-color: #4caf50; color: white; margin-top: 10px;">Copier le code</button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ptCobbInput = document.getElementById('pt-cobb');
+            const mtCobbInput = document.getElementById('mt-cobb');
+            const tlCobbInput = document.getElementById('tl-cobb');
+            const ptBendingInput = document.getElementById('pt-bending');
+            const mtBendingInput = document.getElementById('mt-bending');
+            const tlBendingInput = document.getElementById('tl-bending');
+            const t2t5KyphosisInput = document.getElementById('t2-t5-kyphosis');
+            const t5t12KyphosisInput = document.getElementById('t5-t12-kyphosis');
+            const t10l2KyphosisInput = document.getElementById('t10-l2-kyphosis');
+            const lumbarModifierSelect = document.getElementById('lumbar-modifier');
+            
+            const calculateBtn = document.getElementById('calculate');
+            const resetBtn = document.getElementById('reset');
+            const importBtn = document.getElementById('import');
+            
+            const resultsDiv = document.getElementById('results');
+            const warningDiv = document.getElementById('warning');
+            
+            // Panneau de code d'exportation
+            const exportCodePanel = document.getElementById('export-code-panel');
+            const closeExportCode = document.getElementById('close-export-code');
+            const copyCodeBtn = document.getElementById('copy-code');
+            
+            // Fermer le panneau de code d'exportation
+            closeExportCode.addEventListener('click', function() {
+                exportCodePanel.style.display = 'none';
+            });
+            
+            // Copier le code
+            copyCodeBtn.addEventListener('click', function() {
+                const codeElement = document.getElementById('export-js-code');
+                const range = document.createRange();
+                range.selectNode(codeElement);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                
+                // Changer temporairement le texte du bouton
+                copyCodeBtn.textContent = 'Code copié!';
+                setTimeout(function() {
+                    copyCodeBtn.textContent = 'Copier le code';
+                }, 2000);
+            });
+            
+            // Fonction pour déterminer si une courbe est structurelle
+            function isStructural(cobbAngle, bendingAngle, kyphosisAngle) {
+                // Une courbe est structurelle si:
+                // 1. L'angle en inflexion est >= 25°, ou
+                // 2. La cyphose locale est >= 20°
+                return (bendingAngle >= 25 || kyphosisAngle >= 20);
+            }
+            
+            // Fonction pour déterminer le type de courbe Lenke (1-6)
+            function determineLenkeType(ptIsStructural, mtIsStructural, tlIsStructural, mtIsMajor) {
+                if (mtIsMajor) {
+                    // MT est la courbe majeure
+                    if (ptIsStructural && !tlIsStructural) return 2; // Double thoracique
+                    if (!ptIsStructural && tlIsStructural) return 3; // Double majeure
+                    if (ptIsStructural && tlIsStructural) return 4; // Triple majeure
+                    return 1; // Thoracique principale
+                } else {
+                    // TL/L est la courbe majeure
+                    if (mtIsStructural) return 6; // TL/L-MT
+                    return 5; // TL/L
+                }
+            }
+            
+            // Fonction pour déterminer le modificateur sagittal
+            function determineSagittalModifier(t5t12Kyphosis) {
+                if (t5t12Kyphosis < 10) return '-'; // Hypocyphose
+                if (t5t12Kyphosis > 40) return '+'; // Hypercyphose
+                return 'N'; // Normal
+            }
+            
+            // Fonction pour obtenir la description du type de courbe
+            function getCurveTypeDescription(lenkeType) {
+                switch(lenkeType) {
+                    case 1: return "Thoracique principale (MT)";
+                    case 2: return "Double thoracique (DT)";
+                    case 3: return "Double majeure (DM)";
+                    case 4: return "Triple majeure (TM)";
+                    case 5: return "Thoracolombaire/Lombaire (TL/L)";
+                    case 6: return "Thoracolombaire/Lombaire-Thoracique principale (TL/L-MT)";
+                    default: return "Indéterminé";
+                }
+            }
+            
+            // Fonction pour obtenir des recommandations chirurgicales basées sur la classification
+            function getSurgicalRecommendations(lenkeType, lumbarModifier, sagittalModifier) {
+                let recommendations = "";
+                
+                switch(lenkeType) {
+                    case 1:
+                        recommendations = "<p><strong>Type 1 (Thoracique principale):</strong> Fusion postérieure sélective de la courbe thoracique principale.</p>";
+                        if (lumbarModifier === "A" || lumbarModifier === "B") {
+                            recommendations += "<p>Avec un modificateur lombaire A ou B, une fusion sélective de la courbe thoracique est généralement suffisante, avec une correction spontanée de la courbe lombaire.</p>";
+                        } else if (lumbarModifier === "C") {
+                            recommendations += "<p>Avec un modificateur lombaire C, une analyse clinique et radiographique approfondie est nécessaire pour déterminer si une fusion sélective thoracique est possible. Si le ratio des angles de Cobb, des mesures au scoliomètre et de la translation apicale entre MT et TL/L est > 1,25, une fusion sélective peut être envisagée.</p>";
+                        }
+                        
+                        if (sagittalModifier === "-") {
+                            recommendations += "<p>Avec un profil sagittal hypocyphotique, une approche antérieure peut être préférable pour restaurer la cyphose physiologique.</p>";
+                        }
+                        break;
+                        
+                    case 2:
+                        recommendations = "<p><strong>Type 2 (Double thoracique):</strong> Fusion postérieure des courbes thoraciques proximale et principale.</p>";
+                        recommendations += "<p>L'extension de la fusion à la courbe thoracique proximale est nécessaire en raison de sa structuralité, généralement jusqu'à T2 ou T3.</p>";
+                        break;
+                        
+                    case 3:
+                        recommendations = "<p><strong>Type 3 (Double majeure):</strong> Fusion postérieure des courbes thoracique principale et thoracolombaire/lombaire.</p>";
+                        if (lumbarModifier === "A" || lumbarModifier === "B") {
+                            recommendations += "<p>Dans certains cas sélectionnés avec modificateur A ou B, une fusion sélective de la courbe thoracique peut être envisagée si la courbe lombaire est flexible.</p>";
+                        }
+                        break;
+                        
+                    case 4:
+                        recommendations = "<p><strong>Type 4 (Triple majeure):</strong> Fusion postérieure des trois courbes structurelles (proximale thoracique, thoracique principale et thoracolombaire/lombaire).</p>";
+                        recommendations += "<p>Nécessite généralement une fixation pédiculaire segmentaire pour une correction optimale des trois courbes.</p>";
+                        break;
+                        
+                    case 5:
+                        recommendations = "<p><strong>Type 5 (Thoracolombaire/Lombaire):</strong> Fusion sélective de la courbe thoracolombaire/lombaire.</p>";
+                        recommendations += "<p>Peut être réalisée par voie antérieure ou postérieure, de la vertèbre limite supérieure à la vertèbre limite inférieure.</p>";
+                        break;
+                        
+                    case 6:
+                        recommendations = "<p><strong>Type 6 (Thoracolombaire/Lombaire-Thoracique principale):</strong> Fusion postérieure des courbes thoracique principale et thoracolombaire/lombaire.</p>";
+                        recommendations += "<p>Dans certains cas très sélectionnés, une fusion sélective de la courbe TL/L peut être envisagée si la courbe thoracique est acceptable cliniquement et radiographiquement.</p>";
+                        break;
+                        
+                    default:
+                        recommendations = "<p>Classification insuffisante pour déterminer les recommandations chirurgicales.</p>";
+                }
+                
+                return recommendations;
+            }
+            
+            // Fonction pour déterminer les niveaux de fusion recommandés
+            function getFusionLevels(lenkeType, lumbarModifier, sagittalModifier) {
+                let fusionLevels = "";
+                
+                switch(lenkeType) {
+                    case 1:
+                        if (lumbarModifier === "A" || lumbarModifier === "B") {
+                            fusionLevels = "<p><strong>Niveau supérieur de fusion (UIV):</strong> Généralement T4 ou T5 pour un épaule droite haute, T3 pour des épaules de niveau, T2 pour une épaule gauche haute.</p>";
+                            fusionLevels += "<p><strong>Niveau inférieur de fusion (LIV):</strong> Généralement la vertèbre stable moins une ou moins deux, selon la flexibilité de la courbe.</p>";
+                        } else if (lumbarModifier === "C") {
+                            fusionLevels = "<p><strong>UIV:</strong> Généralement T4 ou T5 pour un épaule droite haute, T3 pour des épaules de niveau, T2 pour une épaule gauche haute.</p>";
+                            fusionLevels += "<p><strong>LIV:</strong> La vertèbre stable (vertèbre la plus proximale dont les pédicules sont bisectés par la CSVL).</p>";
+                        }
+                        break;
+                        
+                    case 2:
+                        fusionLevels = "<p><strong>UIV:</strong> T2 ou T3, selon l'équilibre des épaules.</p>";
+                        fusionLevels += "<p><strong>LIV:</strong> Similaire au type 1, généralement la vertèbre stable moins une ou moins deux.</p>";
+                        break;
+                        
+                    case 3:
+                        fusionLevels = "<p><strong>UIV:</strong> T3 à T5, selon la taille et la rigidité de la courbe PT et l'asymétrie des épaules.</p>";
+                        fusionLevels += "<p><strong>LIV:</strong> Généralement L3 ou L4, le niveau étant déterminé par la vertèbre la plus proximale intersectée par la CSVL.</p>";
+                        break;
+                        
+                    case 4:
+                        fusionLevels = "<p><strong>UIV:</strong> Généralement T2 ou T3.</p>";
+                        fusionLevels += "<p><strong>LIV:</strong> L3 ou L4, avec l'objectif d'horizontalisation, centralisation et neutralisation du disque au niveau choisi comme LIV.</p>";
+                        break;
+                        
+                    case 5:
+                        fusionLevels = "<p><strong>UIV:</strong> La vertèbre limite supérieure (UEV) de la courbe TL/L.</p>";
+                        fusionLevels += "<p><strong>LIV:</strong> La vertèbre limite inférieure (LEV) de la courbe TL/L (pour inclure tous les niveaux avec disques convexes).</p>";
+                        break;
+                        
+                    case 6:
+                        fusionLevels = "<p><strong>UIV:</strong> T3 à T5 selon la localisation de la courbe MT et la hauteur des épaules.</p>";
+                        fusionLevels += "<p><strong>LIV:</strong> La vertèbre la plus proximale touchée par la CSVL, généralement L3 ou L4.</p>";
+                        break;
+                        
+                    default:
+                        fusionLevels = "<p>Classification insuffisante pour déterminer les niveaux de fusion.</p>";
+                }
+                
+                return fusionLevels;
+            }
+            
+            // Bouton Calculer
+            calculateBtn.addEventListener('click', function() {
+                // Validation des entrées
+                if (!ptCobbInput.value || !mtCobbInput.value || !tlCobbInput.value || 
+                    !ptBendingInput.value || !mtBendingInput.value || !tlBendingInput.value || 
+                    !lumbarModifierSelect.value) {
+                    warningDiv.textContent = "Veuillez remplir tous les champs obligatoires: angles de Cobb debout, angles en inflexion et modificateur lombaire.";
+                    resultsDiv.style.display = 'block';
+                    return;
+                }
+                
+                // Effacer les avertissements précédents
+                warningDiv.textContent = '';
+                
+                // Récupérer les valeurs
+                const ptCobb = parseFloat(ptCobbInput.value);
+                const mtCobb = parseFloat(mtCobbInput.value);
+                const tlCobb = parseFloat(tlCobbInput.value);
+                const ptBending = parseFloat(ptBendingInput.value);
+                const mtBending = parseFloat(mtBendingInput.value);
+                const tlBending = parseFloat(tlBendingInput.value);
+                const t2t5Kyphosis = t2t5KyphosisInput.value ? parseFloat(t2t5KyphosisInput.value) : 0;
+                const t5t12Kyphosis = t5t12KyphosisInput.value ? parseFloat(t5t12KyphosisInput.value) : 20; // Valeur par défaut normale
+                const t10l2Kyphosis = t10l2KyphosisInput.value ? parseFloat(t10l2KyphosisInput.value) : 0;
+                const lumbarModifier = lumbarModifierSelect.value;
+                
+                // Déterminer la courbe majeure (plus grand angle de Cobb)
+                const mtIsMajor = mtCobb >= tlCobb;
+                
+                // Déterminer si les courbes sont structurelles
+                const ptIsStructural = isStructural(ptCobb, ptBending, t2t5Kyphosis);
+                const mtIsStructural = isStructural(mtCobb, mtBending, 0) || mtIsMajor; // La courbe majeure est toujours structurelle
+                const tlIsStructural = isStructural(tlCobb, tlBending, t10l2Kyphosis) || !mtIsMajor; // La courbe majeure est toujours structurelle
+                
+                // Déterminer le type de courbe Lenke (1-6)
+                const lenkeType = determineLenkeType(ptIsStructural, mtIsStructural, tlIsStructural, mtIsMajor);
+                
+                // Déterminer le modificateur sagittal
+                const sagittalModifier = determineSagittalModifier(t5t12Kyphosis);
+                
+                // Obtenir la description du type de courbe
+                const curveTypeDesc = getCurveTypeDescription(lenkeType);
+                
+                // Classification complète de Lenke
+                const lenkeClassification = `${lenkeType}${lumbarModifier}${sagittalModifier}`;
+                
+                // Afficher la classification
+                document.getElementById('lenke-classification').innerHTML = `
+                    <p><strong>Classification de Lenke:</strong> ${lenkeClassification}</p>
+                    <p><strong>Type de courbe:</strong> ${lenkeType} - ${curveTypeDesc}</p>
+                    <p><strong>Modificateur lombaire:</strong> ${lumbarModifier}</p>
+                    <p><strong>Modificateur sagittal:</strong> ${sagittalModifier} (${t5t12Kyphosis}°)</p>
+                `;
+                
+                // Remplir le tableau des paramètres d'entrée
+                document.getElementById('input-params').innerHTML = `
+                    <tr>
+                        <td>Courbe PT</td>
+                        <td>${ptCobb.toFixed(1)}° (${ptBending.toFixed(1)}° en inflexion)</td>
+                        <td>${ptIsStructural ? 'Structurelle' : 'Non structurelle'}</td>
+                    </tr>
+                    <tr>
+                        <td>Courbe MT</td>
+                        <td>${mtCobb.toFixed(1)}° (${mtBending.toFixed(1)}° en inflexion)</td>
+                        <td>${mtIsStructural ? 'Structurelle' : 'Non structurelle'} ${mtIsMajor ? '(Majeure)' : ''}</td>
+                    </tr>
+                    <tr>
+                        <td>Courbe TL/L</td>
+                        <td>${tlCobb.toFixed(1)}° (${tlBending.toFixed(1)}° en inflexion)</td>
+                        <td>${tlIsStructural ? 'Structurelle' : 'Non structurelle'} ${!mtIsMajor ? '(Majeure)' : ''}</td>
+                    </tr>
+                    <tr>
+                        <td>Cyphose T2-T5</td>
+                        <td>${t2t5Kyphosis ? t2t5Kyphosis.toFixed(1) : '--'}°</td>
+                        <td>${t2t5Kyphosis >= 20 ? 'Critère de structuralité PT atteint' : '--'}</td>
+                    </tr>
+                    <tr>
+                        <td>Cyphose T5-T12</td>
+                        <td>${t5t12Kyphosis.toFixed(1)}°</td>
+                        <td>Modificateur sagittal: ${sagittalModifier}</td>
+                    </tr>
+                    <tr>
+                        <td>Cyphose T10-L2</td>
+                        <td>${t10l2Kyphosis ? t10l2Kyphosis.toFixed(1) : '--'}°</td>
+                        <td>${t10l2Kyphosis >= 20 ? 'Critère de structuralité TL/L atteint' : '--'}</td>
+                    </tr>
+                `;
+                
+                // Remplir le tableau des détails de classification
+                document.getElementById('classification-details').innerHTML = `
+                    <tr>
+                        <td>${lenkeType}</td>
+                        <td>${lumbarModifier}</td>
+                        <td>${sagittalModifier}</td>
+                        <td>${curveTypeDesc}</td>
+                    </tr>
+                `;
+                
+                // Obtenir et afficher les recommandations chirurgicales
+                const surgicalRecommendations = getSurgicalRecommendations(lenkeType, lumbarModifier, sagittalModifier);
+                document.getElementById('surgical-recommendations').innerHTML = surgicalRecommendations;
+                
+                // Obtenir et afficher les niveaux de fusion recommandés
+                const fusionLevels = getFusionLevels(lenkeType, lumbarModifier, sagittalModifier);
+                document.getElementById('fusion-levels').innerHTML = fusionLevels;
+                
+                // Afficher les résultats
+                resultsDiv.style.display = 'block';
+            });
+            
+            // Bouton Réinitialiser
+            resetBtn.addEventListener('click', function() {
+                ptCobbInput.value = '';
+                mtCobbInput.value = '';
+                tlCobbInput.value = '';
+                ptBendingInput.value = '';
+                mtBendingInput.value = '';
+                tlBendingInput.value = '';
+                t2t5KyphosisInput.value = '';
+                t5t12KyphosisInput.value = '';
+                t10l2KyphosisInput.value = '';
+                lumbarModifierSelect.value = '';
+                resultsDiv.style.display = 'none';
+                warningDiv.textContent = '';
+            });
+            
+            // Bouton Importer
+            importBtn.addEventListener('click', function() {
+                // Afficher le panneau de code d'exportation
+                exportCodePanel.style.display = 'block';
+                
+                // Vérifier si des paramètres d'URL sont présents et les utiliser si c'est le cas
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('ptCobb')) {
+                    ptCobbInput.value = urlParams.get('ptCobb');
+                }
+                if (urlParams.has('mtCobb')) {
+                    mtCobbInput.value = urlParams.get('mtCobb');
+                }
+                if (urlParams.has('tlCobb')) {
+                    tlCobbInput.value = urlParams.get('tlCobb');
+                }
+                if (urlParams.has('ptBending')) {
+                    ptBendingInput.value = urlParams.get('ptBending');
+                }
+                if (urlParams.has('mtBending')) {
+                    mtBendingInput.value = urlParams.get('mtBending');
+                }
+                if (urlParams.has('tlBending')) {
+                    tlBendingInput.value = urlParams.get('tlBending');
+                }
+                if (urlParams.has('t2t5Kyphosis')) {
+                    t2t5KyphosisInput.value = urlParams.get('t2t5Kyphosis');
+                }
+                if (urlParams.has('t5t12Kyphosis')) {
+                    t5t12KyphosisInput.value = urlParams.get('t5t12Kyphosis');
+                }
+                if (urlParams.has('t10l2Kyphosis')) {
+                    t10l2KyphosisInput.value = urlParams.get('t10l2Kyphosis');
+                }
+                if (urlParams.has('lumbarModifier')) {
+                    lumbarModifierSelect.value = urlParams.get('lumbarModifier');
+                }
+                
+                // Si des paramètres ont été importés, calculer automatiquement
+                if (urlParams.has('ptCobb') || urlParams.has('mtCobb') || urlParams.has('tlCobb')) {
+                    calculateBtn.click();
+                }
+            });
+            
+            // Vérifier si des paramètres d'URL sont présents au chargement initial
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('ptCobb') || urlParams.has('mtCobb') || urlParams.has('tlCobb')) {
+                if (urlParams.has('ptCobb')) {
+                    ptCobbInput.value = urlParams.get('ptCobb');
+                }
+                if (urlParams.has('mtCobb')) {
+                    mtCobbInput.value = urlParams.get('mtCobb');
+                }
+                if (urlParams.has('tlCobb')) {
+                    tlCobbInput.value = urlParams.get('tlCobb');
+                }
+                if (urlParams.has('ptBending')) {
+                    ptBendingInput.value = urlParams.get('ptBending');
+                }
+                if (urlParams.has('mtBending')) {
+                    mtBendingInput.value = urlParams.get('mtBending');
+                }
+                if (urlParams.has('tlBending')) {
+                    tlBendingInput.value = urlParams.get('tlBending');
+                }
+                if (urlParams.has('t2t5Kyphosis')) {
+                    t2t5KyphosisInput.value = urlParams.get('t2t5Kyphosis');
+                }
+                if (urlParams.has('t5t12Kyphosis')) {
+                    t5t12KyphosisInput.value = urlParams.get('t5t12Kyphosis');
+                }
+                if (urlParams.has('t10l2Kyphosis')) {
+                    t10l2KyphosisInput.value = urlParams.get('t10l2Kyphosis');
+                }
+                if (urlParams.has('lumbarModifier')) {
+                    lumbarModifierSelect.value = urlParams.get('lumbarModifier');
+                }
+                
+                // Calculer automatiquement
+                setTimeout(function() {
+                    calculateBtn.click();
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>

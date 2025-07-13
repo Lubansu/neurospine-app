@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classification et Traitement de l'Insuffisance Respiratoire Aiguë</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+        }
+        h3 {
+            color: #16a085;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            animation: fadeEffect 1s;
+        }
+        @keyframes fadeEffect {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+        .parameters {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #eaf2f8;
+            border-radius: 5px;
+        }
+        .parameter-group {
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .diagnostic-btn, .treatment-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .diagnostic-btn:hover, .treatment-btn:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .warning {
+            background-color: #fdebd0;
+            border-left: 5px solid #f39c12;
+        }
+        .success {
+            background-color: #d4efdf;
+            border-left: 5px solid #27ae60;
+        }
+        .danger {
+            background-color: #f5b7b1;
+            border-left: 5px solid #c0392b;
+        }
+        .info {
+            background-color: #ebf5fb;
+            border-left: 5px solid #3498db;
+        }
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .select-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        select, input {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .flow-chart {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        .toggle-section {
+            cursor: pointer;
+            background-color: #eaf2f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .toggle-content {
+            display: none;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 0 0 5px 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Classification et Traitement de l'Insuffisance Respiratoire Aiguë</h1>
+        
+        <div class="tab">
+            <button class="tablinks active" onclick="openTab(event, 'Introduction')">Introduction</button>
+            <button class="tablinks" onclick="openTab(event, 'Classification')">Classification</button>
+            <button class="tablinks" onclick="openTab(event, 'Diagnostique')">Diagnostic</button>
+            <button class="tablinks" onclick="openTab(event, 'Traitement')">Traitement</button>
+            <button class="tablinks" onclick="openTab(event, 'CasClinic')">Cas Cliniques</button>
+        </div>
+
+        <div id="Introduction" class="tabcontent" style="display: block;">
+            <h2>Définition de l'Insuffisance Respiratoire Aiguë</h2>
+            <p>La fonction essentielle du système respiratoire étant d'assurer les échanges gazeux, l'insuffisance respiratoire aiguë peut être définie par des altérations gazométriques. Bien que l'examen clinique soit souvent suggestif de l'insuffisance respiratoire (tachypnée, dyspnée, cyanose...), le diagnostic d'insuffisance respiratoire aiguë repose essentiellement sur l'analyse des gaz artériels.</p>
+            
+            <h3>Les deux grands tableaux d'insuffisance respiratoire:</h3>
+            <div class="chart-container">
+                <svg width="600" height="400" class="flow-chart">
+                    <rect x="200" y="20" width="200" height="50" rx="10" ry="10" fill="#3498db" />
+                    <text x="300" y="50" text-anchor="middle" fill="white" font-weight="bold">Insuffisance respiratoire</text>
+                    
+                    <!-- Lines -->
+                    <line x1="300" y1="70" x2="300" y2="100" stroke="#333" stroke-width="2" />
+                    <line x1="300" y1="100" x2="150" y2="100" stroke="#333" stroke-width="2" />
+                    <line x1="300" y1="100" x2="450" y2="100" stroke="#333" stroke-width="2" />
+                    <line x1="150" y1="100" x2="150" y2="130" stroke="#333" stroke-width="2" />
+                    <line x1="450" y1="100" x2="450" y2="130" stroke="#333" stroke-width="2" />
+                    
+                    <!-- Two main types -->
+                    <rect x="50" y="130" width="200" height="50" rx="10" ry="10" fill="#e74c3c" />
+                    <text x="150" y="160" text-anchor="middle" fill="white" font-weight="bold">"pump failure"</text>
+                    
+                    <rect x="350" y="130" width="200" height="50" rx="10" ry="10" fill="#2ecc71" />
+                    <text x="450" y="160" text-anchor="middle" fill="white" font-weight="bold">"lung failure"</text>
+                    
+                    <!-- Lines to subtypes -->
+                    <line x1="150" y1="180" x2="150" y2="210" stroke="#333" stroke-width="2" />
+                    <line x1="450" y1="180" x2="450" y2="210" stroke="#333" stroke-width="2" />
+                    
+                    <!-- Subtypes -->
+                    <rect x="50" y="210" width="200" height="50" rx="10" ry="10" fill="#f1c40f" />
+                    <text x="150" y="235" text-anchor="middle" fill="black" font-weight="bold">Hypoventilation</text>
+                    <text x="150" y="250" text-anchor="middle" fill="black">alvéolaire</text>
+                    
+                    <rect x="350" y="210" width="200" height="50" rx="10" ry="10" fill="#9b59b6" />
+                    <text x="450" y="235" text-anchor="middle" fill="white" font-weight="bold">Altérations</text>
+                    <text x="450" y="250" text-anchor="middle" fill="white">ventilation/perfusion</text>
+                    
+                    <!-- Lines to consequences -->
+                    <line x1="150" y1="260" x2="150" y2="290" stroke="#333" stroke-width="2" />
+                    <line x1="450" y1="260" x2="450" y2="290" stroke="#333" stroke-width="2" />
+                    
+                    <!-- Consequences -->
+                    <rect x="50" y="290" width="200" height="70" rx="10" ry="10" fill="#f39c12" />
+                    <text x="150" y="315" text-anchor="middle" fill="black" font-weight="bold">Hypercapnie</text>
+                    <text x="150" y="335" text-anchor="middle" fill="black" font-size="12">(hypoxémie secondaire,</text>
+                    <text x="150" y="350" text-anchor="middle" fill="black" font-size="12">mais (A-a)DO₂ normal)</text>
+                    
+                    <rect x="350" y="290" width="200" height="70" rx="10" ry="10" fill="#8e44ad" />
+                    <text x="450" y="315" text-anchor="middle" fill="white" font-weight="bold">Hypoxémie</text>
+                    <text x="450" y="335" text-anchor="middle" fill="white" font-size="12">((A-a)DO₂ augmenté</text>
+                    <text x="450" y="350" text-anchor="middle" fill="white" font-size="12">hypercapnie seulement</text>
+                    <text x="450" y="365" text-anchor="middle" fill="white" font-size="12">dans les cas graves)</text>
+                </svg>
+            </div>
+            
+            <h3>Les deux grands types d'insuffisance respiratoire:</h3>
+            <ol>
+                <li><strong>Insuffisance respiratoire hypercapnique ("pump failure")</strong>: Caractérisée par une PaCO₂ élevée en l'absence de compensation d'une alcalose métabolique.</li>
+                <li><strong>Insuffisance respiratoire hypoxémique ("lung failure")</strong>: Caractérisée par une PaO₂ abaissée.</li>
+            </ol>
+            
+            <div class="toggle-section" onclick="toggleContent('intro-more')">
+                <h3>En savoir plus sur l'interprétation des gaz du sang ▼</h3>
+            </div>
+            <div id="intro-more" class="toggle-content">
+                <p>L'interprétation de la PaO₂ doit tenir compte de la pression partielle en O₂ des alvéoles (PAO₂), qui est définie par l'équation des gaz alvéolaires (simplifiée):</p>
+                <p><strong>PAO₂ = (PB – PH₂O) × FiO₂ – (PACO₂/R)</strong></p>
+                <p>Où:</p>
+                <ul>
+                    <li>PB = pression atmosphérique (environ 760 mmHg)</li>
+                    <li>PH₂O = pression partielle de la vapeur d'eau (47 mmHg à 37°C)</li>
+                    <li>FiO₂ = fraction inspiratoire en O₂ du gaz inspiré</li>
+                    <li>R = quotient respiratoire (normalement environ 0,8, mais proche de 1 chez le malade grave)</li>
+                </ul>
+                <p>La PaO₂ normale à l'air ambiant peut être calculée: PAO₂ = (760 – 47) × 0,21 – (40/0,8) = 150 – 50 = 100 mmHg</p>
+                <p>Règle pratique pour interpréter une PaO₂ sous une FiO₂ donnée: la PaO₂ normale est obtenue en multipliant la concentration en oxygène par 5:</p>
+                <ul>
+                    <li>À l'air ambiant (21% O₂): PaO₂ normale ≈ 100 mmHg</li>
+                    <li>À 30% O₂: 150 mmHg</li>
+                    <li>À 50% O₂: 250 mmHg</li>
+                    <li>À 100% O₂: 500 mmHg</li>
+                </ul>
+                <p>La PaO₂ diminue normalement avec l'âge. Elle peut être estimée chez l'adulte par la relation: PaO₂ = 105 – âge/2.</p>
+            </div>
+        </div>
+
+        <div id="Classification" class="tabcontent">
+            <h2>Classification Détaillée des Insuffisances Respiratoires Aiguës</h2>
+            
+            <h3>1. Insuffisance Respiratoire Hypercapnique ("Pump Failure")</h3>
+            <p>L'hypercapnie est due à une ventilation alvéolaire globale insuffisante. Elle résulte d'un déséquilibre entre la force de la pompe respiratoire et les facteurs de charge.</p>
+            
+            <div class="toggle-section" onclick="toggleContent('hypercapnie-causes')">
+                <h4>Causes de l'insuffisance respiratoire hypercapnique ▼</h4>
+            </div>
+            <div id="hypercapnie-causes" class="toggle-content">
+                <table>
+                    <tr>
+                        <th>Défaillance de la pompe ventilatoire</th>
+                        <th>Augmentation de charge ventilatoire</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Dépression du centre respiratoire:</strong>
+                            <ul>
+                                <li>Excès de sédatifs ou de morphine</li>
+                                <li>Alcalose métabolique</li>
+                                <li>Trauma crânien sévère</li>
+                                <li>Accident vasculaire cérébral</li>
+                                <li>Atteinte du tronc cérébral</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <strong>Augmentation de la production de CO₂:</strong>
+                            <ul>
+                                <li>Sepsis</li>
+                                <li>États inflammatoires</li>
+                                <li>Agitation</li>
+                                <li>Douleur</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Transmission neuromusculaire anormale:</strong>
+                            <ul>
+                                <li>Atteinte spinale ou phrénique</li>
+                                <li>Myasthénie</li>
+                                <li>Guillain-Barré</li>
+                                <li>Tétanos</li>
+                                <li>Botulisme</li>
+                                <li>Polyneuropathie des soins intensifs</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <strong>Augmentation des résistances des voies aériennes:</strong>
+                            <ul>
+                                <li>Bronchospasme</li>
+                                <li>Sécrétions trachéo-bronchiques abondantes</li>
+                                <li>Œdème des voies aériennes</li>
+                                <li>Tubulures du respirateur trop longues</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Dysfonction musculaire:</strong>
+                            <ul>
+                                <li>Malnutrition sévère</li>
+                                <li>Altération du transport en oxygène</li>
+                                <li>Myopathie (Duchenne, SLA...)</li>
+                                <li>Hyper- ou hypokaliémie ou hypophosphorémie sévère</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <strong>Augmentation de la rigidité (élastique) pulmonaire:</strong>
+                            <ul>
+                                <li>Pneumonie ou atélectasie étendue</li>
+                                <li>Œdème pulmonaire</li>
+                            </ul>
+                            <strong>Altération de la cage thoracique:</strong>
+                            <ul>
+                                <li>Volet thoracique</li>
+                                <li>Pneumothorax</li>
+                                <li>Épanchement pleural important</li>
+                                <li>Distension abdominale sévère</li>
+                                <li>Ascite</li>
+                                <li>Obésité morbide</li>
+                                <li>Cyphoscoliose</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="toggle-section" onclick="toggleContent('hypercapnie-anatomique')">
+                <h4>Approche anatomique de l'hypercapnie ▼</h4>
+            </div>
+            <div id="hypercapnie-anatomique" class="toggle-content">
+                <ul>
+                    <li>
+                        <strong>Atteinte du centre respiratoire</strong>
+                        <ul>
+                            <li>Anesthésie, excès de calmants</li>
+                            <li>Atteinte du tronc cérébral, Pickwick, hypoventilation primaire (Ondine)</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Atteinte neuromusculaire</strong>
+                        <ul>
+                            <li>Myasthénie, myopathie, Guillain-Barré, SLA</li>
+                            <li>Trauma spinal</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Atteinte de la paroi thoracique</strong>
+                        <ul>
+                            <li>Cyphoscoliose, obésité majeure</li>
+                            <li>Fracture de côtes, atteinte diaphragmatique</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Atteinte des voies respiratoires</strong>
+                        <ul>
+                            <li>Laryngospasme, tumeur</li>
+                            <li>Sténose trachéale</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Atteinte des poumons</strong>
+                        <ul>
+                            <li>Bronchopneumonie sévère</li>
+                            <li>BPCO décompensée, asthme sévère</li>
+                            <li>Œdème pulmonaire sévère</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            
+            <h3>2. Insuffisance Respiratoire Hypoxémique ("Lung Failure")</h3>
+            <p>L'hypoxémie peut être liée à trois phénomènes principaux.</p>
+            
+            <div class="toggle-section" onclick="toggleContent('hypoxemie-causes')">
+                <h4>Causes principales d'hypoxémie ▼</h4>
+            </div>
+            <div id="hypoxemie-causes" class="toggle-content">
+                <ol>
+                    <li>
+                        <strong>Diminution de la pression alvéolaire en O₂ (PAO₂ abaissée)</strong>
+                        <ul>
+                            <li>Altitude</li>
+                            <li>Hypercapnie</li>
+                            <li>Gaz toxiques</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Shunt complet (PAO₂ normale)</strong>
+                        <ul>
+                            <li>Zone non ventilée (atélectasie complète)</li>
+                            <li>Comblement alvéolaire</li>
+                            <li>Shunt anatomique</li>
+                            <li>Hypoxémie relativement résistante à l'augmentation de la FiO₂</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Altérations ventilation-perfusion (PAO₂ normale)</strong>
+                        <ul>
+                            <li>Zone mal ventilée (shunt physiologique)</li>
+                            <li>La PaO₂ est sensiblement améliorée par une augmentation de la FiO₂</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Diminution de la PvO₂</strong>
+                        <ul>
+                            <li>Diminution du transport en oxygène</li>
+                            <li>Augmentation de la consommation d'oxygène</li>
+                            <li>Pour un shunt intrapulmonaire donné, une diminution de PvO₂ entraîne une diminution de PaO₂</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p>Les altérations de la diffusion d'oxygène sont une cause rare d'hypoxémie dans les pathologies aiguës.</p>
+            </div>
+        </div>
+
+        <div id="Diagnostique" class="tabcontent">
+            <h2>Diagnostic de l'Insuffisance Respiratoire Aiguë</h2>
+            
+            <div class="parameters">
+                <h3>Entrez les paramètres du patient:</h3>
+                <div class="parameter-group">
+                    <label for="age">Âge du patient:</label>
+                    <input type="number" id="age" min="0" max="120" value="60">
+                    
+                    <label for="pao2">PaO₂ (mmHg):</label>
+                    <input type="number" id="pao2" min="0" max="500" value="65">
+                    
+                    <label for="paco2">PaCO₂ (mmHg):</label>
+                    <input type="number" id="paco2" min="0" max="150" value="50">
+                    
+                    <label for="ph">pH:</label>
+                    <input type="number" id="ph" min="6.8" max="7.8" step="0.01" value="7.35">
+                    
+                    <label for="fio2">FiO₂ (fraction):</label>
+                    <input type="number" id="fio2" min="0.21" max="1.0" step="0.01" value="0.21">
+                    
+                    <label for="symptoms">Symptômes cliniques:</label>
+                    <div style="display: flex; flex-wrap: wrap;">
+                        <div style="margin-right: 20px;">
+                            <input type="checkbox" id="tachypnee" name="symptoms" value="tachypnee">
+                            <label for="tachypnee">Tachypnée</label><br>
+                            <input type="checkbox" id="dyspnee" name="symptoms" value="dyspnee">
+                            <label for="dyspnee">Dyspnée</label><br>
+                            <input type="checkbox" id="cyanose" name="symptoms" value="cyanose">
+                            <label for="cyanose">Cyanose</label><br>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="wheezing" name="symptoms" value="wheezing">
+                            <label for="wheezing">Wheezing</label><br>
+                            <input type="checkbox" id="secretions" name="symptoms" value="secretions">
+                            <label for="secretions">Sécrétions abondantes</label><br>
+                            <input type="checkbox" id="conscience" name="symptoms" value="conscience">
+                            <label for="conscience">Troubles de conscience</label><br>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="diagnostic-btn" onclick="analyseRespiratoire()">Analyser</button>
+            </div>
+            
+            <div id="diagnostic-result" class="result"></div>
+            
+            <h3>Interprétation des gaz du sang</h3>
+            <p>Voici quelques exemples pratiques d'interprétation des gaz du sang:</p>
+            
+            <table>
+                <tr>
+                    <th>Valeurs</th>
+                    <th>Interprétation</th>
+                </tr>
+                <tr>
+                    <td>PaO₂ 90 mmHg (FiO₂ 0,4), PaCO₂ 40 mmHg, pH 7,40</td>
+                    <td>Même si la valeur absolue de PaO₂ est normale, il existe une altération importante des échanges gazeux puisque la PaO₂ normale sous une FiO₂ de 0,4 est de 5 × 40 = 200 mmHg.</td>
+                </tr>
+                <tr>
+                    <td>PaO₂ 80 mmHg (FiO₂ 0,21), PaCO₂ 25 mmHg, pH 7,51</td>
+                    <td>Alcalémie (pH élevé) due à une alcalose respiratoire (PaCO₂ abaissée). Malgré une PaO₂ dans l'absolu normale, il existe une discrète hypoxémie. En effet, si la PaCO₂ était normale, la PaO₂ serait de : 80 – (40 – 25) = 65 mmHg.</td>
+                </tr>
+                <tr>
+                    <td>PaO₂ 110 mmHg (FiO₂ 0,35), PaCO₂ 50 mmHg, pH 7,40</td>
+                    <td>Acidose respiratoire (PaCO₂ élevée) sans acidémie (pH normal). Il existe donc une alcalose métabolique associée. PaO₂ attendue = 0,35 × 5 = 175 mmHg pour une PaCO₂ normale. Ici, la PaCO₂ est de 10 mmHg trop élevée, si bien que la PaO₂ attendue serait d'environ 165 mmHg. La PaO₂ de 110 mmHg reflète donc ici une hypoxémie modérée.</td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="Traitement" class="tabcontent">
+            <h2>Traitement de l'Insuffisance Respiratoire Aiguë</h2>
+            
+            <div class="select-container">
+                <h3>Sélectionnez le type d'insuffisance respiratoire:</h3>
+                <select id="insuff-type">
+                    <option value="">-- Choisir un type --</option>
+                    <option value="hypercapnique">Insuffisance Respiratoire Hypercapnique</option>
+                    <option value="hypoxemique">Insuffisance Respiratoire Hypoxémique</option>
+                </select>
+                
+                <div id="hypercapnique-options" style="display: none;">
+                    <h4>Sélectionnez la cause principale:</h4>
+                    <select id="hypercapnique-cause">
+                        <option value="">-- Choisir une cause --</option>
+                        <option value="centre">Dépression du centre respiratoire</option>
+                        <option value="neuromusculaire">Transmission neuromusculaire anormale</option>
+                        <option value="musculaire">Dysfonction musculaire</option>
+                        <option value="production-co2">Augmentation de la production de CO₂</option>
+                        <option value="resistance">Augmentation des résistances des voies aériennes</option>
+                        <option value="rigidite">Augmentation de la rigidité pulmonaire</option>
+                        <option value="thoracique">Altération de la cage thoracique</option>
+                    </select>
+                </div>
+                
+                <div id="hypoxemique-options" style="display: none;">
+                    <h4>Sélectionnez la cause principale:</h4>
+                    <select id="hypoxemique-cause">
+                        <option value="">-- Choisir une cause --</option>
+                        <option value="pao2-basse">Diminution de la pression alvéolaire en O₂</option>
+                        <option value="shunt">Shunt complet</option>
+                        <option value="va-q">Altérations ventilation-perfusion</option>
+                        <option value="pvo2">Diminution de la PvO₂</option>
+                    </select>
+                </div>
+                
+                <button class="treatment-btn" onclick="proposerTraitement()">Proposer un traitement</button>
+            </div>
+            
+            <div id="treatment-result" class="result"></div>
+            
+            <div class="toggle-section" onclick="toggleContent('traitement-general')">
+                <h3>Traitement général de l'insuffisance respiratoire hypercapnique ▼</h3>
+            </div>
+            <div id="traitement-general" class="toggle-content">
+                <h4>1. Oxygène</h4>
+                <p>Même si l'hypoxémie n'est pas prédominante dans les altérations de la pompe respiratoire (pump failure), à l'air ambiant, l'hypercapnie s'accompagne toujours d'hypoxémie.</p>
+                <p>L'oxygénothérapie ne corrige évidemment pas l'hypoventilation! Au contraire, en cas d'insuffisance respiratoire chronique décompensée, l'administration excessive d'oxygène peut aggraver l'hypercapnie et précipiter la carbonarcose. L'oxygénothérapie doit être prudente: on vise une SaO₂ proche de 90%.</p>
+                
+                <h4>2. Traitement de la cause</h4>
+                <ul>
+                    <li>Gérer la douleur et le confort, éviter l'administration excessive de calmants ou augmenter les antalgiques si nécessaire</li>
+                    <li>Éliminer les sécrétions: aspirations trachéales, fluidifiants et aérosols, kinésithérapie</li>
+                    <li>Traiter l'infection éventuelle</li>
+                    <li>Administrer des bronchodilatateurs (β-adrénergiques) et éventuellement des stéroïdes en cas de bronchospasme</li>
+                </ul>
+                
+                <h4>3. Correction de l'alcalose métabolique</h4>
+                <p>Corriger l'alcalose métabolique éventuellement surajoutée (qui entraîne une compensation par acidose respiratoire). Maintenir le K⁺ > 4,5 mEq/L (les ajouts de KCl représentent une bonne manière d'apporter du chlore).</p>
+                
+                <h4>4. Assurer un transport en oxygène suffisant</h4>
+                <p>Transfuser en cas d'anémie associée et envisager un traitement inotrope en cas d'insuffisance cardiaque.</p>
+                
+                <h4>5. Appliquer un support ventilatoire</h4>
+                <p>Essayer d'éviter l'intubation endotrachéale si possible. Envisager d'abord la ventilation non invasive (VNI) au masque.</p>
+            </div>
+            
+            <div class="toggle-section" onclick="toggleContent('traitement-hypoxemie')">
+                <h3>Traitement général de l'insuffisance respiratoire hypoxémique ▼</h3>
+            </div>
+            <div id="traitement-hypoxemie" class="toggle-content">
+                <h4>1. Traitement de la cause</h4>
+                <p>La cause de l'hypoxémie peut parfois être levée rapidement:</p>
+                <ul>
+                    <li>Aspiration de sécrétions trachéobronchiques</li>
+                    <li>Bronchofibroscopie ou kinésithérapie pour lever une atélectasie</li>
+                    <li>Retrait de quelques centimètres d'un tube endotrachéal enfoncé dans une bronche souche</li>
+                    <li>Réduction volémique par administration de furosémide ou par ultrafiltration en cas d'œdème pulmonaire</li>
+                </ul>
+                
+                <h4>2. Oxygénothérapie</h4>
+                <p>L'oxygénothérapie peut être effectuée par:</p>
+                <ul>
+                    <li>Sonde nasale ou lunettes nasales (pour une hypoxémie légère)</li>
+                    <li>Masque ordinaire (urgence)</li>
+                    <li>Ventimask (FiO₂ contrôlée)</li>
+                    <li>T-tube (pour tube endotrachéal ou canule de trachéotomie)</li>
+                    <li>Non-rebreathing mask (hautes concentrations d'O₂)</li>
+                    <li>Mélangeur avec FiO₂ réglable</li>
+                </ul>
+                <p>On évite toujours l'hypoxémie, même chez l'individu jeune sans insuffisance coronaire. On tente de maintenir la PaO₂ au moins à 60 mmHg afin que la SaO₂ soit au moins à 90%.</p>
+                
+                <h4>3. Maintien d'une pression positive continue dans les voies aériennes</h4>
+                <ul>
+                    <li>CPAP (continuous positive airway pressure) au cours de la ventilation spontanée</li>
+                    <li>PEEP (positive end-expiratory pressure) au cours de la ventilation mécanique</li>
+                </ul>
+            </div>
+            
+            <div class="toggle-section" onclick="toggleContent('modes-oxygenotherapie')">
+                <h3>Modes d'oxygénothérapie et FiO₂ ▼</h3>
+            </div>
+            <div id="modes-oxygenotherapie" class="toggle-content">
+                <table>
+                    <tr>
+                        <th>Mode d'administration</th>
+                        <th>FiO₂ approximative</th>
+                        <th>Indications</th>
+                        <th>Avantages/Inconvénients</th>
+                    </tr>
+                    <tr>
+                        <td>Lunettes nasales</td>
+                        <td>
+                            1 L/min: 0,24<br>
+                            2 L/min: 0,27<br>
+                            3 L/min: 0,30<br>
+                            4 L/min: 0,33<br>
+                            5-6 L/min: 0,40
+                        </td>
+                        <td>Hypoxémie légère, pendant les repas</td>
+                        <td>
+                            <strong>+</strong> Bonne tolérance<br>
+                            <strong>-</strong> FiO₂ variable, obstruction possible par sécrétions
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Masque ordinaire</td>
+                        <td>Variable (selon débit: 5-8 L/min)</td>
+                        <td>Situations d'urgence</td>
+                        <td>
+                            <strong>+</strong> Rapidité d'installation<br>
+                            <strong>-</strong> FiO₂ non quantifiable
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Ventimask</td>
+                        <td>
+                            0,24 - 0,28 - 0,31<br>
+                            0,35 - 0,40 - 0,50
+                        </td>
+                        <td>Besoin de FiO₂ précise et contrôlée</td>
+                        <td>
+                            <strong>+</strong> FiO₂ connue et contrôlée<br>
+                            <strong>-</strong> Moins confortable
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>T-tube</td>
+                        <td>Variable selon réglage</td>
+                        <td>Patients intubés ou trachéotomisés</td>
+                        <td>
+                            <strong>+</strong> Meilleure humidification<br>
+                            <strong>-</strong> Nécessite intubation/trachéotomie
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Non-rebreathing mask (partiel)</td>
+                        <td>0,6 - 0,8</td>
+                        <td>Œdème pulmonaire, intoxication au CO</td>
+                        <td>
+                            <strong>+</strong> Haute concentration d'O₂<br>
+                            <strong>-</strong> Usage temporaire, risque de toxicité
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Non-rebreathing mask (complet)</td>
+                        <td>0,7 - 0,9</td>
+                        <td>Besoin de FiO₂ très élevée temporairement</td>
+                        <td>
+                            <strong>+</strong> Très haute concentration d'O₂<br>
+                            <strong>-</strong> Usage temporaire, risque de toxicité
+                        </td>
+                    </tr>
+                </table>
+                <p><strong>Note:</strong> Les FiO₂ élevées (>0,50) pendant plus de 24 heures peuvent entraîner une toxicité de l'oxygène et des atélectasies d'absorption. Ces risques sont négligeables à court terme (réanimation cardio-respiratoire, choc, transport).</p>
+            </div>
+        </div>
+
+        <div id="CasClinic" class="tabcontent">
+            <h2>Cas Cliniques</h2>
+            
+            <div class="toggle-section" onclick="toggleContent('cas1')">
+                <h3>Cas #1: Patient BPCO avec insuffisance respiratoire aiguë ▼</h3>
+            </div>
+            <div id="cas1" class="toggle-content">
+                <p><strong>Homme de 68 ans, BPCO connu, hospitalisé pour dyspnée progressive depuis 2 jours.</strong></p>
+                <p><strong>Examen clinique:</strong> Tachypnée à 28/min, utilisation des muscles accessoires, wheezing diffus bilatéral.</p>
+                <p><strong>Gaz du sang (air ambiant):</strong> pH 7.31, PaO₂ 58 mmHg, PaCO₂ 68 mmHg, HCO₃⁻ 32 mmol/L.</p>
+                
+                <h4>Analyse</h4>
+                <p>Ce patient présente une insuffisance respiratoire hypercapnique sur BPCO décompensée. L'acidose respiratoire avec bicarbonates élevés suggère une hypercapnie chronique avec décompensation aiguë.</p>
+                
+                <h4>Prise en charge</h4>
+                <ol>
+                    <li><strong>Oxygénothérapie contrôlée</strong>: Ventimask avec FiO₂ à 28-31%, visant une SpO₂ 88-92% (attention à ne pas dépasser pour éviter la carbonarcose)</li>
+                    <li><strong>Bronchodilatateurs</strong>: β₂-agonistes et anticholinergiques nébulisés</li>
+                    <li><strong>Corticothérapie systémique</strong>: Méthylprednisolone IV</li>
+                    <li><strong>Antibiotiques</strong> si suspicion d'infection</li>
+                    <li><strong>VNI</strong> en mode BiPAP (aide inspiratoire + PEP)</li>
+                    <li><strong>Surveillance étroite</strong> des gaz du sang et de l'état clinique</li>
+                </ol>
+                
+                <p><strong>Évolution:</strong> Après 1h de VNI, les gaz du sang montrent: pH 7.36, PaCO₂ 60 mmHg, PaO₂ 65 mmHg. La VNI est maintenue par sessions intermittentes.</p>
+            </div>
+            
+            <div class="toggle-section" onclick="toggleContent('cas2')">
+                <h3>Cas #2: Patient avec œdème pulmonaire cardiogénique ▼</h3>
+            </div>
+            <div id="cas2" class="toggle-content">
+                <p><strong>Femme de 75 ans, antécédents de cardiopathie ischémique, admise pour dyspnée brutale et orthopnée.</strong></p>
+                <p><strong>Examen clinique:</strong> Tachypnée à 32/min, crépitants bilatéraux, œdèmes des membres inférieurs, TA 180/100 mmHg.</p>
+                <p><strong>Gaz du sang (air ambiant):</strong> pH 7.42, PaO₂ 52 mmHg, PaCO₂ 30 mmHg, HCO₃⁻ 19 mmol/L.</p>
+                
+                <h4>Analyse</h4>
+                <p>Cette patiente présente une insuffisance respiratoire hypoxémique sur œdème pulmonaire cardiogénique. L'hypocapnie indique une hyperventilation compensatoire à l'hypoxémie.</p>
+                
+                <h4>Prise en charge</h4>
+                <ol>
+                    <li><strong>Oxygénothérapie à haut débit</strong>: Non-rebreathing mask (FiO₂ élevée) initialement</li>
+                    <li><strong>Position semi-assise</strong></li>
+                    <li><strong>CPAP</strong> par masque facial (10 cmH₂O)</li>
+                    <li><strong>Traitement de l'OAP</strong>: 
+                        <ul>
+                            <li>Dérivés nitrés IV (vasodilatateurs)</li>
+                            <li>Furosémide IV (diurétique)</li>
+                            <li>Morphine à faible dose (pour l'anxiété et la vasodilatation)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Traitement de l'hypertension</strong></li>
+                    <li><strong>Surveillance cardiaque</strong> et des paramètres respiratoires</li>
+                </ol>
+                
+                <p><strong>Évolution:</strong> Après 2h de traitement, nette amélioration clinique et gazométrique: pH 7.38, PaO₂ 85 mmHg (sous O₂), PaCO₂ 35 mmHg.</p>
+            </div>
+            
+            <div class="toggle-section" onclick="toggleContent('cas3')">
+                <h3>Cas #3: Patient avec intoxication médicamenteuse ▼</h3>
+            </div>
+            <div id="cas3" class="toggle-content">
+                <p><strong>Homme de 42 ans, découvert inconscient à domicile, suspicion d'ingestion massive de benzodiazépines et d'alcool.</strong></p>
+                <p><strong>Examen clinique:</strong> Score de Glasgow à 8, bradypnée à 8/min, TA 110/70 mmHg, SpO₂ 88% à l'air ambiant.</p>
+                <p><strong>Gaz du sang (air ambiant):</strong> pH 7.28, PaO₂ 62 mmHg, PaCO₂ 65 mmHg, HCO₃⁻ 24 mmol/L.</p>
+                
+                <h4>Analyse</h4>
+                <p>Ce patient présente une insuffisance respiratoire hypercapnique sur dépression du centre respiratoire suite à l'intoxication médicamenteuse. L'acidose respiratoire est aiguë (bicarbonates normaux).</p>
+                
+                <h4>Prise en charge</h4>
+                <ol>
+                    <li><strong>Sécurisation des voies aériennes</strong>: Intubation endotrachéale et ventilation mécanique (vu le trouble de conscience)</li>
+                    <li><strong>Oxygénothérapie</strong></li>
+                    <li><strong>Administration de flumazénil</strong> (antagoniste des benzodiazépines) avec prudence si suspicion de dépendance ou d'intoxication mixte</li>
+                    <li><strong>Réhydratation</strong> et surveillance des fonctions vitales</li>
+                    <li><strong>Ventilation protectrice</strong> avec normoventilation (éviter l'hyperventilation)</li>
+                </ol>
+                
+                <p><strong>Évolution:</strong> Après 6h de prise en charge, amélioration neurologique progressive. Extubation possible après 24h et normalisation des gaz du sang.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        
+        function toggleContent(id) {
+            var content = document.getElementById(id);
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+        
+        document.getElementById('insuff-type').addEventListener('change', function() {
+            document.getElementById('hypercapnique-options').style.display = 'none';
+            document.getElementById('hypoxemique-options').style.display = 'none';
+            
+            if (this.value === 'hypercapnique') {
+                document.getElementById('hypercapnique-options').style.display = 'block';
+            } else if (this.value === 'hypoxemique') {
+                document.getElementById('hypoxemique-options').style.display = 'block';
+            }
+        });
+        
+        function analyseRespiratoire() {
+            const age = parseInt(document.getElementById('age').value);
+            const pao2 = parseInt(document.getElementById('pao2').value);
+            const paco2 = parseInt(document.getElementById('paco2').value);
+            const ph = parseFloat(document.getElementById('ph').value);
+            const fio2 = parseFloat(document.getElementById('fio2').value);
+            
+            const symptoms = [];
+            const checkboxes = document.querySelectorAll('input[name="symptoms"]:checked');
+            checkboxes.forEach(checkbox => {
+                symptoms.push(checkbox.value);
+            });
+            
+            // Calculer la PaO2 normale attendue pour cet âge
+            const expectedPaO2 = 105 - (age / 2);
+            
+            // Calculer la PaO2 attendue pour cette FiO2
+            const expectedPaO2ForFiO2 = fio2 * 500;
+            
+            let result = '';
+            let resultClass = '';
+            
+            // Analyse de l'état acido-basique
+            let acidoBasiqueState = '';
+            if (ph < 7.35) {
+                if (paco2 > 45) {
+                    acidoBasiqueState = 'Acidose respiratoire';
+                } else {
+                    acidoBasiqueState = 'Acidose métabolique';
+                }
+            } else if (ph > 7.45) {
+                if (paco2 < 35) {
+                    acidoBasiqueState = 'Alcalose respiratoire';
+                } else {
+                    acidoBasiqueState = 'Alcalose métabolique';
+                }
+            } else {
+                if (paco2 > 45) {
+                    acidoBasiqueState = 'Acidose respiratoire partiellement compensée';
+                } else if (paco2 < 35) {
+                    acidoBasiqueState = 'Alcalose respiratoire partiellement compensée';
+                } else {
+                    acidoBasiqueState = 'Équilibre acido-basique normal';
+                }
+            }
+            
+            // Détermination du type d'insuffisance respiratoire
+            let insuffType = '';
+            if (pao2 < 60 || pao2 < expectedPaO2 - 10) {
+                if (paco2 > 45) {
+                    insuffType = 'Insuffisance respiratoire hypercapnique et hypoxémique';
+                    resultClass = 'danger';
+                } else {
+                    insuffType = 'Insuffisance respiratoire hypoxémique';
+                    resultClass = 'warning';
+                }
+            } else if (paco2 > 45) {
+                insuffType = 'Insuffisance respiratoire hypercapnique sans hypoxémie significative';
+                resultClass = 'warning';
+            } else {
+                insuffType = 'Pas d\'insuffisance respiratoire significative selon les valeurs gazométriques';
+                resultClass = 'success';
+            }
+            
+            // Évaluation de l'efficacité des échanges gazeux
+            let efficaciteEchanges = '';
+            if (pao2 < expectedPaO2ForFiO2 * 0.8) {
+                efficaciteEchanges = 'Altération significative des échanges gazeux. Le rapport PaO₂/FiO₂ est de ' + Math.round(pao2/fio2) + ' mmHg (normal > 500 mmHg).';
+            } else {
+                efficaciteEchanges = 'Échanges gazeux relativement préservés. Le rapport PaO₂/FiO₂ est de ' + Math.round(pao2/fio2) + ' mmHg.';
+            }
+            
+            // Compilation du résultat
+            result = `
+                <h3>Analyse des gaz du sang</h3>
+                <p><strong>État acido-basique:</strong> ${acidoBasiqueState} (pH ${ph})</p>
+                <p><strong>Diagnostic:</strong> ${insuffType}</p>
+                <p><strong>Évaluation des échanges gazeux:</strong> ${efficaciteEchanges}</p>
+                <p><strong>PaO₂ attendue pour l'âge (air ambiant):</strong> ${Math.round(expectedPaO2)} mmHg</p>
+                <p><strong>PaO₂ attendue pour la FiO₂ de ${fio2}:</strong> ${Math.round(expectedPaO2ForFiO2)} mmHg</p>
+            `;
+            
+            // Analyse clinique
+            if (symptoms.length > 0) {
+                result += `<h3>Analyse des symptômes cliniques</h3><p>`;
+                
+                if (symptoms.includes('tachypnee')) {
+                    result += 'La tachypnée peut indiquer une compensation respiratoire face à l\'hypoxémie ou à l\'acidose métabolique. ';
+                }
+                
+                if (symptoms.includes('dyspnee')) {
+                    result += 'La dyspnée suggère un travail respiratoire accru et peut être associée à diverses pathologies pulmonaires ou cardiaques. ';
+                }
+                
+                if (symptoms.includes('cyanose')) {
+                    result += 'La cyanose indique une désaturation significative en oxygène (généralement SaO₂ < 85%). ';
+                }
+                
+                if (symptoms.includes('wheezing')) {
+                    result += 'Le wheezing suggère une obstruction des voies aériennes (asthme, BPCO, bronchospasme). ';
+                }
+                
+                if (symptoms.includes('secretions')) {
+                    result += 'Les sécrétions abondantes peuvent être associées à une infection respiratoire ou à une bronchite chronique. ';
+                }
+                
+                if (symptoms.includes('conscience')) {
+                    result += 'Les troubles de conscience peuvent être liés à l\'hypoxémie sévère ou à l\'hypercapnie (narcose au CO₂). ';
+                }
+                
+                result += '</p>';
+            }
+            
+            // Recommandations
+            result += `<h3>Recommandations</h3><p>`;
+            
+            if (pao2 < 60) {
+                result += 'Administration d\'oxygène pour maintenir une SaO₂ > 90% ';
+                
+                if (paco2 > 45) {
+                    result += '(attention au risque de carbonarcose: viser une SaO₂ de 88-92%). ';
+                } else {
+                    result += '(viser une SaO₂ > 94%). ';
+                }
+            }
+            
+            if (paco2 > 45 && ph < 7.35) {
+                result += 'Une assistance ventilatoire non invasive (VNI) devrait être envisagée. ';
+                
+                if (symptoms.includes('conscience')) {
+                    result += 'Vu les troubles de conscience, une ventilation invasive peut être nécessaire. ';
+                }
+            }
+            
+            if (symptoms.includes('wheezing')) {
+                result += 'Administration de bronchodilatateurs (β₂-agonistes). ';
+            }
+            
+            if (symptoms.includes('secretions')) {
+                result += 'Kinésithérapie respiratoire et aspiration des sécrétions. ';
+            }
+            
+            result += 'Traiter la cause sous-jacente de l\'insuffisance respiratoire. ';
+            result += '</p>';
+            
+            const diagnosticResult = document.getElementById('diagnostic-result');
+            diagnosticResult.innerHTML = result;
+            diagnosticResult.className = 'result ' + resultClass;
+            diagnosticResult.style.display = 'block';
+        }
+        
+        function proposerTraitement() {
+            const insuffType = document.getElementById('insuff-type').value;
+            let cause = '';
+            
+            if (insuffType === 'hypercapnique') {
+                cause = document.getElementById('hypercapnique-cause').value;
+            } else if (insuffType === 'hypoxemique') {
+                cause = document.getElementById('hypoxemique-cause').value;
+            }
+            
+            if (!insuffType || !cause) {
+                alert('Veuillez sélectionner le type d\'insuffisance respiratoire et la cause.');
+                return;
+            }
+            
+            let result = '';
+            let resultClass = 'info';
+            
+            if (insuffType === 'hypercapnique') {
+                result = `<h3>Traitement de l'Insuffisance Respiratoire Hypercapnique</h3>`;
+                
+                // Mesures générales
+                result += `
+                <h4>Mesures générales</h4>
+                <ul>
+                    <li>Oxygénothérapie contrôlée (viser une SaO₂ 88-92% pour éviter la carbonarcose)</li>
+                    <li>Monitoring continu: SpO₂, fréquence respiratoire, état de conscience</li>
+                    <li>Gazométrie artérielle de contrôle après ajustement thérapeutique</li>
+                </ul>`;
+                
+                // Mesures spécifiques selon la cause
+                result += `<h4>Traitement spécifique</h4>`;
+                
+                switch(cause) {
+                    case 'centre':
+                        result += `
+                        <p>Dépression du centre respiratoire:</p>
+                        <ul>
+                            <li>Si surdosage en opioïdes: administration de naloxone (titration prudente)</li>
+                            <li>Si surdosage en benzodiazépines: envisager flumazénil (avec précaution)</li>
+                            <li>Arrêt des médicaments sédatifs non indispensables</li>
+                            <li>Correction d'une éventuelle alcalose métabolique (apport de chlore)</li>
+                            <li>Si nécessaire: ventilation non invasive (VNI) ou intubation/ventilation mécanique</li>
+                        </ul>`;
+                        break;
+                        
+                    case 'neuromusculaire':
+                        result += `
+                        <p>Transmission neuromusculaire anormale:</p>
+                        <ul>
+                            <li>Traitement spécifique de la pathologie sous-jacente (ex: immunoglobulines IV pour Guillain-Barré)</li>
+                            <li>Support ventilatoire: ventilation non invasive ou invasive selon la sévérité</li>
+                            <li>Kinésithérapie respiratoire</li>
+                            <li>Prévention des complications de décubitus</li>
+                            <li>Surveillance neurologique étroite</li>
+                        </ul>`;
+                        break;
+                        
+                    case 'musculaire':
+                        result += `
+                        <p>Dysfonction musculaire:</p>
+                        <ul>
+                            <li>Correction des troubles électrolytiques (K⁺, PO₄³⁻, Mg²⁺)</li>
+                            <li>Support nutritionnel adapté</li>
+                            <li>Optimisation du transport en oxygène (correction de l'anémie)</li>
+                            <li>Support ventilatoire: VNI ou ventilation invasive selon la sévérité</li>
+                            <li>Traitement de la pathologie sous-jacente</li>
+                        </ul>`;
+                        break;
+                        
+                    case 'production-co2':
+                        result += `
+                        <p>Augmentation de la production de CO₂:</p>
+                        <ul>
+                            <li>Traitement de la fièvre et des frissons</li>
+                            <li>Traitement du sepsis ou de l'état inflammatoire sous-jacent</li>
+                            <li>Contrôle de l'agitation (sédation légère si nécessaire)</li>
+                            <li>Analgésie adaptée pour contrôler la douleur</li>
+                            <li>Ajustement de l'apport calorique (éviter la suralimentation)</li>
+                            <li>Support ventilatoire si nécessaire</li>
+                        </ul>`;
+                        break;
+                        
+                    case 'resistance':
+                        result += `
+                        <p>Augmentation des résistances des voies aériennes:</p>
+                        <ul>
+                            <li>Bronchodilatateurs (β₂-agonistes, anticholinergiques)</li>
+                            <li>Corticostéroïdes systémiques en cas de bronchospasme</li>
+                            <li>Aspiration des sécrétions trachéo-bronchiques</li>
+                            <li>Aérosolthérapie et fluidifiants</li>
+                            <li>Kinésithérapie respiratoire</li>
+                            <li>Traitement d'une infection respiratoire si présente</li>
+                            <li>Ventilation non invasive avec aide inspiratoire</li>
+                        </ul>`;
+                        break;
+                        
+                    case 'rigidite':
+                        result += `
+                        <p>Augmentation de la rigidité pulmonaire:</p>
+                        <ul>
+                            <li>Traitement de la cause sous-jacente (pneumonie, œdème)</li>
+                            <li>Antibiotiques si origine infectieuse</li>
+                            <li>Diurétiques si œdème pulmonaire</li>
+                            <li>Décubitus ventral si indiqué (syndrome de détresse respiratoire)</li>
+                            <li>Ventilation avec PEP adaptée</li>
+                            <li>Manœuvres de recrutement alvéolaire si indiquées</li>
+                        </ul>`;
+                        break;
+                        
+                    case 'thoracique':
+                        result += `
+                        <p>Altération de la cage thoracique:</p>
+                        <ul>
+                            <li>Drainage d'un pneumothorax ou d'un épanchement pleural</li>
+                            <li>Stabilisation d'un volet thoracique</li>
+                            <li>Analgésie efficace (blocs nerveux, péridurale) en cas de fractures costales</li>
+                            <li>Décompression abdominale en cas de distension abdominale sévère</li>
+                            <li>Paracentèse si ascite importante</li>
+                            <li>Support ventilatoire adapté (VNI ou invasive)</li>
+                            <li>Kinésithérapie respiratoire adaptée</li>
+                        </ul>`;
+                        break;
+                }
+                
+            } else if (insuffType === 'hypoxemique') {
+                result = `<h3>Traitement de l'Insuffisance Respiratoire Hypoxémique</h3>`;
+                
+                // Mesures générales
+                result += `
+                <h4>Mesures générales</h4>
+                <ul>
+                    <li>Oxygénothérapie adaptée pour maintenir une SaO₂ > 92%</li>
+                    <li>Position semi-assise ou optimisée pour la ventilation</li>
+                    <li>Monitoring continu: SpO₂, fréquence respiratoire, état hémodynamique</li>
+                    <li>Gazométrie artérielle de contrôle après ajustement thérapeutique</li>
+                </ul>`;
+                
+                // Mesures spécifiques selon la cause
+                result += `<h4>Traitement spécifique</h4>`;
+                
+                switch(cause) {
+                    case 'pao2-basse':
+                        result += `
+                        <p>Diminution de la pression alvéolaire en O₂:</p>
+                        <ul>
+                            <li>Si hypercapnie: traitement de la cause de l'hypoventilation</li>
+                            <li>Si altitude: oxygénothérapie à plus haut débit</li>
+                            <li>Si gaz toxiques: extraction du milieu toxique, oxygène à haut débit</li>
+                            <li>Ventilation non invasive ou invasive si nécessaire</li>
+                            <li>Traitement du bronchospasme si présent</li>
+                        </ul>`;
+                        break;
+                        
+                    case 'shunt':
+                        result += `
+                        <p>Shunt complet (zone non ventilée, shunt anatomique):</p>
+                        <ul>
+                            <li>Traitement de l'atélectasie: bronchoscopie, kinésithérapie intensive</li>
+                            <li>En cas de comblement alvéolaire: traitement étiologique (antibiotiques, diurétiques...)</li>
+                            <li>PEEP/CPAP pour recruter les territoires collabés (5-15 cmH₂O)</li>
+                            <li>Décubitus ventral si approprié (syndrome de détresse respiratoire)</li>
+                            <li>Intubation/ventilation si insuffisance respiratoire sévère</li>
+                            <li>Dans certains cas: correction chirurgicale d'un shunt anatomique</li>
+                        </ul>`;
+                        break;
+                        
+                    case 'va-q':
+                        result += `
+                        <p>Altérations ventilation-perfusion:</p>
+                        <ul>
+                            <li>Oxygénothérapie à débit adapté (effet bénéfique sur les rapports VA/Q)</li>
+                            <li>Bronchodilatateurs si bronchospasme</li>
+                            <li>CPAP/PEP pour améliorer la distribution de la ventilation</li>
+                            <li>Aspiration des sécrétions et kinésithérapie</li>
+                            <li>Traitement de la pathologie sous-jacente (pneumonie, œdème...)</li>
+                            <li>Maintien d'une volémie adaptée (ni surcharge, ni hypovolémie)</li>
+                        </ul>`;
+                        break;
+                        
+                    case 'pvo2':
+                        result += `
+                        <p>Diminution de la PvO₂ (↓ transport O₂ ou ↑ consommation):</p>
+                        <ul>
+                            <li>Transfusion si anémie significative (Hb < 7-8 g/dL selon contexte)</li>
+                            <li>Optimisation hémodynamique (remplissage, inotropes si bas débit)</li>
+                            <li>Contrôle de la fièvre</li>
+                            <li>Sédation et contrôle des frissons si nécessaire</li>
+                            <li>Traitement du sepsis/choc septique</li>
+                            <li>Repos des muscles respiratoires (ventilation mécanique) si travail respiratoire excessif</li>
+                            <li>Correction des désordres métaboliques</li>
+                        </ul>`;
+                        break;
+                }
+            }
+            
+            // Recommandations pour le monitoring et le suivi
+            result += `
+            <h4>Monitoring et suivi</h4>
+            <ul>
+                <li>Surveillance clinique: niveau de conscience, fréquence respiratoire, SpO₂, signes de lutte</li>
+                <li>Gazométrie artérielle de contrôle après mise en place du traitement</li>
+                <li>Adaptation du traitement en fonction de l'évolution</li>
+                <li>Évaluation quotidienne du besoin de support ventilatoire</li>
+                <li>Sevrage progressif des thérapeutiques selon l'amélioration</li>
+            </ul>`;
+            
+            const treatmentResult = document.getElementById('treatment-result');
+            treatmentResult.innerHTML = result;
+            treatmentResult.className = 'result ' + resultClass;
+            treatmentResult.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

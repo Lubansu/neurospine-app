@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide de Ventilation Mécanique</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+        }
+        
+        nav {
+            background-color: var(--secondary);
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        nav button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            flex-grow: 1;
+        }
+        
+        nav button:hover, nav button.active {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        main {
+            padding: 20px;
+        }
+        
+        .tab {
+            display: none;
+        }
+        
+        .tab.active {
+            display: block;
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        ul, ol {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card h3 {
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+        }
+        
+        .btn-warning:hover {
+            background-color: #f39c12;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .results {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary);
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .flex-item {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+            }
+            
+            .flex-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Guide de Ventilation Mécanique</h1>
+            <p>Une application d'aide à la décision basée sur les principes et guidelines de ventilation mécanique</p>
+        </header>
+        
+        <nav>
+            <button class="tab-btn active" data-tab="introduction">Introduction</button>
+            <button class="tab-btn" data-tab="modes">Modes Ventilatoires</button>
+            <button class="tab-btn" data-tab="parametres">Paramètres</button>
+            <button class="tab-btn" data-tab="pathologies">Pathologies</button>
+            <button class="tab-btn" data-tab="aide-decision">Aide à la Décision</button>
+            <button class="tab-btn" data-tab="sevrage">Sevrage</button>
+        </nav>
+        
+        <main>
+            <!-- Tab: Introduction -->
+            <div id="introduction" class="tab active">
+                <h2>Principes de base de la ventilation mécanique</h2>
+                
+                <div class="card">
+                    <h3>Indications de la ventilation mécanique</h3>
+                    <ol>
+                        <li><strong>Augmenter la ventilation alvéolaire</strong>
+                            <ul>
+                                <li>Corriger des altérations gazométriques sévères</li>
+                                <li>Soulager la fatigue musculaire respiratoire</li>
+                                <li>Pallier aux délabrements thoraciques importants</li>
+                            </ul>
+                        </li>
+                        <li><strong>Corriger l'hypercapnie</strong>
+                            <ul>
+                                <li>Attention à l'hypercapnie chronique compensée</li>
+                                <li>Hypercapnie "permissive" dans certaines situations (ARDS, asthme sévère)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Corriger une hypoxémie sévère</strong>
+                            <ul>
+                                <li>Maintenir une SaO₂ > 90% (PaO₂ > 60 mmHg)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Contribuer au support cardio-circulatoire</strong>
+                            <ul>
+                                <li>Diminuer la demande en oxygène des muscles respiratoires</li>
+                                <li>Diminuer la post-charge ventriculaire gauche</li>
+                            </ul>
+                        </li>
+                        <li><strong>Permettre l'anesthésie générale ou la sédation/analgésie profonde</strong></li>
+                    </ol>
+                </div>
+                
+                <div class="card">
+                    <h3>Types de ventilation mécanique</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Ventilation invasive</h4>
+                            <ul>
+                                <li>Nécessite une intubation endotrachéale ou une trachéotomie</li>
+                                <li>Permet un contrôle complet de la ventilation</li>
+                                <li>Facilite l'aspiration des sécrétions</li>
+                                <li>Risques : infections nosocomiales, lésions trachéales, impossibilité de parler</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Ventilation non invasive (VNI)</h4>
+                            <ul>
+                                <li>Par masque facial ou nasal</li>
+                                <li>Évite les complications de l'intubation</li>
+                                <li>Indications principales:
+                                    <ul>
+                                        <li>BPCO décompensée</li>
+                                        <li>Œdème pulmonaire cardiogénique</li>
+                                        <li>ARDS d'évolution potentiellement rapide</li>
+                                    </ul>
+                                </li>
+                                <li>Contre-indications: voir l'onglet "Pathologies"</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Effets de la ventilation mécanique sur les autres organes</h3>
+                    <table>
+                        <tr>
+                            <th>Système</th>
+                            <th>Effets</th>
+                        </tr>
+                        <tr>
+                            <td>Hémodynamique</td>
+                            <td>
+                                - Diminution du retour veineux (↓ précharge)<br>
+                                - Diminution de la post-charge du ventricule gauche<br>
+                                - Effet variable sur la post-charge du ventricule droit
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Métabolique</td>
+                            <td>Diminution de la demande en oxygène des muscles respiratoires</td>
+                        </tr>
+                        <tr>
+                            <td>Rénal</td>
+                            <td>
+                                - Possible diminution de la perfusion rénale<br>
+                                - Rétention hydrique (↑ ADH, ↓ facteur natriurétique)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Gastro-intestinal</td>
+                            <td>
+                                - Distension aérique gastrique<br>
+                                - Possible diminution de la perfusion hépatique
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Cérébral</td>
+                            <td>Possible augmentation de la pression intracrânienne (via ↑ pression veineuse centrale)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Tab: Modes Ventilatoires -->
+            <div id="modes" class="tab">
+                <h2>Modes de ventilation mécanique</h2>
+                
+                <div class="card">
+                    <h3>1. Ventilation à volume prédéterminé</h3>
+                    <ul>
+                        <li><strong>Volume Assisté/Contrôlé (VA/C ou VC)</strong>
+                            <ul>
+                                <li>Volume courant fixe (typiquement 8 ml/kg)</li>
+                                <li>Le patient reçoit ce volume à chaque déclenchement du respirateur</li>
+                                <li>Fréquence minimale assurée par le respirateur</li>
+                                <li>Pressions variables selon la compliance et résistance</li>
+                                <li>Mode sûr, idéal pour débuter la ventilation</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>2. Ventilation à pression prédéterminée</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Pressure Control (PC)</h4>
+                            <ul>
+                                <li>Pression d'insufflation fixe</li>
+                                <li>Volume variable selon compliance/résistance</li>
+                                <li>Fréquence respiratoire imposée</li>
+                                <li>Débit décélérant</li>
+                                <li>Le respirateur impose le temps inspiratoire</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Pressure Assist/Control (PAC)</h4>
+                            <ul>
+                                <li>Comme PC mais avec fréquence minimale</li>
+                                <li>Le patient peut déclencher des cycles supplémentaires</li>
+                                <li>Le respirateur impose le temps inspiratoire</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Pressure Support (PS ou Aide Inspiratoire)</h4>
+                            <ul>
+                                <li>Mode assisté uniquement (pas de fréquence minimale)</li>
+                                <li>Fin d'insufflation quand débit inspiratoire < seuil</li>
+                                <li>Le patient détermine le temps inspiratoire</li>
+                                <li>Idéal pour le sevrage progressif</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>3. Systèmes autorégulés</h3>
+                    <ul>
+                        <li><strong>NAVA (Neurally Adjusted Ventilatory Assist)</strong>: Pression proportionnelle à l'activité électrique du diaphragme</li>
+                        <li><strong>PAV (Proportional Assist Ventilation)</strong>: Pression ajustée continuellement selon les efforts du patient</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>4. Autres modes</h3>
+                    <ul>
+                        <li><strong>SIMV (Synchronized Intermittent Mandatory Ventilation)</strong>: Alterance de cycles assistés/contrôlés et spontanés</li>
+                        <li><strong>Ventilation à haute fréquence</strong>: Petits volumes à très haute fréquence</li>
+                        <li><strong>BIPAP/APRV</strong>: Alternance de deux niveaux de CPAP</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Avantages et inconvénients de la ventilation à pression</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Avantages</h4>
+                            <ul>
+                                <li>Meilleure synchronisation patient/respirateur</li>
+                                <li>Confort amélioré pour le patient</li>
+                                <li>Sevrage progressif facilité</li>
+                                <li>Risque moindre de barotraumatisme</li>
+                                <li>Potentielle amélioration des rapports ventilation/perfusion</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Inconvénients</h4>
+                            <ul>
+                                <li>Absence de contrôle du volume courant</li>
+                                <li>Solutions modernes:
+                                    <ul>
+                                        <li>PRVC (Pressure Regulated Volume Control)</li>
+                                        <li>Volume Support</li>
+                                        <li>Pressure Augmentation</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab: Paramètres -->
+            <div id="parametres" class="tab">
+                <h2>Paramètres de ventilation</h2>
+                
+                <div class="card">
+                    <h3>Paramètres principaux</h3>
+                    <table>
+                        <tr>
+                            <th>Paramètre</th>
+                            <th>Description</th>
+                            <th>Valeurs habituelles</th>
+                        </tr>
+                        <tr>
+                            <td>Volume courant (VC)</td>
+                            <td>Volume d'air délivré à chaque cycle respiratoire</td>
+                            <td>6-8 ml/kg (poids idéal)<br>Réduire en cas d'ARDS (4-6 ml/kg)</td>
+                        </tr>
+                        <tr>
+                            <td>Fréquence respiratoire (FR)</td>
+                            <td>Nombre de cycles respiratoires par minute</td>
+                            <td>12-20/min<br>Ajuster selon PaCO₂</td>
+                        </tr>
+                        <tr>
+                            <td>FiO₂</td>
+                            <td>Fraction inspirée d'oxygène</td>
+                            <td>Initier à 1 puis réduire selon SpO₂/PaO₂<br>Viser < 0,6 pour éviter toxicité O₂</td>
+                        </tr>
+                        <tr>
+                            <td>PEEP</td>
+                            <td>Pression positive en fin d'expiration</td>
+                            <td>5 cmH₂O (standard)<br>Augmenter si hypoxémie (8-20 cmH₂O)</td>
+                        </tr>
+                        <tr>
+                            <td>Pression d'insufflation (PS)</td>
+                            <td>En ventilation à pression prédéterminée</td>
+                            <td>15-25 cmH₂O selon besoins</td>
+                        </tr>
+                        <tr>
+                            <td>Rapport I:E</td>
+                            <td>Rapport temps inspiratoire/expiratoire</td>
+                            <td>1:2 (standard)<br>Réduire en cas d'obstruction (1:3, 1:4)</td>
+                        </tr>
+                        <tr>
+                            <td>Trigger</td>
+                            <td>Sensibilité au déclenchement par le patient</td>
+                            <td>Régler pour effort minimal sans auto-déclenchement</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="card">
+                    <h3>PEEP et CPAP</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Indications</h4>
+                            <ul>
+                                <li>Augmenter la capacité résiduelle fonctionnelle</li>
+                                <li>Prévenir/traiter l'atélectasie</li>
+                                <li>Améliorer l'oxygénation</li>
+                                <li>Stabiliser la paroi thoracique (volet)</li>
+                                <li>Compenser l'Auto-PEEP</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Niveau optimal</h4>
+                            <ul>
+                                <li><strong>Risques d'une PEEP excessive</strong>:
+                                    <ul>
+                                        <li>Barotraumatisme</li>
+                                        <li>Instabilité hémodynamique</li>
+                                        <li>Augmentation de l'espace mort</li>
+                                        <li>Possible augmentation de l'œdème pulmonaire</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Risques d'une PEEP insuffisante</strong>:
+                                    <ul>
+                                        <li>Atélectasies</li>
+                                        <li>Aggravation de l'inflammation par ouverture/fermeture répétitive des alvéoles</li>
+                                        <li>Hypoxémie</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Auto-PEEP (PEEP intrinsèque)</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Causes</h4>
+                            <ul>
+                                <li>Obstruction expiratoire (asthme, BPCO)</li>
+                                <li>Temps expiratoire insuffisant</li>
+                                <li>Volumes/minute élevés</li>
+                                <li>Matériel: tube étroit, circuits obstrués</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Effets</h4>
+                            <ul>
+                                <li>Effets hémodynamiques défavorables</li>
+                                <li>Risque de barotraumatisme</li>
+                                <li>Augmentation du travail respiratoire</li>
+                                <li>Erreurs de mesure de compliance</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Gestion</h4>
+                            <ul>
+                                <li>Traiter le bronchospasme</li>
+                                <li>Augmenter le temps expiratoire</li>
+                                <li>Réduire le volume/minute (accepter l'hypercapnie si nécessaire)</li>
+                                <li>Appliquer une PEEP externe (~2/3 de l'Auto-PEEP)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Monitorage respiratoire</h3>
+                    <table>
+                        <tr>
+                            <th>Paramètre</th>
+                            <th>Description</th>
+                            <th>Valeurs normales</th>
+                        </tr>
+                        <tr>
+                            <td>SpO₂</td>
+                            <td>Saturation en oxygène par oxymétrie de pouls</td>
+                            <td>94-99%<br>Viser >90% en général</td>
+                        </tr>
+                        <tr>
+                            <td>Rapport PaO₂/FiO₂</td>
+                            <td>Mesure de l'efficacité des échanges gazeux</td>
+                            <td>
+                                >400: Normal<br>
+                                300-400: Légère atteinte<br>
+                                200-300: Modérée<br>
+                                <200: Sévère (critère d'ARDS)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Pression plateau</td>
+                            <td>Pression de fin d'inspiration (pause)</td>
+                            <td><30 cmH₂O (idéalement <25)</td>
+                        </tr>
+                        <tr>
+                            <td>Compliance</td>
+                            <td>VC/(Pression plateau - PEEP)</td>
+                            <td>50-70 ml/cmH₂O</td>
+                        </tr>
+                        <tr>
+                            <td>Résistance</td>
+                            <td>(Pression de pic - Pression plateau)/Débit</td>
+                            <td>5-10 cmH₂O/l/s</td>
+                        </tr>
+                        <tr>
+                            <td>VD/VT</td>
+                            <td>Espace mort physiologique</td>
+                            <td>
+                                0,3 (normal)<br>
+                                >0,6 (sévère)
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Tab: Pathologies -->
+            <div id="pathologies" class="tab">
+                <h2>Ventilation selon la pathologie</h2>
+                
+                <div class="card">
+                    <h3>ARDS (Syndrome de Détresse Respiratoire Aiguë)</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Caractéristiques</h4>
+                            <ul>
+                                <li>PaO₂/FiO₂ < 300 mmHg</li>
+                                <li>Infiltrats bilatéraux</li>
+                                <li>Non expliqué par insuffisance cardiaque/surcharge hydrique</li>
+                                <li>Compliance pulmonaire réduite ("baby lung")</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Stratégie ventilatoire</h4>
+                            <ul>
+                                <li>Volume courant réduit: 4-6 ml/kg (poids idéal)</li>
+                                <li>Pression plateau < 30 cmH₂O</li>
+                                <li>PEEP optimisée (8-20 cmH₂O)</li>
+                                <li>Hypercapnie permissive si nécessaire</li>
+                                <li>Décubitus ventral si PaO₂/FiO₂ < 150</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>BPCO décompensée</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Caractéristiques</h4>
+                            <ul>
+                                <li>Obstruction chronique des voies aériennes</li>
+                                <li>Hypercapnie chronique souvent présente</li>
+                                <li>Risque d'auto-PEEP important</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Stratégie ventilatoire</h4>
+                            <ul>
+                                <li>VNI souvent suffisante (1er choix)</li>
+                                <li>Si intubation:
+                                    <ul>
+                                        <li>Temps expiratoire prolongé (I:E 1:3 ou 1:4)</li>
+                                        <li>Fréquence respiratoire basse (10-12/min)</li>
+                                        <li>PEEP externe pour compenser l'auto-PEEP</li>
+                                        <li>Éviter l'hyperoxie (cible SpO₂ 88-92%)</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Asthme aigu sévère</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Caractéristiques</h4>
+                            <ul>
+                                <li>Obstruction expiratoire sévère</li>
+                                <li>Auto-PEEP majeure</li>
+                                <li>Risque d'hyperinflation dynamique</li>
+                                <li>Risque élevé de barotraumatisme</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Stratégie ventilatoire</h4>
+                            <ul>
+                                <li>Volume courant modéré (6-8 ml/kg)</li>
+                                <li>Fréquence respiratoire basse (8-10/min)</li>
+                                <li>Temps expiratoire maximal (I:E 1:4 ou 1:5)</li>
+                                <li>Hypercapnie permissive (cible pH > 7,2)</li>
+                                <li>Sédation profonde ± curarisation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Œdème pulmonaire cardiogénique</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Caractéristiques</h4>
+                            <ul>
+                                <li>Congestion pulmonaire par insuffisance cardiaque</li>
+                                <li>Bénéficie des effets cardio-circulatoires de la ventilation</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Stratégie ventilatoire</h4>
+                            <ul>
+                                <li>VNI (CPAP ou BiPAP) souvent efficace</li>
+                                <li>PEEP élevée (10-15 cmH₂O) pour diminuer la précharge</li>
+                                <li>FiO₂ pour SpO₂ > 92%</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Traumatisme thoracique / Volet costal</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Caractéristiques</h4>
+                            <ul>
+                                <li>Instabilité de la paroi thoracique</li>
+                                <li>Contusion pulmonaire souvent associée</li>
+                                <li>Douleur limitant la ventilation</li>
+                            </ul>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Stratégie ventilatoire</h4>
+                            <ul>
+                                <li>CPAP/VNI si possible (stabilisation interne)</li>
+                                <li>Si intubation:
+                                    <ul>
+                                        <li>PEEP suffisante pour stabiliser la paroi</li>
+                                        <li>Analgésie optimale</li>
+                                        <li>Sevrage précoce si possible</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Contre-indications à la VNI</h3>
+                    <ul>
+                        <li>Manque de collaboration du patient</li>
+                        <li>Altération de l'état mental</li>
+                        <li>Sécrétions abondantes, difficultés d'expectoration</li>
+                        <li>État hémodynamique instable, arythmies préoccupantes</li>
+                        <li>Risque important d'inhalation de contenu gastrique</li>
+                        <li>Épistaxis entraînant l'inhalation de sang</li>
+                        <li>Traumatisme facial</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Complications à surveiller</h3>
+                    <table>
+                        <tr>
+                            <th>Complication</th>
+                            <th>Signes</th>
+                            <th>Actions</th>
+                        </tr>
+                        <tr>
+                            <td>Barotraumatisme</td>
+                            <td>Pneumothorax, emphysème sous-cutané</td>
+                            <td>Réduire pressions, drainage si nécessaire</td>
+                        </tr>
+                        <tr>
+                            <td>Pneumonie associée au ventilateur (VAP)</td>
+                            <td>Fièvre, sécrétions purulentes, infiltrats nouveaux</td>
+                            <td>Prélèvements, antibiothérapie adaptée</td>
+                        </tr>
+                        <tr>
+                            <td>Auto-PEEP</td>
+                            <td>Hypotension, débit expiratoire persistant</td>
+                            <td>Adapter ventilation, bronchodilatateurs</td>
+                        </tr>
+                        <tr>
+                            <td>Atélectasies</td>
+                            <td>Hypoxémie, diminution des volumes</td>
+                            <td>PEEP, recrutement, kinésithérapie</td>
+                        </tr>
+                        <tr>
+                            <td>Lésions trachéales</td>
+                            <td>Œdème glottique à l'extubation</td>
+                            <td>Limiter pression du ballonnet (25-30 cmH₂O)</td>
+                        </tr>
+                        <tr>
+                            <td>Instabilité hémodynamique</td>
+                            <td>Hypotension, ↓ débit cardiaque</td>
+                            <td>Remplissage, adapter PEEP/pressions</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Tab: Aide à la Décision -->
+            <div id="aide-decision" class="tab">
+                <h2>Aide à la décision ventilatoire</h2>
+                
+                <div class="card">
+                    <h3>Sélection du mode ventilatoire</h3>
+                    
+                    <div class="form-group">
+                        <label for="pathologie">Pathologie principale:</label>
+                        <select id="pathologie">
+                            <option value="">Sélectionner...</option>
+                            <option value="ards">ARDS</option>
+                            <option value="bpco">BPCO décompensée</option>
+                            <option value="asthme">Asthme aigu sévère</option>
+                            <option value="oedeme">Œdème pulmonaire cardiogénique</option>
+                            <option value="trauma">Traumatisme thoracique / Volet costal</option>
+                            <option value="neuro">Atteinte neurologique (coma, AVC...)</option>
+                            <option value="postop">Post-opératoire</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="conscience">État de conscience:</label>
+                        <select id="conscience">
+                            <option value="">Sélectionner...</option>
+                            <option value="normal">Normal, collaborant</option>
+                            <option value="agite">Agité</option>
+                            <option value="confus">Confus</option>
+                            <option value="somnolent">Somnolent mais réveillable</option>
+                            <option value="coma">Coma</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gazometrie">Gazométrie:</label>
+                        <select id="gazometrie">
+                            <option value="">Sélectionner...</option>
+                            <option value="normal">Normale</option>
+                            <option value="hypoxemie">Hypoxémie isolée (PaO₂ < 60 mmHg)</option>
+                            <option value="hypercapnie">Hypercapnie isolée (PaCO₂ > 45 mmHg)</option>
+                            <option value="mixte">Hypoxémie et hypercapnie</option>
+                            <option value="severe">Hypoxémie sévère (PaO₂/FiO₂ < 200)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hemodynamique">État hémodynamique:</label>
+                        <select id="hemodynamique">
+                            <option value="">Sélectionner...</option>
+                            <option value="stable">Stable</option>
+                            <option value="instable">Instable</option>
+                            <option value="choc">État de choc</option>
+                        </select>
+                    </div>
+                    
+                    <button id="analyse-btn" class="btn">Analyser</button>
+                    
+                    <div id="resultats" class="results" style="display: none;">
+                        <h4>Recommandations:</h4>
+                        <div id="mode-recommande"></div>
+                        <div id="parametres-recommandes"></div>
+                        <div id="surveillance"></div>
+                        <div id="precautions"></div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Détermination du niveau de PEEP</h3>
+                    
+                    <div class="form-group">
+                        <label for="pao2fio2">Rapport PaO₂/FiO₂ (mmHg):</label>
+                        <input type="number" id="pao2fio2" placeholder="Ex: 250">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="compliance">Compliance (ml/cmH₂O):</label>
+                        <input type="number" id="compliance" placeholder="Ex: 40">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="condition">Condition particulière:</label>
+                        <select id="condition">
+                            <option value="">Aucune</option>
+                            <option value="obesite">Obésité</option>
+                            <option value="ards">ARDS</option>
+                            <option value="bpco">BPCO</option>
+                            <option value="asthme">Asthme</option>
+                            <option value="oedeme">Œdème pulmonaire cardiogénique</option>
+                        </select>
+                    </div>
+                    
+                    <button id="peep-btn" class="btn">Évaluer PEEP optimale</button>
+                    
+                    <div id="peep-resultats" class="results" style="display: none;">
+                        <h4>PEEP recommandée:</h4>
+                        <div id="peep-recommandee"></div>
+                        <div id="justification"></div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Évaluation du risque d'Auto-PEEP</h3>
+                    
+                    <div class="form-group">
+                        <label for="vc">Volume courant (ml):</label>
+                        <input type="number" id="vc" placeholder="Ex: 500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fr">Fréquence respiratoire (/min):</label>
+                        <input type="number" id="fr" placeholder="Ex: 20">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="te">Temps expiratoire (s):</label>
+                        <input type="number" id="te" step="0.1" placeholder="Ex: 2.0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="obstruction">Obstruction des voies aériennes:</label>
+                        <select id="obstruction">
+                            <option value="non">Non</option>
+                            <option value="legere">Légère</option>
+                            <option value="moderee">Modérée</option>
+                            <option value="severe">Sévère</option>
+                        </select>
+                    </div>
+                    
+                    <button id="autopeep-btn" class="btn">Évaluer risque</button>
+                    
+                    <div id="autopeep-resultats" class="results" style="display: none;">
+                        <h4>Risque d'Auto-PEEP:</h4>
+                        <div id="risque-autopeep"></div>
+                        <div id="recommendations-autopeep"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab: Sevrage -->
+            <div id="sevrage" class="tab">
+                <h2>Sevrage de la ventilation mécanique</h2>
+                
+                <div class="card">
+                    <h3>Critères de sevrage</h3>
+                    <ol>
+                        <li><strong>Critères gazométriques</strong>:
+                            <ul>
+                                <li>PaO₂/FiO₂ > 200 mmHg</li>
+                                <li>PEEP ≤ 5-8 cmH₂O</li>
+                                <li>FiO₂ ≤ 0,4-0,5</li>
+                            </ul>
+                        </li>
+                        <li><strong>Critères hémodynamiques</strong>:
+                            <ul>
+                                <li>Pas ou peu d'agents vasopresseurs</li>
+                                <li>Pas d'insuffisance cardiaque majeure</li>
+                                <li>Pas d'arythmie importante</li>
+                                <li>Pas de saignement majeur</li>
+                            </ul>
+                        </li>
+                        <li><strong>Critères neurologiques</strong>:
+                            <ul>
+                                <li>État de conscience suffisant</li>
+                                <li>Centre respiratoire fonctionnel</li>
+                                <li>Capacité à protéger les voies aériennes</li>
+                            </ul>
+                        </li>
+                        <li><strong>Critères pragmatiques</strong>:
+                            <ul>
+                                <li>Pas de procédure prévue nécessitant la ventilation</li>
+                                <li>Absence de fatigue ou d'agitation excessive</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div class="card">
+                    <h3>Signes d'échec du sevrage</h3>
+                    <ul>
+                        <li>Inconfort subjectif, anxiété</li>
+                        <li>Tachypnée (FR > 30-35/min)</li>
+                        <li>Tachycardie (augmentation > 20%) et hypertension</li>
+                        <li>Sudations, agitation</li>
+                        <li>SpO₂ < 90% malgré FiO₂ adéquate</li>
+                        <li>Détérioration des gaz sanguins:
+                            <ul>
+                                <li>PaCO₂ élevée ET acidémie</li>
+                                <li>Rapport PaO₂/FiO₂ bas</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Protocole de sevrage</h3>
+                    <div class="flex-container">
+                        <div class="flex-item">
+                            <h4>Méthode progressive</h4>
+                            <ol>
+                                <li>Réduire progressivement le niveau de pressure support:
+                                    <ul>
+                                        <li>Commencer à un niveau égal à la pression de plateau</li>
+                                        <li>Réduire de 2-4 cmH₂O par paliers</li>
+                                        <li>Observer la réponse (fréquence respiratoire)</li>
+                                        <li>Niveau de 8-10 cmH₂O: compensation des résistances du circuit</li>
+                                    </ul>
+                                </li>
+                                <li>Épreuve de ventilation spontanée (T-tube):
+                                    <ul>
+                                        <li>Durée: 30-120 minutes</li>
+                                        <li>Surveillance des signes de tolérance</li>
+                                    </ul>
+                                </li>
+                                <li>Si succès: évaluer possibilité d'extubation</li>
+                                <li>Si échec: retour au pressure support et nouvelle tentative ultérieure</li>
+                            </ol>
+                        </div>
+                        <div class="flex-item">
+                            <h4>Check-list avant détubation</h4>
+                            <ol>
+                                <li>Gaz sanguins satisfaisants</li>
+                                <li>Sécrétions modérées, toux efficace</li>
+                                <li>État de conscience adéquat</li>
+                                <li>Voies aériennes supérieures perméables:
+                                    <ul>
+                                        <li>Considérer test de fuite (tube dégonflé)</li>
+                                        <li>En cas de doute: détubation sous fibroscopie</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Facteurs corrigeables en cas d'échec</h3>
+                    <table>
+                        <tr>
+                            <th>Problème</th>
+                            <th>Solution</th>
+                        </tr>
+                        <tr>
+                            <td>Charge de travail respiratoire excessive</td>
+                            <td>Raccourcir tubulures, enlever filtres inutiles</td>
+                        </tr>
+                        <tr>
+                            <td>Altération de conscience</td>
+                            <td>Arrêter sédatifs, antagonistes si besoin</td>
+                        </tr>
+                        <tr>
+                            <td>Sécrétions abondantes</td>
+                            <td>Kinésithérapie, aspirations, fibroscopie</td>
+                        </tr>
+                        <tr>
+                            <td>Œdème pulmonaire</td>
+                            <td>Diurétiques, vasodilatateurs</td>
+                        </tr>
+                        <tr>
+                            <td>Bronchospasme</td>
+                            <td>Bronchodilatateurs, corticoïdes</td>
+                        </tr>
+                        <tr>
+                            <td>Fatigue musculaire</td>
+                            <td>Nutrition adéquate, supplémentation (phosphore)</td>
+                        </tr>
+                        <tr>
+                            <td>Instabilité hémodynamique</td>
+                            <td>Optimiser volémie et inotropes</td>
+                        </tr>
+                        <tr>
+                            <td>Auto-PEEP</td>
+                            <td>Bronchodilatateurs, adapter ventilation</td>
+                        </tr>
+                        <tr>
+                            <td>Facteurs psychologiques</td>
+                            <td>Rassurer, expliquer, anxiolytiques si nécessaire</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="card">
+                    <h3>Évaluation du sevrage</h3>
+                    
+                    <div class="form-group">
+                        <label for="criteres-gazometrie">Critères gazométriques remplis:</label>
+                        <select id="criteres-gazometrie">
+                            <option value="oui">Oui</option>
+                            <option value="non">Non</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="criteres-hemodynamique">Critères hémodynamiques remplis:</label>
+                        <select id="criteres-hemodynamique">
+                            <option value="oui">Oui</option>
+                            <option value="non">Non</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="criteres-neuro">Critères neurologiques remplis:</label>
+                        <select id="criteres-neuro">
+                            <option value="oui">Oui</option>
+                            <option value="non">Non</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duree-vm">Durée de ventilation mécanique:</label>
+                        <select id="duree-vm">
+                            <option value="court">< 48h</option>
+                            <option value="moyen">2-7 jours</option>
+                            <option value="long">> 7 jours</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="echecs-prealables">Échecs de sevrage préalables:</label>
+                        <select id="echecs-prealables">
+                            <option value="non">Non</option>
+                            <option value="un">Un</option>
+                            <option value="multiple">Multiples</option>
+                        </select>
+                    </div>
+                    
+                    <button id="evaluation-sevrage-btn" class="btn">Évaluer</button>
+                    
+                    <div id="sevrage-resultats" class="results" style="display: none;">
+                        <h4>Évaluation du sevrage:</h4>
+                        <div id="probabilite-succes"></div>
+                        <div id="strategie-recommandee"></div>
+                        <div id="facteurs-risque"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Gestion des onglets
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Désactiver tous les onglets et boutons
+                    tabs.forEach(tab => tab.classList.remove('active'));
+                    tabBtns.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Activer l'onglet sélectionné
+                    document.getElementById(tabId).classList.add('active');
+                    this.classList.add('active');
+                });
+            });
+            
+            // Logique pour l'aide à la décision
+            const analyseBtn = document.getElementById('analyse-btn');
+            if (analyseBtn) {
+                analyseBtn.addEventListener('click', function() {
+                    const pathologie = document.getElementById('pathologie').value;
+                    const conscience = document.getElementById('conscience').value;
+                    const gazometrie = document.getElementById('gazometrie').value;
+                    const hemodynamique = document.getElementById('hemodynamique').value;
+                    
+                    if (!pathologie || !conscience || !gazometrie || !hemodynamique) {
+                        alert('Veuillez remplir tous les champs');
+                        return;
+                    }
+                    
+                    const resultats = document.getElementById('resultats');
+                    const modeRecommande = document.getElementById('mode-recommande');
+                    const parametresRecommandes = document.getElementById('parametres-recommandes');
+                    const surveillance = document.getElementById('surveillance');
+                    const precautions = document.getElementById('precautions');
+                    
+                    // Déterminer les recommandations basées sur les entrées
+                    let mode = '', parametres = '', alertes = '', precaution = '';
+                    
+                    // Mode ventilatoire recommandé basé sur la pathologie et l'état du patient
+                    if (conscience === 'normal' && (pathologie === 'bpco' || pathologie === 'oedeme') && hemodynamique === 'stable') {
+                        mode = `<div class="alert alert-success"><strong>VNI recommandée</strong> - Le patient est conscient et collaborant, avec une pathologie qui répond bien à la VNI.</div>`;
+                    } else if (conscience === 'coma' || conscience === 'somnolent' || hemodynamique === 'choc') {
+                        mode = `<div class="alert alert-warning"><strong>Ventilation invasive recommandée</strong> - En raison de l'état de conscience altéré ou de l'instabilité hémodynamique.</div>`;
+                    } else if (pathologie === 'ards' && gazometrie === 'severe') {
+                        mode = `<div class="alert alert-warning"><strong>Ventilation invasive recommandée</strong> - ARDS avec hypoxémie sévère nécessite généralement une intubation.</div>`;
+                    } else if (pathologie === 'asthme' && gazometrie === 'mixte') {
+                        mode = `<div class="alert alert-warning"><strong>Ventilation invasive probable</strong> - L'asthme sévère avec hypercapnie et hypoxémie nécessite souvent une intubation.</div>`;
+                    } else {
+                        mode = `<div class="alert alert-success"><strong>Évaluer au cas par cas</strong> - Commencer par essayer la VNI si pas de contre-indication, avec un seuil bas pour l'intubation en cas d'échec.</div>`;
+                    }
+                    
+                    // Paramètres recommandés
+                    if (pathologie === 'ards') {
+                        parametres = `
+                            <h5>Paramètres recommandés:</h5>
+                            <ul>
+                                <li><strong>Mode</strong>: Volume contrôlé ou Pression contrôlée</li>
+                                <li><strong>Volume courant</strong>: 4-6 ml/kg poids idéal</li>
+                                <li><strong>PEEP</strong>: 10-18 cmH₂O selon gravité</li>
+                                <li><strong>Pression plateau</strong>: Maintenir < 30 cmH₂O</li>
+                                <li><strong>Fréquence</strong>: Ajuster selon PaCO₂ (hypercapnie permissive)</li>
+                                <li><strong>FiO₂</strong>: Minimiser pour SpO₂ 88-95%</li>
+                            </ul>
+                            <p><strong>Considérer</strong>: Position ventrale si PaO₂/FiO₂ < 150 mmHg</p>
+                        `;
+                    } else if (pathologie === 'bpco') {
+                        parametres = `
+                            <h5>Paramètres recommandés:</h5>
+                            <ul>
+                                <li><strong>VNI</strong>: PS 12-18 cmH₂O, PEEP 5-6 cmH₂O</li>
+                                <li><strong>Si VM invasive</strong>:
+                                    <ul>
+                                        <li>Volume courant: 6-8 ml/kg</li>
+                                        <li>Fréquence respiratoire basse: 10-12/min</li>
+                                        <li>Rapport I:E: 1:3 ou 1:4</li>
+                                        <li>PEEP: Compenser l'auto-PEEP (souvent 5-8 cmH₂O)</li>
+                                        <li>FiO₂: Viser SpO₂ 88-92% (attention à l'hypercapnie induite)</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        `;
+                    } else if (pathologie === 'asthme') {
+                        parametres = `
+                            <h5>Paramètres recommandés:</h5>
+                            <ul>
+                                <li><strong>Mode</strong>: Volume contrôlé ou Pression contrôlée</li>
+                                <li><strong>Volume courant</strong>: 6-8 ml/kg poids idéal</li>
+                                <li><strong>Fréquence</strong>: Basse (8-10/min) pour éviter l'auto-PEEP</li>
+                                <li><strong>Rapport I:E</strong>: 1:4 ou 1:5 (temps expiratoire long)</li>
+                                <li><strong>PEEP</strong>: Minimale (0-5 cmH₂O), attention à l'auto-PEEP</li>
+                                <li><strong>Hypercapnie permissive</strong>: Viser pH > 7,20</li>
+                            </ul>
+                            <p><strong>Considérer</strong>: Sédation profonde ± curarisation</p>
+                        `;
+                    } else if (pathologie === 'oedeme') {
+                        parametres = `
+                            <h5>Paramètres recommandés:</h5>
+                            <ul>
+                                <li><strong>VNI</strong>: CPAP 10-12 cmH₂O ou BiPAP (PS 12-15, PEEP 8-10)</li>
+                                <li><strong>Si VM invasive</strong>:
+                                    <ul>
+                                        <li>PEEP: 8-12 cmH₂O</li>
+                                        <li>Volume courant: 6-8 ml/kg</li>
+                                        <li>Objectif: Réduire la précharge et améliorer l'oxygénation</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        `;
+                    } else if (pathologie === 'trauma') {
+                        parametres = `
+                            <h5>Paramètres recommandés:</h5>
+                            <ul>
+                                <li><strong>CPAP/VNI</strong>: Si volet thoracique isolé et conscience préservée</li>
+                                <li><strong>Si VM invasive</strong>:
+                                    <ul>
+                                        <li>PEEP: Suffisante pour stabiliser la paroi (8-12 cmH₂O)</li>
+                                        <li>Volume courant: 6-8 ml/kg</li>
+                                        <li>Attention aux lésions pulmonaires associées (contusion)</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <p><strong>Importance</strong>: Analgésie optimale</p>
+                        `;
+                    } else if (pathologie === 'neuro') {
+                        parametres = `
+                            <h5>Paramètres recommandés:</h5>
+                            <ul>
+                                <li><strong>Mode</strong>: Volume contrôlé</li>
+                                <li><strong>Volume courant</strong>: 6-8 ml/kg</li>
+                                <li><strong>Normocapnie</strong>: Viser PaCO₂ 35-40 mmHg (sauf indication contraire)</li>
+                                <li><strong>PEEP</strong>: Modérée (5-8 cmH₂O), attention à la PIC</li>
+                                <li><strong>Positionnement</strong>: Tête surélevée (30°)</li>
+                            </ul>
+                            <p><strong>Attention</strong>: L'hypocapnie (PaCO₂ ≤ 30 mmHg) peut être indiquée en cas d'œdème cérébral sévère, mais pour de courtes périodes</p>
+                        `;
+                    } else if (pathologie === 'postop') {
+                        parametres = `
+                            <h5>Paramètres recommandés:</h5>
+                            <ul>
+                                <li><strong>Mode</strong>: Pressure Support (si conscience préservée)</li>
+                                <li><strong>Volume courant</strong>: 6-8 ml/kg poids idéal</li>
+                                <li><strong>PEEP</strong>: 5-8 cmH₂O (prévention atélectasies)</li>
+                                <li><strong>Objectif</strong>: Sevrage précoce si possible</li>
+                            </ul>
+                        `;
+                    } else {
+                        parametres = `
+                            <h5>Paramètres recommandés:</h5>
+                            <ul>
+                                <li><strong>Instauration</strong>: Débuter en volume assisté/contrôlé</li>
+                                <li><strong>Volume courant</strong>: 6-8 ml/kg poids idéal</li>
+                                <li><strong>Fréquence</strong>: 12-16/min</li>
+                                <li><strong>PEEP</strong>: 5 cmH₂O (standard)</li>
+                                <li><strong>FiO₂</strong>: Initialement élevée, puis titrer pour SpO₂ > 92%</li>
+                            </ul>
+                            <p>Réévaluer après gazométrie initiale et adapter selon l'évolution clinique.</p>
+                        `;
+                    }
+                    
+                    // Surveillance recommandée
+                    surveillance.innerHTML = `
+                        <h5>Surveillance recommandée:</h5>
+                        <ul>
+                            <li><strong>Clinique</strong>: FR, SpO₂, signes de lutte/désadaptation, auscultation</li>
+                            <li><strong>Gazométrique</strong>: Gazométrie à 30-60 min puis selon évolution</li>
+                            <li><strong>Ventilatoire</strong>: Pressions (pic/plateau), compliance, auto-PEEP</li>
+                            <li><strong>Hémodynamique</strong>: FC, PA, signes de bas débit</li>
+                            <li><strong>Mécanique ventilatoire</strong>: Synchronisation, courbes débit/pression</li>
+                        </ul>
+                    `;
+                    
+                    // Précautions particulières
+                    if (pathologie === 'ards') {
+                        precaution = `
+                            <div class="alert alert-danger">
+                                <strong>Précautions:</strong>
+                                <ul>
+                                    <li>Risque élevé de barotraumatisme - surveiller pressions plateau (<30 cmH₂O)</li>
+                                    <li>Hypercapnie permissive peut être nécessaire</li>
+                                    <li>Considérer position ventrale si PaO₂/FiO₂ < 150</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else if (pathologie === 'bpco' || pathologie === 'asthme') {
+                        precaution = `
+                            <div class="alert alert-danger">
+                                <strong>Précautions:</strong>
+                                <ul>
+                                    <li>Risque majeur d'auto-PEEP - monitorer le piégeage gazeux</li>
+                                    <li>Privilégier un temps expiratoire long (I:E 1:3 ou plus)</li>
+                                    <li>Éviter l'hyperoxie (SpO₂ 88-92%)</li>
+                                    <li>Attention à l'hypercapnie chronique compensée</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else if (hemodynamique === 'instable' || hemodynamique === 'choc') {
+                        precaution = `
+                            <div class="alert alert-danger">
+                                <strong>Précautions:</strong>
+                                <ul>
+                                    <li>Risque d'aggravation hémodynamique - surveiller la PA et l'état de remplissage</li>
+                                    <li>Limiter les pressions (PEEP) selon tolérance</li>
+                                    <li>Adapter sédation si besoin</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else if (pathologie === 'neuro') {
+                        precaution = `
+                            <div class="alert alert-danger">
+                                <strong>Précautions:</strong>
+                                <ul>
+                                    <li>Attention aux effets sur la PIC (↑ PEEP → ↑ PIC)</li>
+                                    <li>Maintenir tête surélevée (30°)</li>
+                                    <li>Contrôle strict de la PaCO₂ (éviter hypercapnie)</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else {
+                        precaution = `
+                            <div class="alert alert-warning">
+                                <strong>Précautions générales:</strong>
+                                <ul>
+                                    <li>Position semi-assise (30-45°) pour réduire risque de pneumonie</li>
+                                    <li>Ajuster sédation pour confort et synchronisation</li>
+                                    <li>Envisager sevrage dès que possible</li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                    
+                    // Afficher les résultats
+                    modeRecommande.innerHTML = mode;
+                    parametresRecommandes.innerHTML = parametres;
+                    precautions.innerHTML = precaution;
+                    resultats.style.display = 'block';
+                });
+            }
+            
+            // Fonction pour la recommandation de PEEP
+            const peepBtn = document.getElementById('peep-btn');
+            if (peepBtn) {
+                peepBtn.addEventListener('click', function() {
+                    const pao2fio2 = parseInt(document.getElementById('pao2fio2').value) || 0;
+                    const compliance = parseInt(document.getElementById('compliance').value) || 0;
+                    const condition = document.getElementById('condition').value;
+                    
+                    if (pao2fio2 === 0 || compliance === 0) {
+                        alert('Veuillez entrer des valeurs numériques valides');
+                        return;
+                    }
+                    
+                    const peepResultats = document.getElementById('peep-resultats');
+                    const peepRecommandee = document.getElementById('peep-recommandee');
+                    const justification = document.getElementById('justification');
+                    
+                    let peep = 5; // PEEP par défaut
+                    let justif = '';
+                    
+                    // Déterminer la PEEP recommandée
+                    if (condition === 'obesite') {
+                        peep = 10;
+                        justif = 'L\'obésité réduit la compliance thoraco-pulmonaire et favorise l\'atélectasie. Une PEEP plus élevée est nécessaire pour maintenir le recrutement alvéolaire.';
+                    } else if (condition === 'ards') {
+                        if (pao2fio2 < 100) {
+                            peep = 16;
+                            justif = 'ARDS sévère (P/F < 100) - Une PEEP élevée est nécessaire pour le recrutement alvéolaire et l\'amélioration de l\'oxygénation.';
+                        } else if (pao2fio2 < 200) {
+                            peep = 12;
+                            justif = 'ARDS modéré (P/F 100-200) - PEEP modérée à élevée pour optimiser le recrutement sans compromettre l\'hémodynamique.';
+                        } else {
+                            peep = 8;
+                            justif = 'ARDS léger (P/F 200-300) - PEEP modérée pour maintenir le recrutement.';
+                        }
+                    } else if (condition === 'bpco') {
+                        peep = 5;
+                        justif = 'Dans la BPCO, le risque d\'auto-PEEP est important. Une PEEP externe modérée (≤ 5 cmH₂O) peut compenser l\'auto-PEEP sans aggraver l\'hyperinflation.';
+                    } else if (condition === 'asthme') {
+                        peep = 0;
+                        justif = 'Dans l\'asthme aigu, la PEEP externe augmente le risque d\'hyperinflation et de barotraumatisme. Une PEEP minimale ou nulle est préférable.';
+                    } else if (condition === 'oedeme') {
+                        peep = 10;
+                        justif = 'Dans l\'œdème pulmonaire cardiogénique, une PEEP plus élevée améliore l\'oxygénation et réduit la précharge, aidant à améliorer la fonction cardiaque.';
+                    } else {
+                        // Ajuster selon compliance et PaO2/FiO2
+                        if (compliance < 30) {
+                            peep += 3;
+                            justif = 'Compliance basse suggérant une atteinte pulmonaire significative - PEEP augmentée pour optimiser le recrutement.';
+                        } else if (compliance > 60) {
+                            justif = 'Compliance relativement préservée - PEEP standard pour éviter la surdistension.';
+                        }
+                        
+                        if (pao2fio2 < 150) {
+                            peep += 4;
+                            justif += ' Hypoxémie sévère (P/F < 150) nécessitant une PEEP plus élevée.';
+                        } else if (pao2fio2 < 250) {
+                            peep += 2;
+                            justif += ' Hypoxémie modérée (P/F 150-250) - PEEP augmentée modérément.';
+                        }
+                    }
+                    
+                    // Limiter à des valeurs raisonnables
+                    peep = Math.min(Math.max(peep, 0), 20);
+                    
+                    // Afficher les résultats
+                    peepRecommandee.innerHTML = `<div class="alert alert-success"><strong>PEEP recommandée: ${peep} cmH₂O</strong></div>`;
+                    justification.innerHTML = `<p><strong>Justification:</strong> ${justif}</p>
+                        <p><em>Note:</em> Cette recommandation est indicative. La PEEP optimale doit être titrée individuellement en fonction de la réponse clinique (oxygénation, hémodynamique, mécanique respiratoire).</p>`;
+                    peepResultats.style.display = 'block';
+                });
+            }
+            
+            // Fonction pour l'évaluation du risque d'auto-PEEP
+            const autopeepBtn = document.getElementById('autopeep-btn');
+            if (autopeepBtn) {
+                autopeepBtn.addEventListener('click', function() {
+                    const vc = parseInt(document.getElementById('vc').value) || 0;
+                    const fr = parseInt(document.getElementById('fr').value) || 0;
+                    const te = parseFloat(document.getElementById('te').value) || 0;
+                    const obstruction = document.getElementById('obstruction').value;
+                    
+                    if (vc === 0 || fr === 0 || te === 0) {
+                        alert('Veuillez entrer des valeurs numériques valides');
+                        return;
+                    }
+                    
+                    const autopeepResultats = document.getElementById('autopeep-resultats');
+                    const risqueAutopeep = document.getElementById('risque-autopeep');
+                    const recommendationsAutopeep = document.getElementById('recommendations-autopeep');
+                    
+                    // Calcul simplifié du risque
+                    let risque = 'faible';
+                    let score = 0;
+                    
+                    // Facteurs de risque
+                    if (fr > 20) score += 2;
+                    if (fr > 25) score += 3;
+                    
+                    if (te < 1.5) score += 2;
+                    if (te < 1.0) score += 3;
+                    
+                    if (vc > 600) score += 1;
+                    if (vc > 800) score += 2;
+                    
+                    if (obstruction === 'legere') score += 2;
+                    if (obstruction === 'moderee') score += 4;
+                    if (obstruction === 'severe') score += 6;
+                    
+                    // Évaluation du risque
+                    if (score >= 10) {
+                        risque = 'très élevé';
+                    } else if (score >= 7) {
+                        risque = 'élevé';
+                    } else if (score >= 4) {
+                        risque = 'modéré';
+                    }
+                    
+                    // Recommandations
+                    let alerte, recommandations;
+                    
+                    if (risque === 'très élevé') {
+                        alerte = `<div class="alert alert-danger"><strong>Risque d'Auto-PEEP très élevé</strong></div>`;
+                        recommandations = `
+                            <p><strong>Recommandations:</strong></p>
+                            <ul>
+                                <li>Réduire immédiatement la fréquence respiratoire (< 12/min)</li>
+                                <li>Augmenter le temps expiratoire (ratio I:E ≥ 1:4)</li>
+                                <li>Considérer une réduction du volume courant</li>
+                                <li>Traitement bronchodilatateur agressif</li>
+                                <li>Envisager la sédation profonde ± curarisation si nécessaire</li>
+                                <li>Appliquer une PEEP externe (~2/3 de l'auto-PEEP mesurée)</li>
+                                <li>Accepter l'hypercapnie permissive (pH > 7,2)</li>
+                            </ul>
+                        `;
+                    } else if (risque === 'élevé') {
+                        alerte = `<div class="alert alert-warning"><strong>Risque d'Auto-PEEP élevé</strong></div>`;
+                        recommandations = `
+                            <p><strong>Recommandations:</strong></p>
+                            <ul>
+                                <li>Réduire la fréquence respiratoire (12-15/min)</li>
+                                <li>Allonger le temps expiratoire (ratio I:E ≥ 1:3)</li>
+                                <li>Optimiser le traitement bronchodilatateur</li>
+                                <li>Mesurer l'auto-PEEP (pause expiratoire)</li>
+                                <li>Considérer une PEEP externe (50-75% de l'auto-PEEP mesurée)</li>
+                            </ul>
+                        `;
+                    } else if (risque === 'modéré') {
+                        alerte = `<div class="alert alert-warning"><strong>Risque d'Auto-PEEP modéré</strong></div>`;
+                        recommandations = `
+                            <p><strong>Recommandations:</strong></p>
+                            <ul>
+                                <li>Surveiller les courbes de débit (retour à zéro avant inspiration)</li>
+                                <li>Optimiser le rapport I:E (1:2 ou plus)</li>
+                                <li>Considérer un traitement bronchodilatateur</li>
+                                <li>Réévaluer régulièrement</li>
+                            </ul>
+                        `;
+                    } else {
+                        alerte = `<div class="alert alert-success"><strong>Risque d'Auto-PEEP faible</strong></div>`;
+                        recommandations = `
+                            <p><strong>Recommandations:</strong></p>
+                            <ul>
+                                <li>Surveillance standard</li>
+                                <li>Maintenir un temps expiratoire adéquat</li>
+                            </ul>
+                        `;
+                    }
+                    
+                    // Afficher les résultats
+                    risqueAutopeep.innerHTML = alerte;
+                    recommendationsAutopeep.innerHTML = recommandations;
+                    autopeepResultats.style.display = 'block';
+                });
+            }
+            
+            // Fonction pour l'évaluation du sevrage
+            const evaluationSevrageBtn = document.getElementById('evaluation-sevrage-btn');
+            if (evaluationSevrageBtn) {
+                evaluationSevrageBtn.addEventListener('click', function() {
+                    const criteresGazometrie = document.getElementById('criteres-gazometrie').value;
+                    const criteresHemodynamique = document.getElementById('criteres-hemodynamique').value;
+                    const criteresNeuro = document.getElementById('criteres-neuro').value;
+                    const dureeVM = document.getElementById('duree-vm').value;
+                    const echecsPre = document.getElementById('echecs-prealables').value;
+                    
+                    const sevrageResultats = document.getElementById('sevrage-resultats');
+                    const probabiliteSucces = document.getElementById('probabilite-succes');
+                    const strategieRecommandee = document.getElementById('strategie-recommandee');
+                    const facteursRisque = document.getElementById('facteurs-risque');
+                    
+                    // Évaluer probabilité de succès
+                    let probabilite = 'élevée';
+                    let strategie = '';
+                    let facteurs = '';
+                    
+                    // Critères essentiels
+                    if (criteresGazometrie === 'non' || criteresHemodynamique === 'non' || criteresNeuro === 'non') {
+                        probabilite = 'faible';
+                        facteurs = `
+                            <p><strong>Facteurs de risque majeurs:</strong></p>
+                            <ul>
+                                ${criteresGazometrie === 'non' ? '<li>Critères gazométriques non remplis</li>' : ''}
+                                ${criteresHemodynamique === 'non' ? '<li>Instabilité hémodynamique</li>' : ''}
+                                ${criteresNeuro === 'non' ? '<li>État neurologique inadéquat</li>' : ''}
+                            </ul>
+                            <p><strong>Recommandation:</strong> Différer le sevrage et optimiser les facteurs corrigeables.</p>
+                        `;
+                        strategie = `
+                            <p><strong>Stratégie recommandée:</strong></p>
+                            <ul>
+                                <li>Reporter le sevrage</li>
+                                <li>Optimiser les facteurs défavorables:
+                                    <ul>
+                                        ${criteresGazometrie === 'non' ? '<li>Améliorer l\'oxygénation (recrutement, PEEP, position)</li>' : ''}
+                                        ${criteresHemodynamique === 'non' ? '<li>Stabiliser l\'hémodynamique (remplissage, inotropes...)</li>' : ''}
+                                        ${criteresNeuro === 'non' ? '<li>Évaluer et améliorer l\'état neurologique (arrêt sédation, traitement neurologique...)</li>' : ''}
+                                    </ul>
+                                </li>
+                                <li>Réévaluer quotidiennement</li>
+                            </ul>
+                        `;
+                    } else {
+                        // Facteurs secondaires
+                        if (dureeVM === 'long' || echecsPre === 'multiple') {
+                            probabilite = 'modérée';
+                        }
+                        
+                        if (dureeVM === 'long' && echecsPre === 'multiple') {
+                            probabilite = 'incertaine';
+                        }
+                        
+                        // Stratégie
+                        if (probabilite === 'élevée') {
+                            strategie = `
+                                <p><strong>Stratégie recommandée:</strong></p>
+                                <ul>
+                                    <li>Épreuve de ventilation spontanée (T-tube 30-60 min)</li>
+                                    <li>Si succès, procéder à l'extubation</li>
+                                    <li>Considérer une VNI post-extubation préventive si facteurs de risque</li>
+                                </ul>
+                            `;
+                            facteurs = `
+                                <p><strong>Facteurs favorables:</strong></p>
+                                <ul>
+                                    <li>Tous les critères essentiels remplis</li>
+                                    <li>Durée de VM ${dureeVM === 'court' ? 'courte' : 'acceptable'}</li>
+                                    <li>Absence d'échecs préalables multiples</li>
+                                </ul>
+                            `;
+                        } else if (probabilite === 'modérée') {
+                            strategie = `
+                                <p><strong>Stratégie recommandée:</strong></p>
+                                <ul>
+                                    <li>Commencer par sevrage progressif en pressure support</li>
+                                    <li>Réduire progressivement de 2-4 cmH₂O toutes les 4-6h</li>
+                                    <li>Épreuve de ventilation spontanée quand PS ≤ 8 cmH₂O</li>
+                                    <li>Considérer VNI post-extubation</li>
+                                </ul>
+                            `;
+                            facteurs = `
+                                <p><strong>Facteurs de risque à considérer:</strong></p>
+                                <ul>
+                                    ${dureeVM === 'long' ? '<li>VM prolongée (>7j) - risque de faiblesse musculaire</li>' : ''}
+                                    ${echecsPre === 'multiple' ? '<li>Échecs de sevrage préalables</li>' : ''}
+                                    <li>Optimiser: nutrition, équilibre hydro-électrolytique, kinésithérapie</li>
+                                </ul>
+                            `;
+                        } else {
+                            strategie = `
+                                <p><strong>Stratégie recommandée:</strong></p>
+                                <ul>
+                                    <li>Sevrage très progressif</li>
+                                    <li>Envisager trachéotomie si non déjà réalisée</li>
+                                    <li>Séances progressives de VS (plusieurs/jour)</li>
+                                    <li>Programme de renforcement musculaire respiratoire</li>
+                                    <li>VNI post-extubation fortement recommandée</li>
+                                </ul>
+                            `;
+                            facteurs = `
+                                <p><strong>Facteurs de risque majeurs:</strong></p>
+                                <ul>
+                                    <li>VM prolongée (>7j)</li>
+                                    <li>Échecs de sevrage multiples</li>
+                                    <li>Risque élevé de dysfonction diaphragmatique</li>
+                                    <li>Optimiser: nutrition, kinésithérapie intensive, équilibre métabolique</li>
+                                </ul>
+                            `;
+                        }
+                    }
+                    
+                    // Afficher les résultats
+                    let alertClass = 'alert-success';
+                    if (probabilite === 'modérée') alertClass = 'alert-warning';
+                    if (probabilite === 'incertaine' || probabilite === 'faible') alertClass = 'alert-danger';
+                    
+                    probabiliteSucces.innerHTML = `<div class="alert ${alertClass}"><strong>Probabilité de succès: ${probabilite}</strong></div>`;
+                    strategieRecommandee.innerHTML = strategie;
+                    facteursRisque.innerHTML = facteurs;
+                    sevrageResultats.style.display = 'block';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+                  
